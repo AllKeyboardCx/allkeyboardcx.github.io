@@ -14,13 +14,16 @@
     <link href="css/sidebar.css" rel="stylesheet" />
     <style>
         #live2d-container {
-            position: fixed;
-            left: 60px;
-            bottom: -30px;
-            width: 280px;
-            height: 360px;
+            position: fixed !important;
+            left: 60px !important;
+            bottom: -80px !important;
+            width: 280px !important;
+            height: 360px !important;
             z-index: 1000;
             pointer-events: auto;
+        }
+        .l2d-widget {
+            position: static !important;
         }
     </style>
 </head>
@@ -213,7 +216,7 @@
                         width: 280,
                         height: 360,
                         positionX: 0.5,
-                        positionY: 0.5,
+                        positionY: 0.2,
                         scale: 1
                     },
                     mobile: {
