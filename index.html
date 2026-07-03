@@ -12,6 +12,17 @@
     <link href="css/styles.css" rel="stylesheet" />
     <!-- 侧边栏专用样式 -->
     <link href="css/sidebar.css" rel="stylesheet" />
+    <style>
+        #live2d-container {
+            position: fixed;
+            left: 60px;
+            bottom: 30px;
+            width: 280px;
+            height: 360px;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -157,6 +168,9 @@
                 </div>
             </div>
 
+            <!-- Live2D看板娘 -->
+            <div id="live2d-container"></div>
+
             <!-- 页脚 -->
             <footer class="py-5 bg-black">
                 <div class="container"><p class="m-0 text-center text-white">Copyright &copy; AllKeyboardCx 2026</p></div>
@@ -166,6 +180,8 @@
 
     <!-- Bootstrap core JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Live2D CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.0.4/lib/L2Dwidget.min.js"></script>
     <!-- 侧边栏交互 JavaScript -->
     <script src="js/sidebar.js"></script>
     <!-- Core theme JS -->
@@ -178,12 +194,52 @@
             loadTags();
             loadComments();
             loadStats();
+            initLive2D();
             
             document.getElementById('comment-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 submitComment();
             });
         });
+
+        function initLive2D() {
+            try {
+                L2Dwidget.init({
+                    model: {
+                        jsonPath: 'KianaModel/model.json'
+                    },
+                    display: {
+                        superSample: 2,
+                        width: 280,
+                        height: 360,
+                        positionX: 0.5,
+                        positionY: 0.5,
+                        scale: 1
+                    },
+                    mobile: {
+                        show: true,
+                        scale: 0.5
+                    },
+                    react: {
+                        opacityDefault: 1,
+                        opacityOnHover: 1
+                    },
+                    dev: {
+                        border: false
+                    },
+                    plugin: {
+                        mouseWheel: false,
+                        tap: true
+                    },
+                    storage: {
+                        enable: true
+                    },
+                    container: '#live2d-container'
+                });
+            } catch (error) {
+                console.error('Live2D初始化失败:', error);
+            }
+        }
 
         function showQQModal() {
             const modalHtml = `
