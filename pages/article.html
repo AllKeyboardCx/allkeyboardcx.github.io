@@ -25,6 +25,7 @@
             <li class="sidebar-nav-item"><a href="tools.html">🔧 工具分享</a></li>
             <li class="sidebar-nav-item"><a href="notes.html">📝 学习笔记</a></li>
             <li class="sidebar-nav-item"><a href="about.html">📬 关于我</a></li>
+            <li class="sidebar-nav-item"><a href="admin.html">⚙️ 管理后台</a></li>
         </ul>
         <div class="sidebar-footer">
             <small>© 2026 AllKeyboardCx</small>
@@ -99,6 +100,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.1/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script>
+        function parseFrontmatter(content) {
+            const frontmatterRegex = /^---\n([\s\S]*?)\n---\n/;
+            const match = content.match(frontmatterRegex);
+            if (!match) {
+                return { data: {}, body: content };
+            }
+            const body = content.slice(match[0].length);
+            const data = {};
+            const frontmatter = match[1];
+            const lines = frontmatter.split('\n');
+            for (const line of lines) {
+                if (!line.trim()) continue;
+                if (line.includes(': ')) {
+                    const [key, ...rest] = line.split(': ');
+                    let value = rest.join(': ');
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.slice(1, -1);
+                    } else if (value.startsWith('[') && value.endsWith(']')) {
+                        try {
+                            value = JSON.parse(value);
+                        } catch {}
+                    }
+                    data[key.trim()] = value;
+                }
+            }
+            return { data, body };
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const category = urlParams.get('category');
@@ -121,7 +150,8 @@
                     return response.text();
                 })
                 .then(mdContent => {
-                    const htmlContent = marked.parse(mdContent);
+                    const { data, body } = parseFrontmatter(mdContent);
+                    const htmlContent = marked.parse(body);
                     document.getElementById('article-content').innerHTML = htmlContent;
                     
                     document.querySelectorAll('pre code').forEach(block => {
@@ -133,17 +163,12 @@
                         document.title = titleElement.textContent + ' - AllKeyboardCx';
                     }
                     
-                    fetch(`../content/${category}/index.json`)
-                        .then(res => res.json())
-                        .then(posts => {
-                            const post = posts.find(p => p.filename === file);
-                            if (post) {
-                                const tagsContainer = document.getElementById('article-tags');
-                                tagsContainer.innerHTML = post.tags.map(tag => 
-                                    `<span class="badge bg-secondary me-1">${tag}</span>`
-                                ).join('');
-                            }
-                        });
+                    if (data.tags && Array.isArray(data.tags)) {
+                        const tagsContainer = document.getElementById('article-tags');
+                        tagsContainer.innerHTML = data.tags.map(tag => 
+                            `<span class="badge bg-secondary me-1">${tag}</span>`
+                        ).join('');
+                    }
                 })
                 .catch(error => {
                     document.getElementById('article-content').innerHTML = `

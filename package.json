@@ -1,0 +1,11 @@
+{
+  "name": "allkeyboardcx-blog",
+  "version": "1.0.0",
+  "description": "AllKeyboardCx's personal blog",
+  "scripts": {
+    "build": "node scripts/build-index.js",
+    "dev": "node scripts/build-index.js && python -m http.server 8000"
+  },
+  "author": "AllKeyboardCx",
+  "license": "MIT"
+}

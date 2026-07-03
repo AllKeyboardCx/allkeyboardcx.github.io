@@ -1,3 +1,10 @@
+---
+title: "栈溢出漏洞利用完全指南"
+date: "2026-06-20"
+tags: ["StackOverflow", "ROP", "漏洞利用"]
+summary: "从基础原理到高级技巧，全面讲解栈溢出的各种利用方式..."
+---
+
 # 栈溢出漏洞利用完全指南
 
 ## 什么是栈溢出
@@ -50,8 +57,3 @@ payload = padding + eip + shellcode
 ```python
 rop_chain = p32(write_addr) + p32(next_addr) + p32(fd) + p32(buf) + p32(len)
 ```
-
----
-
-**Tags:** StackOverflow, ROP, 漏洞利用
-**Date:** 2026-06-20

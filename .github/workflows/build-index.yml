@@ -1,0 +1,32 @@
+name: Build Index
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'content/**/*.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Run build script
+        run: node scripts/build-index.js
+      
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'Auto-update index.json'
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
