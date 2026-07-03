@@ -44,8 +44,8 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="../index.html">首页</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">归档</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">学习笔记</a></li>
+                        <li class="nav-item"><a class="nav-link" href="search.html">归档</a></li>
+                        <li class="nav-item"><a class="nav-link" href="security.html">博客</a></li>
                         <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
                     </ul>
                 </div>
@@ -169,10 +169,12 @@ encrypted = cipher.encrypt(b"secret data")</code></pre>
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🔍 搜索笔记</div>
                         <div class="card-body">
-                            <div class="input-group">
-                                <input class="form-control bg-gray text-light" type="text" placeholder="搜索学习笔记..." aria-label="搜索" />
-                                <button class="btn btn-primary" type="button">Go!</button>
-                            </div>
+                            <form action="search.html" method="get">
+                                <div class="input-group">
+                                    <input class="form-control bg-gray text-light" type="text" name="q" placeholder="搜索学习笔记..." aria-label="搜索" />
+                                    <button class="btn btn-primary" type="submit">Go!</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="card mb-4 bg-dark border-gray">

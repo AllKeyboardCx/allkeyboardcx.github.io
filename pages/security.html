@@ -44,7 +44,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="../index.html">首页</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">归档</a></li>
+                        <li class="nav-item"><a class="nav-link" href="search.html">归档</a></li>
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">安全研究</a></li>
                         <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
                     </ul>
@@ -70,10 +70,13 @@
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🔍 搜索</div>
                         <div class="card-body">
-                            <div class="input-group">
-                                <input class="form-control bg-gray text-light" type="text" placeholder="搜索安全研究文章..." aria-label="搜索" />
-                                <button class="btn btn-primary" type="button">Go!</button>
-                            </div>
+                            <form action="search.html" method="get">
+                                <div class="input-group">
+                                    <input class="form-control bg-gray text-light" type="text" name="q" placeholder="搜索安全研究文章..." aria-label="搜索" />
+                                    <input type="hidden" name="category" value="security" />
+                                    <button class="btn btn-primary" type="submit">Go!</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="card mb-4 bg-dark border-gray">
@@ -86,7 +89,7 @@
                         <div class="card-header text-light">📊 统计信息</div>
                         <div class="card-body">
                             <p class="text-light">共 <span class="text-primary" id="article-count">0</span> 篇文章</p>
-                            <p class="text-light">总阅读量 <span class="text-primary">3,520</span></p>
+                            <p class="text-light">总阅读量 <span class="text-primary" id="total-views">0</span></p>
                         </div>
                     </div>
                 </div>
@@ -104,18 +107,28 @@
                 .then(response => response.json())
                 .then(posts => {
                     const listContainer = document.getElementById('article-list');
-                    listContainer.innerHTML = posts.map(post => `
+                    listContainer.innerHTML = posts.map(post => {
+                        const views = parseInt(localStorage.getItem(`views_security_${post.filename}`) || '0');
+                        return `
                         <a href="article.html?category=security&file=${post.filename}" class="list-group-item list-group-item-action bg-dark text-light border-gray">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">${post.title}</h5>
                                 <small class="text-muted">${post.date}</small>
                             </div>
                             <p class="mb-1">${post.summary}</p>
-                            <small class="text-muted">#${post.tags.join(' #')}</small>
+                            <div class="d-flex w-100 justify-content-between">
+                                <small class="text-muted">#${post.tags.join(' #')}</small>
+                                <small class="text-muted">阅读量: ${views}</small>
+                            </div>
                         </a>
-                    `).join('');
+                    `}).join('');
                     
                     document.getElementById('article-count').textContent = posts.length;
+                    
+                    const totalViews = posts.reduce((sum, post) => {
+                        return sum + parseInt(localStorage.getItem(`views_security_${post.filename}`) || '0');
+                    }, 0);
+                    document.getElementById('total-views').textContent = totalViews.toLocaleString();
                     
                     const allTags = posts.reduce((tags, post) => [...tags, ...post.tags], []);
                     const tagCounts = {};
@@ -124,7 +137,7 @@
                     });
                     const tagCloud = document.getElementById('tag-cloud');
                     tagCloud.innerHTML = Object.entries(tagCounts).map(([tag, count]) => 
-                        `<span class="badge bg-secondary me-1 mb-1">${tag} (${count})</span>`
+                        `<a href="search.html?q=${encodeURIComponent(tag)}" class="badge bg-secondary me-1 mb-1 text-decoration-none">${tag} (${count})</a>`
                     ).join('');
                 })
                 .catch(error => {

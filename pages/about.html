@@ -44,8 +44,8 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="../index.html">首页</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">归档</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">博客</a></li>
+                        <li class="nav-item"><a class="nav-link" href="search.html">归档</a></li>
+                        <li class="nav-item"><a class="nav-link" href="security.html">博客</a></li>
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">关于</a></li>
                     </ul>
                 </div>
@@ -154,15 +154,15 @@
                         <div class="card-body">
                             <div class="row text-center">
                                 <div class="col-4">
-                                    <p class="text-primary fs-3">70+</p>
+                                    <p class="text-primary fs-3" id="stat-articles">0</p>
                                     <p class="text-muted small">文章数</p>
                                 </div>
                                 <div class="col-4">
-                                    <p class="text-primary fs-3">25K</p>
+                                    <p class="text-primary fs-3" id="stat-views">0</p>
                                     <p class="text-muted small">阅读量</p>
                                 </div>
                                 <div class="col-4">
-                                    <p class="text-primary fs-3">3年</p>
+                                    <p class="text-primary fs-3" id="stat-days">0</p>
                                     <p class="text-muted small">运营时长</p>
                                 </div>
                             </div>
@@ -198,5 +198,49 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Promise.all([
+                fetch('../content/security/index.json?t=' + Date.now()).then(r => r.json()),
+                fetch('../content/binary/index.json?t=' + Date.now()).then(r => r.json()),
+                fetch('../content/web-security/index.json?t=' + Date.now()).then(r => r.json())
+            ])
+            .then(([securityPosts, binaryPosts, webPosts]) => {
+                const allPosts = [...securityPosts, ...binaryPosts, ...webPosts];
+                document.getElementById('stat-articles').textContent = allPosts.length;
+
+                let totalViews = 0;
+                securityPosts.forEach(post => {
+                    totalViews += parseInt(localStorage.getItem(`views_security_${post.filename}`) || '0');
+                });
+                binaryPosts.forEach(post => {
+                    totalViews += parseInt(localStorage.getItem(`views_binary_${post.filename}`) || '0');
+                });
+                webPosts.forEach(post => {
+                    totalViews += parseInt(localStorage.getItem(`views_web-security_${post.filename}`) || '0');
+                });
+                document.getElementById('stat-views').textContent = totalViews.toLocaleString();
+
+                const startDate = new Date('2026-07-03');
+                const today = new Date();
+                const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                document.getElementById('stat-days').textContent = days + '天';
+
+                const recentPosts = allPosts.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+                const recentListContainer = document.querySelector('.card-body ul.list-unstyled');
+                if (recentListContainer) {
+                    recentListContainer.innerHTML = recentPosts.map(post => {
+                        let category = 'security';
+                        if (binaryPosts.some(p => p.filename === post.filename)) category = 'binary';
+                        else if (webPosts.some(p => p.filename === post.filename)) category = 'web-security';
+                        return `<li><a href="article.html?category=${category}&file=${post.filename}" class="text-light text-decoration-none">${post.title}</a></li>`;
+                    }).join('');
+                }
+            })
+            .catch(error => {
+                console.error('加载统计数据失败:', error);
+            });
+        });
+    </script>
 </body>
 </html>

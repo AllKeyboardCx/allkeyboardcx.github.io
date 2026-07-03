@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="我的个人博客 - 深色主题" />
     <meta name="author" content="AllKeyboardCx" />
-    <title>我的博客 - 深色主题</title>
+    <title>AllKeyboard的小屋</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Core theme CSS (includes Bootstrap)-->
@@ -104,20 +104,18 @@
                         <div class="card mb-4">
                             <div class="card-header">搜索</div>
                             <div class="card-body">
-                                <div class="input-group">
-                                    <input class="form-control" type="text" placeholder="搜索..." aria-label="搜索" />
-                                    <button class="btn btn-primary" type="button">Go!</button>
-                                </div>
+                                <form action="pages/search.html" method="get">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" name="q" placeholder="搜索..." aria-label="搜索" />
+                                        <button class="btn btn-primary" type="submit">Go!</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         <div class="card mb-4">
                             <div class="card-header">标签云</div>
-                            <div class="card-body">
-                                <span class="badge bg-secondary me-1">Pwn</span>
-                                <span class="badge bg-secondary me-1">Web</span>
-                                <span class="badge bg-secondary me-1">逆向</span>
-                                <span class="badge bg-secondary me-1">CTF</span>
-                                <span class="badge bg-secondary">Linux</span>
+                            <div class="card-body" id="home-tag-cloud">
+                                <span class="text-muted">加载中...</span>
                             </div>
                         </div>
                     </div>
@@ -137,5 +135,30 @@
     <script src="js/sidebar.js"></script>
     <!-- Core theme JS -->
     <script src="js/scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Promise.all([
+                fetch('content/security/index.json?t=' + Date.now()).then(r => r.json()),
+                fetch('content/binary/index.json?t=' + Date.now()).then(r => r.json()),
+                fetch('content/web-security/index.json?t=' + Date.now()).then(r => r.json())
+            ])
+            .then(([securityPosts, binaryPosts, webPosts]) => {
+                const allPosts = [...securityPosts, ...binaryPosts, ...webPosts];
+                const allTags = allPosts.reduce((tags, post) => [...tags, ...post.tags], []);
+                const tagCounts = {};
+                allTags.forEach(tag => {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                });
+                const tagCloud = document.getElementById('home-tag-cloud');
+                tagCloud.innerHTML = Object.entries(tagCounts).map(([tag, count]) => 
+                    `<a href="pages/search.html?q=${encodeURIComponent(tag)}" class="badge bg-secondary me-1 mb-1 text-decoration-none">${tag} (${count})</a>`
+                ).join('');
+            })
+            .catch(error => {
+                console.error('加载标签云失败:', error);
+                document.getElementById('home-tag-cloud').innerHTML = '<span class="text-muted">加载失败</span>';
+            });
+        });
+    </script>
 </body>
 </html>

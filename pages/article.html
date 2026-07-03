@@ -45,8 +45,8 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="../index.html">首页</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">归档</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">博客</a></li>
+                        <li class="nav-item"><a class="nav-link" href="search.html">归档</a></li>
+                        <li class="nav-item"><a class="nav-link" href="security.html">博客</a></li>
                         <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
                     </ul>
                 </div>
@@ -75,10 +75,12 @@
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🔍 搜索</div>
                         <div class="card-body">
-                            <div class="input-group">
-                                <input class="form-control bg-gray text-light" type="text" placeholder="搜索文章..." aria-label="搜索" />
-                                <button class="btn btn-primary" type="button">Go!</button>
-                            </div>
+                            <form action="search.html" method="get">
+                                <div class="input-group">
+                                    <input class="form-control bg-gray text-light" type="text" name="q" placeholder="搜索文章..." aria-label="搜索" />
+                                    <button class="btn btn-primary" type="submit">Go!</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="card mb-4 bg-dark border-gray">
@@ -141,6 +143,10 @@
                 return;
             }
 
+            const viewKey = `views_${category}_${file}`;
+            const views = parseInt(localStorage.getItem(viewKey) || '0');
+            localStorage.setItem(viewKey, views + 1);
+
             fetch(`../content/${category}/${file}.md`)
                 .then(response => {
                     if (!response.ok) throw new Error('文章不存在');
@@ -149,7 +155,10 @@
                 .then(mdContent => {
                     const { data, body } = parseMetadata(mdContent);
                     const htmlContent = marked.parse(body);
-                    document.getElementById('article-content').innerHTML = htmlContent;
+                    document.getElementById('article-content').innerHTML = `
+                        <div class="mb-4 text-muted">阅读量: ${views + 1}</div>
+                        ${htmlContent}
+                    `;
                     
                     document.querySelectorAll('pre code').forEach(block => {
                         hljs.highlightElement(block);
@@ -157,7 +166,7 @@
                     
                     const titleElement = document.querySelector('h1');
                     if (titleElement) {
-                        document.title = titleElement.textContent + ' - AllKeyboardCx';
+                        document.title = titleElement.textContent + ' - AllKeyboard的小屋';
                     }
                 })
                 .catch(error => {
