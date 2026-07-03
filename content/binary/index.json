@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "title": "UAF与unlink攻击",
+    "filename": "hitcon2014_stkof-UAF-unlink-堆利用漏洞-堆溢出 - 副本",
+    "date": "2026-07-04",
+    "tags": [
+      "heap",
+      "unlink",
+      "UAF"
+    ],
+    "summary": "利用UAF和unlink攻击手段达到伪造GOT表进而提权的目的"
+  }
+]

@@ -38,7 +38,7 @@ SUMMARY 利用UAF和unlink攻击手段达到伪造GOT表进而提权的目的
 - x86 看 BYREF，有就不加
   
 - x64 不管 BYREF，一律加 8
-![[Pasted image 20260402130116.png]]
+![Pasted image 20260402130116.png](<../pictures/Pasted image 20260402130116.png>)
 
 
 
@@ -60,7 +60,7 @@ SUMMARY 利用UAF和unlink攻击手段达到伪造GOT表进而提权的目的
 
 
 
-![[839b035cac10193376d64c189f291f92.jpg]]
+![839b035cac10193376d64c189f291f92.jpg](<../pictures/839b035cac10193376d64c189f291f92.jpg>)
 
 
 
@@ -72,7 +72,7 @@ SUMMARY 利用UAF和unlink攻击手段达到伪造GOT表进而提权的目的
 ---
 ## 当输入为1时：对应exp alloc函数
 
-![[Pasted image 20260405204221.png]]
+![Pasted image 20260405204221.png](<../pictures/Pasted image 20260405204221.png>)
 
 ### 先看这行代码
 
@@ -150,8 +150,8 @@ s[3] = 第3个堆指针
 [[#题目分析：（看完exp逆向分析版）]]          [[#4. unlink 核心伪造（最关键代码）]]
 
 - target算出s的地址
-- ![[Pasted image 20260406183207.png|669]]
-- ![[Pasted image 20260406183418.png]]
+- <img src="../pictures/Pasted image 20260406183207.png" width="669" alt="Pasted image 20260406183207.png">
+- ![Pasted image 20260406183418.png](<../pictures/Pasted image 20260406183418.png>)
 - 这里s+0x10的原因是：
 - 0x602140 → s\[0] （不用） 
 - 0x602148 → s\[1] （第一个堆） 
@@ -197,7 +197,7 @@ unlink执行完后，会自动计算出：P = target
 ---
 ## exp fill 函数：
 
-![[Pasted image 20260406185809.png]]
+![Pasted image 20260406185809.png](<../pictures/Pasted image 20260406185809.png>)
 
 ### IDA反汇编代码解释：
 
@@ -237,7 +237,7 @@ content  8
 
 ## exp free函数：
 
-![[Pasted image 20260407094146.png]]
+![Pasted image 20260407094146.png](<../pictures/Pasted image 20260407094146.png>)
 
 sub_400B07是释放全局数组的堆块，free则是调用这个函数相当于就是给指定堆块释放
 
@@ -291,7 +291,7 @@ glibc会：
 
 ## 第二、第三个payload：
 
-![[Pasted image 20260407124818.png]]
+![Pasted image 20260407124818.png](<../pictures/Pasted image 20260407124818.png>)
 
 第二个是向已经可控地可写的 chunk2 写入free和puts的got
 第三个则是向第一个chunk写入puts的plt，然后free chunk2
@@ -341,7 +341,7 @@ fill(1, payload)
 
 ## 构造getshell，提权  GOT 劫持
 
-![[Pasted image 20260407174035.png]]
+![Pasted image 20260407174035.png](<../pictures/Pasted image 20260407174035.png>)
 
 - **这里在第一处fill就以及把 free 函数的 got条目给修改了，换成了system的地址**
 ---
