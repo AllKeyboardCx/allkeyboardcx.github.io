@@ -64,9 +64,21 @@
                         </div>
                     </article>
                     <section class="mb-5 mt-5">
-                        <div class="card bg-dark border-gray">
+                        <div class="card">
                             <div class="card-body">
-                                <form class="mb-4"><textarea class="form-control bg-gray text-light" rows="3" placeholder="加入讨论，留下你的评论！"></textarea></form>
+                                <p class="text-muted text-sm mb-4">💡 请友善发言，网络并非法外之地。</p>
+                                <form id="comment-form" class="mb-4">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" id="comment-username" placeholder="请输入您的昵称" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <textarea class="form-control" id="comment-content" rows="3" placeholder="加入讨论，留下你的评论！" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">发表评论</button>
+                                </form>
+                                <div id="comments-list">
+                                    <div class="text-center text-muted py-4">加载评论中...</div>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -266,7 +278,137 @@
                 console.error('加载标签云失败:', error);
                 document.getElementById('tag-cloud').innerHTML = '<span class="text-muted">加载失败</span>';
             });
+
+            document.getElementById('comment-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitComment();
+            });
+            loadComments();
         });
+
+        function generateAvatar(username) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+            ];
+            const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const color = colors[hash % colors.length];
+            const firstChar = username.charAt(0);
+            const displayChar = /[\u4e00-\u9fa5]/.test(firstChar) ? firstChar : firstChar.toUpperCase();
+            
+            return `<div class="rounded-circle" style="width: 50px; height: 50px; background-color: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${displayChar}</div>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        async function loadComments() {
+            const SUPABASE_URL = 'https://dgwuzhngmrksrtdrmjvm.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_fMMt5IGPP8ub6Ys-QfRD4Q_OEse9xv1';
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            const file = urlParams.get('file');
+            const postId = `${category}/${file}`;
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/comments?post_id=eq.${encodeURIComponent(postId)}&order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                if (!response.ok) {
+                    console.error('加载评论失败:', await response.text());
+                    document.getElementById('comments-list').innerHTML = '<div class="text-center text-muted py-4">加载评论失败</div>';
+                    return;
+                }
+                const comments = await response.json();
+                renderComments(comments);
+            } catch (error) {
+                console.error('加载评论失败:', error);
+                document.getElementById('comments-list').innerHTML = '<div class="text-center text-muted py-4">加载评论失败</div>';
+            }
+        }
+
+        function renderComments(comments) {
+            const commentsList = document.getElementById('comments-list');
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<div class="text-center text-muted py-4">暂无评论，快来发表第一条吧！</div>';
+                return;
+            }
+            commentsList.innerHTML = comments.map(comment => `
+                <div class="d-flex mb-4">
+                    <div class="flex-shrink-0">
+                        ${generateAvatar(comment.username)}
+                    </div>
+                    <div class="ms-3">
+                        <div class="fw-bold">${escapeHtml(comment.username)}</div>
+                        <div class="text-muted text-sm">${formatDate(comment.created_at)}</div>
+                        <p>${escapeHtml(comment.content)}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function submitComment() {
+            const SUPABASE_URL = 'https://dgwuzhngmrksrtdrmjvm.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_fMMt5IGPP8ub6Ys-QfRD4Q_OEse9xv1';
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            const file = urlParams.get('file');
+            const postId = `${category}/${file}`;
+
+            const username = document.getElementById('comment-username').value.trim();
+            const content = document.getElementById('comment-content').value.trim();
+            
+            if (!username || !content) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        post_id: postId,
+                        username: username,
+                        content: content,
+                        created_at: new Date().toISOString()
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('发表评论失败:', await response.text());
+                    alert('发表评论失败，请稍后重试');
+                    return;
+                }
+                
+                document.getElementById('comment-form').reset();
+                loadComments();
+            } catch (error) {
+                console.error('发表评论失败:', error);
+                alert('发表评论失败，请稍后重试');
+            }
+        }
     </script>
 </body>
 </html>

@@ -285,3 +285,143 @@ code {
     background-color: rgba(88, 166, 255, 0.2) !important;
     box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
 }
+
+/* 页脚透明 */
+footer {
+    background-color: rgba(13, 17, 23, 0.6) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(88, 166, 255, 0.3) !important;
+}
+
+footer p {
+    color: rgba(201, 209, 217, 0.7) !important;
+}
+
+/* 导航栏透明 */
+.navbar-dark .navbar-brand,
+.navbar-dark .nav-link {
+    color: #c9d1d9 !important;
+}
+
+.navbar-dark .nav-link:hover {
+    color: #f0f6fc !important;
+}
+
+/* badge标签透明 */
+.badge {
+    background-color: rgba(88, 166, 255, 0.3) !important;
+    color: #58a6ff !important;
+    border: 1px solid rgba(88, 166, 255, 0.4) !important;
+}
+
+.badge.bg-secondary {
+    background-color: rgba(106, 115, 125, 0.4) !important;
+    color: #c9d1d9 !important;
+    border-color: rgba(106, 115, 125, 0.5) !important;
+}
+
+/* 文本区域透明 */
+textarea {
+    background-color: rgba(13, 17, 23, 0.5) !important;
+    border: 1px solid rgba(88, 166, 255, 0.4) !important;
+    color: #c9d1d9 !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+textarea::placeholder {
+    color: rgba(201, 209, 217, 0.6);
+}
+
+/* 文章内容区域透明 */
+article {
+    background-color: rgba(22, 27, 34, 0.55) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(88, 166, 255, 0.35) !important;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.4), 0 0 24px rgba(88, 166, 255, 0.15);
+    animation: glowBorderBlue 3s ease-in-out infinite;
+}
+
+/* 文章标题样式 */
+article h1, article h2, article h3, article h4, article h5, article h6 {
+    color: #f0f6fc !important;
+}
+
+article p {
+    color: #c9d1d9 !important;
+}
+
+article figure img {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 评论卡片透明 */
+.comment-card {
+    background-color: rgba(22, 27, 34, 0.55) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(88, 166, 255, 0.35) !important;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.4), 0 0 24px rgba(88, 166, 255, 0.15);
+    animation: glowBorderBlue 3s ease-in-out infinite;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    #live2d-container {
+        left: 20px !important;
+        bottom: -30px !important;
+        width: 140px !important;
+        height: 180px !important;
+    }
+    
+    .card, .list-group-item, .bg-dark, .modal-content, pre {
+        background-color: rgba(22, 27, 34, 0.7) !important;
+    }
+    
+    body {
+        background-image: url('../assets/background.jpg') !important;
+        background-color: #0d1117 !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
+    }
+}
+
+/* 文章列表项透明 */
+.list-group-item.bg-dark {
+    background-color: rgba(22, 27, 34, 0.55) !important;
+    border: 1px solid rgba(88, 166, 255, 0.3) !important;
+}
+
+.list-group-item.bg-dark:hover {
+    background-color: rgba(88, 166, 255, 0.15) !important;
+}
+
+/* 模态框透明 */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(13, 17, 23, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(88, 166, 255, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(88, 166, 255, 0.7);
+}
