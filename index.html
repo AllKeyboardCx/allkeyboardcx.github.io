@@ -208,7 +208,7 @@
             commentsList.innerHTML = comments.map(comment => `
                 <div class="d-flex mb-4">
                     <div class="flex-shrink-0">
-                        <img class="rounded-circle" src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(comment.username)}" alt="${comment.username}" />
+                        ${generateAvatar(comment.username)}
                     </div>
                     <div class="ms-3">
                         <div class="fw-bold">${escapeHtml(comment.username)}</div>
@@ -217,6 +217,19 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        function generateAvatar(username) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+            ];
+            const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const color = colors[hash % colors.length];
+            const firstChar = username.charAt(0);
+            const displayChar = /[\u4e00-\u9fa5]/.test(firstChar) ? firstChar : firstChar.toUpperCase();
+            
+            return `<div class="rounded-circle" style="width: 50px; height: 50px; background-color: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${displayChar}</div>`;
         }
 
         async function submitComment() {
