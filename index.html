@@ -106,6 +106,36 @@
                     </div>
                     <!-- 侧边小部件 (原右侧边栏) -->
                     <div class="col-lg-4">
+                        <div class="card bg-dark border-gray mb-4">
+                            <div class="card-body text-center">
+                                <img src="assets/avatar.jpg" alt="AllKeyboardCx" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; object-position: center;" />
+                                <h3 class="fw-bolder text-light">AllKeyboardCx</h3>
+                                <p class="text-primary text-sm">🔐 网络安全研究员 / CTF选手</p>
+                                <p class="text-muted text-sm mb-3">热爱技术，专注于网络安全领域的研究与分享</p>
+                                <div class="mb-4">
+                                    <a href="https://github.com/allkeyboardcx" target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                                        <span>🐙</span> GitHub
+                                    </a>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="showQQModal()">
+                                        <span>💬</span> QQ
+                                    </button>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="text-primary fw-bold" id="home-stat-articles">0</div>
+                                        <div class="text-muted text-xs">文章数</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-primary fw-bold" id="home-stat-views">0</div>
+                                        <div class="text-muted text-xs">浏览量</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-primary fw-bold" id="home-stat-days">0</div>
+                                        <div class="text-muted text-xs">运营时长</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card mb-4">
                             <div class="card-header">搜索</div>
                             <div class="card-body">
@@ -147,12 +177,40 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadTags();
             loadComments();
+            loadStats();
             
             document.getElementById('comment-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 submitComment();
             });
         });
+
+        function showQQModal() {
+            const modalHtml = `
+                <div class="modal fade" id="qqModal" tabindex="-1" aria-labelledby="qqModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark border-gray">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-light" id="qqModalLabel">💬 我的QQ</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="display-1 mb-3">💬</div>
+                                <p class="text-muted">我的QQ号：</p>
+                                <p class="display-4 text-primary font-bold">702836413</p>
+                                <p class="text-muted mt-3">欢迎添加好友，一起交流学习！</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">知道了</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('qqModal'));
+            modal.show();
+        }
 
         function loadTags() {
             Promise.all([
@@ -176,6 +234,43 @@
                 console.error('加载标签云失败:', error);
                 document.getElementById('home-tag-cloud').innerHTML = '<span class="text-muted">加载失败</span>';
             });
+        }
+
+        async function loadStats() {
+            try {
+                const [securityPosts, binaryPosts, webPosts] = await Promise.all([
+                    fetch('content/security/index.json?t=' + Date.now()).then(r => r.json()),
+                    fetch('content/binary/index.json?t=' + Date.now()).then(r => r.json()),
+                    fetch('content/web-security/index.json?t=' + Date.now()).then(r => r.json())
+                ]);
+                
+                const allPosts = [...securityPosts, ...binaryPosts, ...webPosts];
+                document.getElementById('home-stat-articles').textContent = allPosts.length;
+
+                const startDate = new Date('2026-07-03');
+                const today = new Date();
+                const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                document.getElementById('home-stat-days').textContent = days + '天';
+
+                const paths = [
+                    ...securityPosts.map(p => `security/${p.filename}`),
+                    ...binaryPosts.map(p => `binary/${p.filename}`),
+                    ...webPosts.map(p => `web-security/${p.filename}`)
+                ];
+
+                const pathList = paths.map(p => encodeURIComponent(p)).join(',');
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/views?path=in.(${pathList})`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                const viewsData = await response.json();
+                const totalViews = viewsData.reduce((sum, item) => sum + (item.count || 0), 0);
+                document.getElementById('home-stat-views').textContent = totalViews.toLocaleString();
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
         }
 
         async function loadComments() {
