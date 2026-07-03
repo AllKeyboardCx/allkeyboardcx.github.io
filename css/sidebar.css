@@ -24,7 +24,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.65);
+    background-color: rgba(0, 0, 0, 0.45);
     z-index: -1;
     pointer-events: none;
 }
@@ -166,9 +166,9 @@ body::before {
 .bg-secondary,
 .bg-gray,
 .bg-gray-dark {
-    background-color: rgba(22, 27, 34, 0.55) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(22, 27, 34, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
 .border-gray {
@@ -192,9 +192,9 @@ pre,
 .accordion-item,
 .accordion-button,
 .accordion-button:not(.collapsed) {
-    background-color: rgba(22, 27, 34, 0.55) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(22, 27, 34, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(88, 166, 255, 0.35) !important;
     box-shadow: 0 0 12px rgba(88, 166, 255, 0.4), 0 0 24px rgba(88, 166, 255, 0.15);
     animation: glowBorderBlue 3s ease-in-out infinite;
@@ -206,12 +206,12 @@ pre,
 
 .card-header {
     border-bottom: 1px solid rgba(88, 166, 255, 0.3) !important;
-    background-color: rgba(22, 27, 34, 0.5) !important;
+    background-color: rgba(22, 27, 34, 0.3) !important;
 }
 
 .card-footer {
     border-top: 1px solid rgba(88, 166, 255, 0.3) !important;
-    background-color: rgba(22, 27, 34, 0.5) !important;
+    background-color: rgba(22, 27, 34, 0.3) !important;
 }
 
 .list-group-item-action:hover {
@@ -220,7 +220,7 @@ pre,
 }
 
 pre {
-    background-color: rgba(13, 17, 23, 0.7) !important;
+    background-color: rgba(13, 17, 23, 0.45) !important;
     border: 1px solid rgba(88, 166, 255, 0.35) !important;
     color: #c9d1d9 !important;
 }
@@ -231,9 +231,9 @@ code {
 
 /* 侧边栏透明 */
 #sidebar {
-    background-color: rgba(13, 17, 23, 0.75) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(13, 17, 23, 0.5) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-right: 1px solid rgba(88, 166, 255, 0.4) !important;
     box-shadow: 2px 0 15px rgba(88, 166, 255, 0.3);
 }
@@ -269,20 +269,20 @@ code {
 /* 导航栏透明 */
 .navbar,
 .navbar-dark {
-    background-color: rgba(13, 17, 23, 0.6) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(13, 17, 23, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(88, 166, 255, 0.3);
 }
 
 /* 表单控件透明 */
 .form-control,
 .form-control:focus {
-    background-color: rgba(13, 17, 23, 0.5) !important;
+    background-color: rgba(13, 17, 23, 0.3) !important;
     border: 1px solid rgba(88, 166, 255, 0.4) !important;
     color: #c9d1d9 !important;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .form-control::placeholder {
@@ -291,10 +291,10 @@ code {
 
 /* 按钮透明 */
 .btn-primary {
-    background-color: rgba(88, 166, 255, 0.7) !important;
+    background-color: rgba(88, 166, 255, 0.5) !important;
     border: 1px solid rgba(88, 166, 255, 0.6) !important;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .btn-primary:hover {
@@ -315,9 +315,9 @@ code {
 
 /* 页脚透明 */
 footer {
-    background-color: rgba(13, 17, 23, 0.6) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(13, 17, 23, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid rgba(88, 166, 255, 0.3) !important;
 }
 
@@ -350,11 +350,11 @@ footer p {
 
 /* 文本区域透明 */
 textarea {
-    background-color: rgba(13, 17, 23, 0.5) !important;
+    background-color: rgba(13, 17, 23, 0.3) !important;
     border: 1px solid rgba(88, 166, 255, 0.4) !important;
     color: #c9d1d9 !important;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 textarea::placeholder {
@@ -363,9 +363,9 @@ textarea::placeholder {
 
 /* 文章内容区域透明 */
 article {
-    background-color: rgba(22, 27, 34, 0.55) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(22, 27, 34, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(88, 166, 255, 0.35) !important;
     border-radius: 8px;
     padding: 24px;
@@ -390,9 +390,9 @@ article figure img {
 
 /* 评论卡片透明 */
 .comment-card {
-    background-color: rgba(22, 27, 34, 0.55) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(22, 27, 34, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(88, 166, 255, 0.35) !important;
     box-shadow: 0 0 12px rgba(88, 166, 255, 0.4), 0 0 24px rgba(88, 166, 255, 0.15);
     animation: glowBorderBlue 3s ease-in-out infinite;
@@ -443,13 +443,13 @@ article figure img {
     .list-group-item, .bg-dark, .bg-black, .bg-secondary,
     .bg-gray, .bg-gray-dark, .modal-content, pre,
     .accordion-item, .accordion-button, .accordion-button:not(.collapsed) {
-        background-color: rgba(22, 27, 34, 0.7) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background-color: rgba(22, 27, 34, 0.5) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
     .bg-dark, .bg-black, .bg-secondary, .bg-gray, .bg-gray-dark {
-        background-color: rgba(22, 27, 34, 0.7) !important;
+        background-color: rgba(22, 27, 34, 0.5) !important;
     }
     
     html, body {
@@ -467,23 +467,23 @@ article figure img {
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.65) !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
         z-index: -1;
         pointer-events: none;
     }
     
     article {
-        background-color: rgba(22, 27, 34, 0.7) !important;
+        background-color: rgba(22, 27, 34, 0.5) !important;
     }
     
     #sidebar {
-        background-color: rgba(13, 17, 23, 0.85) !important;
+        background-color: rgba(13, 17, 23, 0.65) !important;
     }
 }
 
 /* 文章列表项透明 */
 .list-group-item.bg-dark {
-    background-color: rgba(22, 27, 34, 0.55) !important;
+    background-color: rgba(22, 27, 34, 0.35) !important;
     border: 1px solid rgba(88, 166, 255, 0.3) !important;
 }
 
