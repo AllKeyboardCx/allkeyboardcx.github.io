@@ -471,14 +471,13 @@
                     return;
                 }
 
-                const data = await response.json();
-                if (data.length === 0) {
-                    alert('未找到要删除的笔记');
-                    return;
-                }
-
                 if (deleteModal) {
                     deleteModal.hide();
+                }
+
+                const noteCard = document.querySelector(`.note-card[data-id="${currentDeleteId}"]`);
+                if (noteCard) {
+                    noteCard.remove();
                 }
 
                 loadNotes();
