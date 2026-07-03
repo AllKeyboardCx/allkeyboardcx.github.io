@@ -10824,3 +10824,95 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+/* 卡片、输入框、下拉菜单等组件背景深色化 */
+.card,
+.card.bg-light,
+.card-header,
+.card-body,
+.form-control,
+.form-control:focus,
+.input-group-text,
+.dropdown-menu,
+.breadcrumb,
+.list-group-item,
+.accordion-item,
+.accordion-button,
+.accordion-button:not(.collapsed) {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333333 !important;
+}
+
+/* 让卡片头部文字更亮 */
+.card-header {
+    color: #f0f0f0 !important;
+    border-bottom-color: #333333 !important;
+}
+
+/* 输入框文字和占位符 */
+.form-control {
+    color: #e0e0e0 !important;
+}
+.form-control::placeholder {
+    color: #888888 !important;
+}
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.3);
+}
+
+/* 评论区域 - 去掉默认的浅色背景 */
+.card.bg-light {
+    background-color: #1a1a1a !important;
+}
+
+/* 文本颜色微调 */
+.text-muted {
+    color: #aaaaaa !important;
+}
+.text-dark {
+    color: #e0e0e0 !important;
+}
+
+/* 链接颜色保持辨识度 */
+a:not(.navbar-brand):not(.badge) {
+    color: #6ea8fe;
+}
+a:not(.navbar-brand):not(.badge):hover {
+    color: #9ec5fe;
+}
+
+/* 列表组边框 */
+.list-group-item {
+    border-color: #333333 !important;
+}
+
+/* 分割线 */
+hr {
+    border-color: #333333;
+    opacity: 1;
+}
+
+/* 小标签徽章在深色背景下的显示 */
+.badge.bg-secondary {
+    background-color: #444444 !important;
+}
+
+/* 侧边栏小部件中的列表 */
+.list-unstyled li a {
+    color: #6ea8fe;
+    text-decoration: none;
+}
+.list-unstyled li a:hover {
+    color: #9ec5fe;
+    text-decoration: underline;
+}
+
+/* 图片圆角保留，但添加边框使其在深色背景下更清晰 */
+.img-fluid.rounded {
+    border: 1px solid #333333;
+}
