@@ -64,7 +64,7 @@
                                 <a href="https://github.com/allkeyboardcx" target="_blank" class="btn btn-outline-primary me-2">
                                     <span>🐙</span> GitHub
                                 </a>
-                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="QQ: 702836413">
+                                <button type="button" class="btn btn-outline-primary" onclick="showQQModal()">
                                     <span>💬</span> QQ
                                 </button>
                             </div>
@@ -190,6 +190,33 @@
     <script>
         const SUPABASE_URL = 'https://dgwuzhngmrksrtdrmjvm.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_fMMt5IGPP8ub6Ys-QfRD4Q_OEse9xv1';
+
+        function showQQModal() {
+            const modalHtml = `
+                <div class="modal fade" id="qqModal" tabindex="-1" aria-labelledby="qqModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark border-gray">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-light" id="qqModalLabel">💬 我的QQ</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="display-1 mb-3">💬</div>
+                                <p class="text-muted">我的QQ号：</p>
+                                <p class="display-4 text-primary font-bold">702836413</p>
+                                <p class="text-muted mt-3">欢迎添加好友，一起交流学习！</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">知道了</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('qqModal'));
+            modal.show();
+        }
 
         async function getTotalViews(paths) {
             try {
