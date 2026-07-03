@@ -60,7 +60,7 @@ SUMMARY 利用UAF和unlink攻击手段达到伪造GOT表进而提权的目的
 
 
 
-![839b035cac10193376d64c189f291f92.jpg](<../pictures/839b035cac10193376d64c189f291f92.jpg>)
+![abc.jpg](<../pictures/abc.jpg>)
 
 
 
