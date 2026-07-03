@@ -3,73 +3,41 @@ const path = require('path');
 
 const CONTENT_DIR = path.join(__dirname, '../content');
 
-function parseFrontmatter(content) {
-    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n/;
-    const match = content.match(frontmatterRegex);
-    
-    if (!match) {
-        console.warn('No frontmatter found');
-        return {
-            data: {
-                title: 'Untitled',
-                date: new Date().toISOString().split('T')[0],
-                tags: [],
-                summary: ''
-            },
-            content: content
-        };
-    }
-    
-    const frontmatter = match[1];
-    const body = content.slice(match[0].length);
-    const data = {};
-    
-    const lines = frontmatter.split('\n');
-    let currentKey = '';
-    let currentValue = '';
-    
-    for (const line of lines) {
-        if (!line.trim()) continue;
-        
-        if (line.includes(': ')) {
-            if (currentKey) {
-                data[currentKey] = parseValue(currentValue.trim());
-            }
-            const [key, ...rest] = line.split(': ');
-            currentKey = key.trim();
-            currentValue = rest.join(': ');
-        } else {
-            currentValue += '\n' + line;
-        }
-    }
-    
-    if (currentKey) {
-        data[currentKey] = parseValue(currentValue.trim());
-    }
-    
-    return {
-        data: {
-            title: data.title || 'Untitled',
-            date: data.date || new Date().toISOString().split('T')[0],
-            tags: Array.isArray(data.tags) ? data.tags : [],
-            summary: data.summary || ''
-        },
-        content: body
+function parseMetadata(content) {
+    const lines = content.split('\n');
+    const data = {
+        title: 'Untitled',
+        date: '',
+        tags: [],
+        summary: ''
     };
-}
-
-function parseValue(value) {
-    if (value.startsWith('"') && value.endsWith('"')) {
-        return value.slice(1, -1);
-    }
-    if (value.startsWith('[') && value.endsWith(']')) {
-        try {
-            return JSON.parse(value);
-        } catch {
-            return value;
+    
+    let bodyStart = 0;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        if (line.startsWith('TITLE ')) {
+            data.title = line.substring(6).trim();
+            bodyStart = i + 1;
+        } else if (line.startsWith('DATE ')) {
+            data.date = line.substring(5).trim();
+            bodyStart = i + 1;
+        } else if (line.startsWith('SUMMARY ')) {
+            data.summary = line.substring(8).trim();
+            bodyStart = i + 1;
+        } else if (line.startsWith('TAG ')) {
+            const tagStr = line.substring(4).trim();
+            data.tags = tagStr ? tagStr.split(',').map(t => t.trim()).filter(t => t) : [];
+            bodyStart = i + 1;
+        } else if (line.startsWith('# ') || line.startsWith('## ') || line.startsWith('### ') || line.startsWith('#### ') || line.startsWith('##### ') || line.startsWith('###### ') || (line && !line.startsWith('TITLE') && !line.startsWith('DATE') && !line.startsWith('SUMMARY') && !line.startsWith('TAG'))) {
+            break;
         }
     }
-    return value;
+    
+    const body = lines.slice(bodyStart).join('\n').trim();
+    
+    return { data, body };
 }
 
 function buildIndex() {
@@ -87,12 +55,15 @@ function buildIndex() {
         for (const file of files) {
             const filePath = path.join(categoryDir, file);
             const content = fs.readFileSync(filePath, 'utf-8');
-            const { data } = parseFrontmatter(content);
+            const { data } = parseMetadata(content);
+            
+            const stat = fs.statSync(filePath);
+            const defaultDate = stat.mtime.toISOString().split('T')[0];
             
             posts.push({
                 title: data.title,
                 filename: file.replace('.md', ''),
-                date: data.date,
+                date: data.date || defaultDate,
                 tags: data.tags,
                 summary: data.summary
             });
