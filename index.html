@@ -21,6 +21,15 @@
             height: 260px !important;
             z-index: 1000;
             pointer-events: auto;
+            right: auto !important;
+        }
+        #live2d-widget,
+        #live2d-container > div {
+            position: static !important;
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
         }
         .l2d-widget {
             position: static !important;
@@ -209,7 +218,7 @@
             try {
                 L2Dwidget.init({
                     model: {
-                        jsonPath: 'KianaModel/model.json'
+                        jsonPath: 'KianaModel/model.model.json'
                     },
                     display: {
                         superSample: 2,
@@ -239,10 +248,60 @@
                     },
                     container: '#live2d-container'
                 });
+
+                // 强制设置看板娘位置
+                setTimeout(function() {
+                    fixLive2DPosition();
+                }, 500);
+
+                // 重复检查，确保位置正确
+                var fixCount = 0;
+                var fixInterval = setInterval(function() {
+                    fixLive2DPosition();
+                    fixCount++;
+                    if (fixCount > 10) clearInterval(fixInterval);
+                }, 1000);
             } catch (error) {
                 console.error('Live2D初始化失败:', error);
             }
         }
+
+        function fixLive2DPosition() {
+            var container = document.getElementById('live2d-container');
+            if (!container) return;
+
+            var isMobile = window.innerWidth <= 768;
+            var left = isMobile ? '20px' : '60px';
+            var bottom = isMobile ? '-30px' : '-50px';
+            var width = isMobile ? '140px' : '200px';
+            var height = isMobile ? '180px' : '260px';
+
+            container.style.position = 'fixed';
+            container.style.left = left;
+            container.style.right = 'auto';
+            container.style.bottom = bottom;
+            container.style.top = 'auto';
+            container.style.width = width;
+            container.style.height = height;
+            container.style.zIndex = '1000';
+            container.style.transform = 'none';
+            container.style.float = 'none';
+
+            // 修复内部元素
+            var children = container.querySelectorAll('*');
+            children.forEach(function(el) {
+                if (el.style.position === 'fixed' || el.style.position === 'absolute') {
+                    el.style.position = 'static';
+                    el.style.left = 'auto';
+                    el.style.right = 'auto';
+                    el.style.top = 'auto';
+                    el.style.bottom = 'auto';
+                    el.style.transform = 'none';
+                }
+            });
+        }
+
+        window.addEventListener('resize', fixLive2DPosition);
 
         function showQQModal() {
             const modalHtml = `

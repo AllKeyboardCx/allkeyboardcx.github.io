@@ -160,6 +160,17 @@ body::before {
     -webkit-backdrop-filter: blur(8px);
 }
 
+/* 强制所有深色背景类透明 */
+.bg-dark,
+.bg-black,
+.bg-secondary,
+.bg-gray,
+.bg-gray-dark {
+    background-color: rgba(22, 27, 34, 0.55) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
 .border-gray {
     border-color: rgba(88, 166, 255, 0.4) !important;
 }
@@ -170,10 +181,17 @@ body::before {
 
 /* 卡片透明 + 发光边框 */
 .card,
+.card-header,
+.card-body,
+.card-footer,
 .list-group-item,
 .bg-dark,
+.bg-black,
 .modal-content,
-pre {
+pre,
+.accordion-item,
+.accordion-button,
+.accordion-button:not(.collapsed) {
     background-color: rgba(22, 27, 34, 0.55) !important;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -182,8 +200,17 @@ pre {
     animation: glowBorderBlue 3s ease-in-out infinite;
 }
 
+.card {
+    border: 1px solid rgba(88, 166, 255, 0.35) !important;
+}
+
 .card-header {
     border-bottom: 1px solid rgba(88, 166, 255, 0.3) !important;
+    background-color: rgba(22, 27, 34, 0.5) !important;
+}
+
+.card-footer {
+    border-top: 1px solid rgba(88, 166, 255, 0.3) !important;
     background-color: rgba(22, 27, 34, 0.5) !important;
 }
 
@@ -371,6 +398,23 @@ article figure img {
     animation: glowBorderBlue 3s ease-in-out infinite;
 }
 
+/* Live2D 看板娘强制位置（防止被库内联样式覆盖） */
+#live2d-container {
+    position: fixed !important;
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+}
+
+#live2d-container > * {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    float: none !important;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
     #live2d-container {
@@ -378,18 +422,62 @@ article figure img {
         bottom: -30px !important;
         width: 140px !important;
         height: 180px !important;
+        right: auto !important;
     }
     
-    .card, .list-group-item, .bg-dark, .modal-content, pre {
+    #live2d-container canvas,
+    #live2d-container > div {
+        position: static !important;
+        transform: none !important;
+        left: auto !important;
+        right: auto !important;
+    }
+    
+    .l2d-widget {
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+    }
+    
+    .card, .card-header, .card-body, .card-footer,
+    .list-group-item, .bg-dark, .bg-black, .bg-secondary,
+    .bg-gray, .bg-gray-dark, .modal-content, pre,
+    .accordion-item, .accordion-button, .accordion-button:not(.collapsed) {
+        background-color: rgba(22, 27, 34, 0.7) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .bg-dark, .bg-black, .bg-secondary, .bg-gray, .bg-gray-dark {
         background-color: rgba(22, 27, 34, 0.7) !important;
     }
     
-    body {
+    html, body {
         background-image: url('../assets/background.jpg') !important;
         background-color: #0d1117 !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.65) !important;
+        z-index: -1;
+        pointer-events: none;
+    }
+    
+    article {
+        background-color: rgba(22, 27, 34, 0.7) !important;
+    }
+    
+    #sidebar {
+        background-color: rgba(13, 17, 23, 0.85) !important;
     }
 }
 
