@@ -198,18 +198,26 @@
                 return;
             }
             notesList.innerHTML = notes.map(note => `
-                <div class="card mb-4">
-                    <div class="card-header">
+                <div class="card mb-4 note-card" data-id="${note.id}">
+                    <div class="card-header" style="cursor: pointer;" onclick="toggleNote(${note.id})">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h3 class="h4 text-light">${escapeHtml(note.title)}</h3>
-                            <span class="small text-muted">${formatDate(note.created_at)}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="note-toggle text-light" id="toggle-${note.id}">▶</span>
+                                <h3 class="h4 text-light mb-0">${escapeHtml(note.title)}</h3>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="small text-muted">${formatDate(note.created_at)}</span>
+                                <button class="btn btn-outline-danger btn-sm" onclick="event.stopPropagation(); confirmDelete(${note.id})" title="删除笔记">
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body note-content">
+                    <div class="card-body note-content" id="note-body-${note.id}" style="display: none;">
                         ${marked.parse(note.content)}
                     </div>
-                    <div class="card-footer text-muted">
-                        <span>👁️ 浏览量: ${note.views || 0}</span>
+                    <div class="card-footer text-muted" id="note-footer-${note.id}" style="display: none;">
+                        <span>👁️ 浏览量: <span id="views-${note.id}">${note.views || 0}</span></span>
                     </div>
                 </div>
             `).join('');
@@ -264,6 +272,80 @@
             }
         }
 
+        function toggleNote(id) {
+            const body = document.getElementById(`note-body-${id}`);
+            const footer = document.getElementById(`note-footer-${id}`);
+            const toggle = document.getElementById(`toggle-${id}`);
+            
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                footer.style.display = 'block';
+                toggle.textContent = '▼';
+                incrementView(id);
+            } else {
+                body.style.display = 'none';
+                footer.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
+
+        function hasViewed(id) {
+            const viewed = JSON.parse(localStorage.getItem('viewed-notes') || '{}');
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            
+            if (viewed[id] && (now - viewed[id]) < oneDay) {
+                return true;
+            }
+            return false;
+        }
+
+        function markViewed(id) {
+            const viewed = JSON.parse(localStorage.getItem('viewed-notes') || '{}');
+            viewed[id] = Date.now();
+            localStorage.setItem('viewed-notes', JSON.stringify(viewed));
+        }
+
+        async function incrementView(id) {
+            if (hasViewed(id)) {
+                return;
+            }
+
+            markViewed(id);
+
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            const newViews = (note.views || 0) + 1;
+            note.views = newViews;
+            const viewsEl = document.getElementById(`views-${id}`);
+            if (viewsEl) {
+                viewsEl.textContent = newViews;
+            }
+            updateStats();
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/notes?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        views: newViews
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('更新浏览量失败:', await response.text());
+                }
+            } catch (error) {
+                console.error('更新浏览量失败:', error);
+            }
+        }
+
         function searchNotes() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filtered = allNotes.filter(note => 
@@ -315,6 +397,78 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        let currentDeleteId = null;
+
+        function confirmDelete(id) {
+            currentDeleteId = id;
+            const modalHtml = `
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark border-gray">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-light" id="deleteModalLabel">⚠️ 确认删除</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-light">确定要删除这篇笔记吗？此操作不可撤销。</p>
+                                <div class="mb-3">
+                                    <label class="form-label text-light">请输入删除口令：</label>
+                                    <input type="password" class="form-control" id="delete-password" placeholder="请输入口令" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-danger" onclick="deleteNote()">确认删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (!document.getElementById('deleteModal')) {
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            }
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            document.getElementById('delete-password').value = '';
+            modal.show();
+        }
+
+        async function deleteNote() {
+            const password = document.getElementById('delete-password').value.trim();
+            
+            if (password !== PASSWORD) {
+                alert('口令错误！');
+                return;
+            }
+
+            if (!currentDeleteId) return;
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/notes?id=eq.${currentDeleteId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('删除笔记失败:', await response.text());
+                    alert('删除笔记失败，请稍后重试');
+                    return;
+                }
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                modal.hide();
+                
+                loadNotes();
+                alert('删除成功！');
+            } catch (error) {
+                console.error('删除笔记失败:', error);
+                alert('删除笔记失败，请稍后重试');
+            }
         }
     </script>
 </body>
