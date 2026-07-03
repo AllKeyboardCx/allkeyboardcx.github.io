@@ -117,7 +117,7 @@
             const lines = content.split('\n');
             const data = { title: '', summary: '', tags: [] };
             let bodyStart = 0;
-            
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (line.startsWith('TITLE ')) {
@@ -134,9 +134,54 @@
                     break;
                 }
             }
-            
+
             const body = lines.slice(bodyStart).join('\n').trim();
             return { data, body };
+        }
+
+        function generateTOC(htmlString) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+
+            const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            if (headings.length === 0) {
+                return { html: htmlString, toc: '' };
+            }
+
+            const usedIds = {};
+
+            headings.forEach((heading, index) => {
+                const text = heading.textContent.trim();
+                let baseId = text
+                    .toLowerCase()
+                    .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+
+                if (!baseId) baseId = `heading-${index}`;
+
+                let id = baseId;
+                if (usedIds[id]) {
+                    usedIds[id]++;
+                    id = `${baseId}-${usedIds[baseId]}`;
+                } else {
+                    usedIds[id] = 1;
+                }
+
+                heading.id = id;
+            });
+
+            let tocHtml = '<div class="article-toc"><div class="toc-title">📑 目录</div><ul class="toc-list">';
+            headings.forEach(heading => {
+                const level = parseInt(heading.tagName.substring(1));
+                const text = heading.textContent.trim();
+                const id = heading.id;
+                tocHtml += `<li class="toc-item toc-level-${level}"><a href="#${id}">${escapeHtml(text)}</a></li>`;
+            });
+            tocHtml += '</ul></div>';
+
+            return { html: tempDiv.innerHTML, toc: tocHtml };
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -232,15 +277,17 @@
                     .then(mdContent => {
                         const { data, body } = parseMetadata(mdContent);
                         const htmlContent = marked.parse(body);
+                        const { html: finalHtml, toc } = generateTOC(htmlContent);
                         document.getElementById('article-content').innerHTML = `
                             <div class="mb-4 text-muted">阅读量: ${viewCount}</div>
-                            ${htmlContent}
+                            ${toc}
+                            ${finalHtml}
                         `;
-                        
+
                         document.querySelectorAll('pre code').forEach(block => {
                             hljs.highlightElement(block);
                         });
-                        
+
                         const titleElement = document.querySelector('h1');
                         if (titleElement) {
                             document.title = titleElement.textContent + ' - AllKeyboard的小屋';

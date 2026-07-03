@@ -2,6 +2,11 @@ html, body {
     height: 100%;
 }
 
+html {
+    scroll-padding-top: 80px;
+    scroll-behavior: smooth;
+}
+
 body {
     background-image: url('../assets/background.jpg') !important;
     background-color: #0d1117 !important;
@@ -273,6 +278,9 @@ code {
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(88, 166, 255, 0.3);
+    position: sticky !important;
+    top: 0;
+    z-index: 1030;
 }
 
 /* 表单控件透明 */
@@ -387,6 +395,60 @@ article figure img {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
+/* 文章目录 TOC */
+.article-toc {
+    background-color: rgba(22, 27, 34, 0.35) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(88, 166, 255, 0.35) !important;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.4), 0 0 24px rgba(88, 166, 255, 0.15);
+}
+
+.article-toc .toc-title {
+    color: #f0f6fc;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(88, 166, 255, 0.3);
+}
+
+.article-toc .toc-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.article-toc .toc-item {
+    margin: 4px 0;
+}
+
+.article-toc .toc-item a {
+    color: #c9d1d9;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    line-height: 1.4;
+}
+
+.article-toc .toc-item a:hover {
+    background-color: rgba(88, 166, 255, 0.15);
+    color: #f0f6fc;
+}
+
+.article-toc .toc-level-1 { padding-left: 0; font-weight: 600; }
+.article-toc .toc-level-2 { padding-left: 18px; }
+.article-toc .toc-level-3 { padding-left: 36px; }
+.article-toc .toc-level-4 { padding-left: 54px; }
+.article-toc .toc-level-5 { padding-left: 72px; }
+.article-toc .toc-level-6 { padding-left: 90px; }
 
 /* 评论卡片透明 */
 .comment-card {
@@ -512,4 +574,52 @@ article figure img {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(88, 166, 255, 0.7);
+}
+
+/* 回到顶部按钮 */
+#back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(88, 166, 255, 0.5);
+    border: 1px solid rgba(88, 166, 255, 0.6);
+    color: #f0f6fc;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s, background-color 0.3s, transform 0.3s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+#back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#back-to-top:hover {
+    background-color: rgba(88, 166, 255, 0.8);
+    box-shadow: 0 0 16px rgba(88, 166, 255, 0.7);
+    transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+    #back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
 }
