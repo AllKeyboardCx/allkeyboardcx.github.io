@@ -122,16 +122,7 @@
             const resultsContainer = document.getElementById('search-results');
             const resultCount = document.getElementById('result-count');
             
-            if (!query) {
-                resultsContainer.innerHTML = `
-                    <div class="text-center py-8 text-muted">
-                        <h3>请输入搜索关键词</h3>
-                        <p>在上方搜索框中输入关键词，按回车或点击搜索按钮开始搜索</p>
-                    </div>
-                `;
-                resultCount.textContent = '0';
-                return;
-            }
+            
             
             resultsContainer.innerHTML = `
                 <div class="text-center py-4">
@@ -155,6 +146,7 @@
                 
                 const filteredPosts = allPosts.filter(post => {
                     if (filterCategory && post.category !== filterCategory) return false;
+                    if (!query) return true;
                     const searchText = `${post.title} ${post.summary} ${post.tags.join(' ')}`.toLowerCase();
                     return searchText.includes(query.toLowerCase());
                 });
