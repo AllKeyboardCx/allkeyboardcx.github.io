@@ -83,7 +83,7 @@
                     </div>
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🏷️ 标签云</div>
-                        <div class="card-body" id="article-tags">
+                        <div class="card-body" id="tag-cloud">
                             <span class="text-muted">加载中...</span>
                         </div>
                     </div>
@@ -159,13 +159,6 @@
                     if (titleElement) {
                         document.title = titleElement.textContent + ' - AllKeyboardCx';
                     }
-                    
-                    if (data.tags && data.tags.length > 0) {
-                        const tagsContainer = document.getElementById('article-tags');
-                        tagsContainer.innerHTML = data.tags.map(tag => 
-                            `<span class="badge bg-secondary me-1">${tag}</span>`
-                        ).join('');
-                    }
                 })
                 .catch(error => {
                     document.getElementById('article-content').innerHTML = `
@@ -176,6 +169,28 @@
                         </div>
                     `;
                 });
+            
+            Promise.all([
+                fetch('../content/security/index.json?t=' + Date.now()).then(r => r.json()),
+                fetch('../content/binary/index.json?t=' + Date.now()).then(r => r.json()),
+                fetch('../content/web-security/index.json?t=' + Date.now()).then(r => r.json())
+            ])
+            .then(([securityPosts, binaryPosts, webPosts]) => {
+                const allPosts = [...securityPosts, ...binaryPosts, ...webPosts];
+                const allTags = allPosts.reduce((tags, post) => [...tags, ...post.tags], []);
+                const tagCounts = {};
+                allTags.forEach(tag => {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                });
+                const tagCloud = document.getElementById('tag-cloud');
+                tagCloud.innerHTML = Object.entries(tagCounts).map(([tag, count]) => 
+                    `<span class="badge bg-secondary me-1 mb-1">${tag} (${count})</span>`
+                ).join('');
+            })
+            .catch(error => {
+                console.error('加载标签云失败:', error);
+                document.getElementById('tag-cloud').innerHTML = '<span class="text-muted">加载失败</span>';
+            });
         });
     </script>
 </body>

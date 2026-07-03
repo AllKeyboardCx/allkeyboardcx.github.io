@@ -53,7 +53,7 @@
         </nav>
         <div class="container mt-5">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-9">
                     <h1 class="fw-bolder mb-4">🛡️ 安全研究</h1>
                     <div class="mb-6">
                         <p class="fs-5 text-muted">记录安全领域的研究成果与技术分享</p>
@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-3">
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🔍 搜索</div>
                         <div class="card-body">
@@ -78,21 +78,14 @@
                     </div>
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🏷️ 标签云</div>
-                        <div class="card-body">
-                            <span class="badge bg-secondary me-1">APT</span>
-                            <span class="badge bg-secondary me-1">威胁情报</span>
-                            <span class="badge bg-secondary me-1">漏洞挖掘</span>
-                            <span class="badge bg-secondary me-1">ZeroDay</span>
-                            <span class="badge bg-secondary me-1">态势感知</span>
-                            <span class="badge bg-secondary me-1">供应链安全</span>
-                            <span class="badge bg-secondary me-1">防御</span>
-                            <span class="badge bg-secondary me-1">渗透测试</span>
+                        <div class="card-body" id="tag-cloud">
+                            <span class="text-muted">加载中...</span>
                         </div>
                     </div>
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">📊 统计信息</div>
                         <div class="card-body">
-                            <p class="text-light">共 <span class="text-primary">12</span> 篇文章</p>
+                            <p class="text-light">共 <span class="text-primary" id="article-count">0</span> 篇文章</p>
                             <p class="text-light">总阅读量 <span class="text-primary">3,520</span></p>
                         </div>
                     </div>
@@ -121,6 +114,18 @@
                             <small class="text-muted">#${post.tags.join(' #')}</small>
                         </a>
                     `).join('');
+                    
+                    document.getElementById('article-count').textContent = posts.length;
+                    
+                    const allTags = posts.reduce((tags, post) => [...tags, ...post.tags], []);
+                    const tagCounts = {};
+                    allTags.forEach(tag => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    });
+                    const tagCloud = document.getElementById('tag-cloud');
+                    tagCloud.innerHTML = Object.entries(tagCounts).map(([tag, count]) => 
+                        `<span class="badge bg-secondary me-1 mb-1">${tag} (${count})</span>`
+                    ).join('');
                 })
                 .catch(error => {
                     document.getElementById('article-list').innerHTML = `
