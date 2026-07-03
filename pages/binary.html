@@ -108,7 +108,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('../content/binary/index.json')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(posts => {
                     const listContainer = document.getElementById('article-list');
                     listContainer.innerHTML = posts.map(post => `
@@ -123,9 +128,10 @@
                     `).join('');
                 })
                 .catch(error => {
+                    console.error('加载文章列表失败:', error);
                     document.getElementById('article-list').innerHTML = `
                         <div class="text-center py-4 text-muted">
-                            加载文章列表失败
+                            加载文章列表失败: ${error.message}
                         </div>
                     `;
                 });

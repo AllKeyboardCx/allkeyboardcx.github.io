@@ -72,7 +72,7 @@ function buildIndex() {
         posts.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         const indexPath = path.join(categoryDir, 'index.json');
-        fs.writeFileSync(indexPath, JSON.stringify(posts, null, 2));
+        fs.writeFileSync(indexPath, JSON.stringify(posts, null, 2), 'utf-8');
         
         console.log(`Generated ${indexPath} with ${posts.length} posts`);
     }
