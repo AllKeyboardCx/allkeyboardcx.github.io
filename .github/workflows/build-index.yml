@@ -6,10 +6,13 @@ on:
       - main
     paths:
       - 'content/**/*.md'
+      - 'scripts/build-index.js'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +26,9 @@ jobs:
       
       - name: Run build script
         run: node scripts/build-index.js
+      
+      - name: Pull latest changes
+        run: git pull origin main
       
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
