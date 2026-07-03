@@ -1,0 +1,147 @@
+/* ===== 侧边栏样式 ===== */
+
+/* 整个页面容器 - 用于平滑移动 */
+#page-wrapper {
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: transform 0.35s ease-in-out;
+}
+
+/* 当侧边栏打开时，整个页面向右移动 */
+#page-wrapper.sidebar-open {
+    transform: translateX(280px);
+}
+
+/* ===== 侧边栏本身 ===== */
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    border-right: 1px solid #30363d;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-280px);
+    transition: transform 0.35s ease-in-out;
+    z-index: 1050;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* 侧边栏打开时移回原位 */
+#sidebar.open {
+    transform: translateX(0);
+}
+
+/* ===== 侧边栏头部 ===== */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #30363d;
+    flex-shrink: 0;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f0f6fc;
+}
+
+#close-sidebar-btn {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.7;
+    cursor: pointer;
+}
+#close-sidebar-btn:hover {
+    opacity: 1;
+}
+
+/* ===== 侧边栏导航列表 ===== */
+.sidebar-nav {
+    list-style: none;
+    padding: 12px 0;
+    margin: 0;
+    flex: 1;
+}
+
+.sidebar-nav-item {
+    padding: 0;
+}
+
+.sidebar-nav-item a {
+    display: block;
+    padding: 10px 24px;
+    color: #c9d1d9;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-nav-item a:hover {
+    background-color: #21262d;
+    color: #f0f6fc;
+    border-left-color: #58a6ff;
+}
+
+.sidebar-nav-item a:active {
+    background-color: #1c2128;
+}
+
+/* ===== 侧边栏底部 ===== */
+.sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #30363d;
+    font-size: 0.8rem;
+    color: #8b949e;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* ===== 打开侧边栏的按钮 (在导航栏中) ===== */
+#open-sidebar-btn {
+    border-color: #58a6ff;
+    color: #58a6ff;
+    transition: all 0.2s;
+}
+#open-sidebar-btn:hover {
+    background-color: #58a6ff;
+    color: #0d1117;
+}
+
+/* ===== 移动端适配 ===== */
+@media (max-width: 768px) {
+    #sidebar {
+        width: 240px;
+        transform: translateX(-240px);
+    }
+
+    #page-wrapper.sidebar-open {
+        transform: translateX(240px);
+    }
+
+    .sidebar-title {
+        font-size: 1rem;
+    }
+    .sidebar-nav-item a {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+}
+
+/* 当页面宽度很小时，防止内容被截断 */
+@media (max-width: 480px) {
+    #page-wrapper.sidebar-open {
+        transform: translateX(200px);
+    }
+    #sidebar {
+        width: 200px;
+        transform: translateX(-200px);
+    }
+}
