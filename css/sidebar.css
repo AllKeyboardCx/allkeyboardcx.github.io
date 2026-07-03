@@ -1,16 +1,21 @@
 /* ===== 侧边栏样式 ===== */
 
-/* 整个页面容器 - 用于平滑移动 */
+/* 整个页面容器 */
 #page-wrapper {
     display: flex;
     min-height: 100vh;
     overflow-x: hidden;
-    transition: transform 0.35s ease-in-out;
 }
 
-/* 当侧边栏打开时，整个页面向右移动 */
-#page-wrapper.sidebar-open {
-    transform: translateX(280px);
+/* 主内容区域 - 响应侧边栏打开/关闭 */
+#main-content {
+    flex: 1;
+    transition: margin-left 0.35s ease-in-out;
+}
+
+/* 当侧边栏打开时，主内容向右移动 */
+#page-wrapper.sidebar-open #main-content {
+    margin-left: 280px;
 }
 
 /* ===== 侧边栏本身 ===== */
@@ -122,8 +127,8 @@
         transform: translateX(-240px);
     }
 
-    #page-wrapper.sidebar-open {
-        transform: translateX(240px);
+    #page-wrapper.sidebar-open #main-content {
+        margin-left: 240px;
     }
 
     .sidebar-title {
@@ -137,8 +142,8 @@
 
 /* 当页面宽度很小时，防止内容被截断 */
 @media (max-width: 480px) {
-    #page-wrapper.sidebar-open {
-        transform: translateX(200px);
+    #page-wrapper.sidebar-open #main-content {
+        margin-left: 200px;
     }
     #sidebar {
         width: 200px;
