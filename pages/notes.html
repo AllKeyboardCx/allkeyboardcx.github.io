@@ -471,6 +471,13 @@
                     return;
                 }
 
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    alert('删除失败：Supabase RLS 策略阻止了删除操作。\n\n请在 Supabase SQL Editor 中执行以下 SQL：\n\nCREATE POLICY "Allow public delete" ON notes FOR DELETE USING (true);');
+                    return;
+                }
+
                 if (deleteModal) {
                     deleteModal.hide();
                 }

@@ -184,6 +184,89 @@
             return { html: tempDiv.innerHTML, toc: tocHtml };
         }
 
+        const CALLOUT_TYPES = {
+            note: { icon: '📝', title: '备注', color: '#58a6ff' },
+            tip: { icon: '💡', title: '提示', color: '#3fb950' },
+            important: { icon: '❗', title: '重要', color: '#a371f7' },
+            warning: { icon: '⚠️', title: '警告', color: '#d29922' },
+            caution: { icon: '🔴', title: '注意', color: '#f85149' },
+            danger: { icon: '🔥', title: '危险', color: '#f85149' },
+            info: { icon: 'ℹ️', title: '信息', color: '#58a6ff' },
+            success: { icon: '✅', title: '成功', color: '#3fb950' },
+            question: { icon: '❓', title: '疑问', color: '#d29922' },
+            abstract: { icon: '📋', title: '摘要', color: '#a371f7' },
+            example: { icon: '📌', title: '示例', color: '#58a6ff' },
+            quote: { icon: '💬', title: '引用', color: '#6e7681' }
+        };
+
+        function renderCallouts(htmlString) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+
+            const blockquotes = tempDiv.querySelectorAll('blockquote');
+
+            blockquotes.forEach(blockquote => {
+                const firstElement = blockquote.firstElementChild || blockquote.firstChild;
+                if (!firstElement) return;
+
+                let firstText = '';
+                if (firstElement.tagName === 'P') {
+                    firstText = firstElement.textContent.trim();
+                } else if (firstElement.nodeType === 3) {
+                    firstText = firstElement.textContent.trim();
+                }
+
+                const calloutMatch = firstText.match(/^\[!([^\]]+)\](.*)/);
+                if (!calloutMatch) return;
+
+                const type = calloutMatch[1].trim().toLowerCase();
+                const titleText = calloutMatch[2].trim();
+                const config = CALLOUT_TYPES[type] || CALLOUT_TYPES.note;
+
+                const calloutDiv = document.createElement('div');
+                calloutDiv.className = `callout callout-${type}`;
+                calloutDiv.style.borderLeftColor = config.color;
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'callout-header';
+                headerDiv.innerHTML = `<span class="callout-icon">${config.icon}</span> <span class="callout-title">${escapeHtml(titleText || config.title)}</span>`;
+                headerDiv.style.color = config.color;
+                calloutDiv.appendChild(headerDiv);
+
+                const bodyDiv = document.createElement('div');
+                bodyDiv.className = 'callout-body';
+
+                let contentStarted = false;
+                const children = Array.from(blockquote.childNodes);
+                children.forEach((child, index) => {
+                    if (!contentStarted) {
+                        if (child.nodeType === 1 && child.tagName === 'P') {
+                            const remainingText = firstText.replace(/^\[!([^\]]+)\].*/, '').trim();
+                            if (remainingText) {
+                                const newP = document.createElement('p');
+                                newP.innerHTML = child.innerHTML.replace(/^\[!([^\]]+)\].*/, '').trim();
+                                if (newP.innerHTML.trim()) {
+                                    bodyDiv.appendChild(newP);
+                                }
+                            }
+                            contentStarted = true;
+                            return;
+                        }
+                        if (child.nodeType === 3) {
+                            contentStarted = true;
+                            return;
+                        }
+                    }
+                    bodyDiv.appendChild(child.cloneNode(true));
+                });
+
+                calloutDiv.appendChild(bodyDiv);
+                blockquote.replaceWith(calloutDiv);
+            });
+
+            return tempDiv.innerHTML;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const category = urlParams.get('category');
@@ -278,10 +361,11 @@
                         const { data, body } = parseMetadata(mdContent);
                         const htmlContent = marked.parse(body);
                         const { html: finalHtml, toc } = generateTOC(htmlContent);
+                        const calloutHtml = renderCallouts(finalHtml);
                         document.getElementById('article-content').innerHTML = `
                             <div class="mb-4 text-muted">阅读量: ${viewCount}</div>
                             ${toc}
-                            ${finalHtml}
+                            ${calloutHtml}
                         `;
 
                         document.querySelectorAll('pre code').forEach(block => {
