@@ -58,39 +58,12 @@
                     <div class="mb-6">
                         <p class="fs-5 text-muted">Web应用安全漏洞分析与防护</p>
                     </div>
-                    <div class="list-group">
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">SQL注入漏洞深度解析</h5>
-                                <small class="text-muted">2026-06-18</small>
+                    <div class="list-group" id="article-list">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">加载中...</span>
                             </div>
-                            <p class="mb-1">从基础到高级，全面分析SQL注入漏洞的原理、检测和利用...</p>
-                            <small class="text-muted">#SQLi #数据库安全</small>
-                        </a>
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">XSS跨站脚本攻击详解</h5>
-                                <small class="text-muted">2026-05-22</small>
-                            </div>
-                            <p class="mb-1">深入探讨XSS攻击的各种类型及其防御方法...</p>
-                            <small class="text-muted">#XSS #前端安全</small>
-                        </a>
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">CSRF跨站请求伪造防护</h5>
-                                <small class="text-muted">2026-04-15</small>
-                            </div>
-                            <p class="mb-1">CSRF攻击原理分析与防护策略...</p>
-                            <small class="text-muted">#CSRF #安全防护</small>
-                        </a>
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">文件上传漏洞攻防实战</h5>
-                                <small class="text-muted">2026-03-20</small>
-                            </div>
-                            <p class="mb-1">文件上传漏洞的各种绕过技巧和防御措施...</p>
-                            <small class="text-muted">#FileUpload #Web漏洞</small>
-                        </a>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -132,5 +105,31 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../content/web-security/index.json')
+                .then(response => response.json())
+                .then(posts => {
+                    const listContainer = document.getElementById('article-list');
+                    listContainer.innerHTML = posts.map(post => `
+                        <a href="article.html?category=web-security&file=${post.filename}" class="list-group-item list-group-item-action bg-dark text-light border-gray">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">${post.title}</h5>
+                                <small class="text-muted">${post.date}</small>
+                            </div>
+                            <p class="mb-1">${post.summary}</p>
+                            <small class="text-muted">#${post.tags.join(' #')}</small>
+                        </a>
+                    `).join('');
+                })
+                .catch(error => {
+                    document.getElementById('article-list').innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            加载文章列表失败
+                        </div>
+                    `;
+                });
+        });
+    </script>
 </body>
 </html>

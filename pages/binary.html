@@ -58,39 +58,12 @@
                     <div class="mb-6">
                         <p class="fs-5 text-muted">深入探索二进制安全与漏洞利用技术</p>
                     </div>
-                    <div class="list-group">
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">栈溢出漏洞利用完全指南</h5>
-                                <small class="text-muted">2026-06-20</small>
+                    <div class="list-group" id="article-list">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">加载中...</span>
                             </div>
-                            <p class="mb-1">从基础原理到高级技巧，全面讲解栈溢出的各种利用方式...</p>
-                            <small class="text-muted">#StackOverflow #ROP</small>
-                        </a>
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">格式化字符串漏洞详解</h5>
-                                <small class="text-muted">2026-05-15</small>
-                            </div>
-                            <p class="mb-1">深入分析格式化字符串漏洞的原理、检测方法和利用技术...</p>
-                            <small class="text-muted">#FormatString #漏洞利用</small>
-                        </a>
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">堆漏洞利用技术总结</h5>
-                                <small class="text-muted">2026-04-25</small>
-                            </div>
-                            <p class="mb-1">整理常见的堆漏洞类型及其利用方法...</p>
-                            <small class="text-muted">#HeapExploit #UseAfterFree</small>
-                        </a>
-                        <a href="#!" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">CTF Pwn题解题思路分享</h5>
-                                <small class="text-muted">2026-03-30</small>
-                            </div>
-                            <p class="mb-1">分享CTF比赛中常见Pwn题目的解题技巧和经验...</p>
-                            <small class="text-muted">#CTF #Pwn</small>
-                        </a>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -132,5 +105,31 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../content/binary/index.json')
+                .then(response => response.json())
+                .then(posts => {
+                    const listContainer = document.getElementById('article-list');
+                    listContainer.innerHTML = posts.map(post => `
+                        <a href="article.html?category=binary&file=${post.filename}" class="list-group-item list-group-item-action bg-dark text-light border-gray">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">${post.title}</h5>
+                                <small class="text-muted">${post.date}</small>
+                            </div>
+                            <p class="mb-1">${post.summary}</p>
+                            <small class="text-muted">#${post.tags.join(' #')}</small>
+                        </a>
+                    `).join('');
+                })
+                .catch(error => {
+                    document.getElementById('article-list').innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            加载文章列表失败
+                        </div>
+                    `;
+                });
+        });
+    </script>
 </body>
 </html>

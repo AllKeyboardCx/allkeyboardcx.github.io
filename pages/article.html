@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="安全研究 - AllKeyboardCx的博客" />
+    <meta name="description" content="文章详情 - AllKeyboardCx的博客" />
     <meta name="author" content="AllKeyboardCx" />
-    <title>安全研究 - AllKeyboardCx</title>
+    <title>文章详情 - AllKeyboardCx</title>
     <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
     <link href="../css/styles.css" rel="stylesheet" />
     <link href="../css/sidebar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
 </head>
 <body>
     <div id="sidebar">
@@ -18,7 +19,7 @@
         </div>
         <ul class="sidebar-nav">
             <li class="sidebar-nav-item"><a href="../index.html">🏠 首页</a></li>
-            <li class="sidebar-nav-item active"><a href="security.html">🛡️ 安全研究</a></li>
+            <li class="sidebar-nav-item"><a href="security.html">🛡️ 安全研究</a></li>
             <li class="sidebar-nav-item"><a href="binary.html">💻 二进制/Pwn</a></li>
             <li class="sidebar-nav-item"><a href="web-security.html">🌐 Web安全</a></li>
             <li class="sidebar-nav-item"><a href="tools.html">🔧 工具分享</a></li>
@@ -45,7 +46,7 @@
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link" href="../index.html">首页</a></li>
                         <li class="nav-item"><a class="nav-link" href="#!">归档</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">安全研究</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">博客</a></li>
                         <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
                     </ul>
                 </div>
@@ -54,46 +55,36 @@
         <div class="container mt-5">
             <div class="row">
                 <div class="col-lg-8">
-                    <h1 class="fw-bolder mb-4">🛡️ 安全研究</h1>
-                    <div class="mb-6">
-                        <p class="fs-5 text-muted">记录安全领域的研究成果与技术分享</p>
-                    </div>
-                    <div class="list-group" id="article-list">
-                        <div class="text-center py-4">
+                    <article id="article-content">
+                        <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">加载中...</span>
                             </div>
+                            <p class="text-muted mt-3">正在加载文章...</p>
                         </div>
-                    </div>
+                    </article>
+                    <section class="mb-5 mt-5">
+                        <div class="card bg-dark border-gray">
+                            <div class="card-body">
+                                <form class="mb-4"><textarea class="form-control bg-gray text-light" rows="3" placeholder="加入讨论，留下你的评论！"></textarea></form>
+                            </div>
+                        </div>
+                    </section>
                 </div>
                 <div class="col-lg-4">
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🔍 搜索</div>
                         <div class="card-body">
                             <div class="input-group">
-                                <input class="form-control bg-gray text-light" type="text" placeholder="搜索安全研究文章..." aria-label="搜索" />
+                                <input class="form-control bg-gray text-light" type="text" placeholder="搜索文章..." aria-label="搜索" />
                                 <button class="btn btn-primary" type="button">Go!</button>
                             </div>
                         </div>
                     </div>
                     <div class="card mb-4 bg-dark border-gray">
                         <div class="card-header text-light">🏷️ 标签云</div>
-                        <div class="card-body">
-                            <span class="badge bg-secondary me-1">APT</span>
-                            <span class="badge bg-secondary me-1">威胁情报</span>
-                            <span class="badge bg-secondary me-1">漏洞挖掘</span>
-                            <span class="badge bg-secondary me-1">ZeroDay</span>
-                            <span class="badge bg-secondary me-1">态势感知</span>
-                            <span class="badge bg-secondary me-1">供应链安全</span>
-                            <span class="badge bg-secondary me-1">防御</span>
-                            <span class="badge bg-secondary me-1">渗透测试</span>
-                        </div>
-                    </div>
-                    <div class="card mb-4 bg-dark border-gray">
-                        <div class="card-header text-light">📊 统计信息</div>
-                        <div class="card-body">
-                            <p class="text-light">共 <span class="text-primary">12</span> 篇文章</p>
-                            <p class="text-light">总阅读量 <span class="text-primary">3,520</span></p>
+                        <div class="card-body" id="article-tags">
+                            <span class="text-muted">加载中...</span>
                         </div>
                     </div>
                 </div>
@@ -105,27 +96,61 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('../content/security/index.json')
-                .then(response => response.json())
-                .then(posts => {
-                    const listContainer = document.getElementById('article-list');
-                    listContainer.innerHTML = posts.map(post => `
-                        <a href="article.html?category=security&file=${post.filename}" class="list-group-item list-group-item-action bg-dark text-light border-gray">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">${post.title}</h5>
-                                <small class="text-muted">${post.date}</small>
-                            </div>
-                            <p class="mb-1">${post.summary}</p>
-                            <small class="text-muted">#${post.tags.join(' #')}</small>
-                        </a>
-                    `).join('');
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            const file = urlParams.get('file');
+
+            if (!category || !file) {
+                document.getElementById('article-content').innerHTML = `
+                    <div class="text-center py-5">
+                        <h2 class="text-light">参数错误</h2>
+                        <p class="text-muted">请从正确的链接访问文章</p>
+                        <a href="../index.html" class="btn btn-primary mt-3">返回首页</a>
+                    </div>
+                `;
+                return;
+            }
+
+            fetch(`../content/${category}/${file}.md`)
+                .then(response => {
+                    if (!response.ok) throw new Error('文章不存在');
+                    return response.text();
+                })
+                .then(mdContent => {
+                    const htmlContent = marked.parse(mdContent);
+                    document.getElementById('article-content').innerHTML = htmlContent;
+                    
+                    document.querySelectorAll('pre code').forEach(block => {
+                        hljs.highlightElement(block);
+                    });
+                    
+                    const titleElement = document.querySelector('h1');
+                    if (titleElement) {
+                        document.title = titleElement.textContent + ' - AllKeyboardCx';
+                    }
+                    
+                    fetch(`../content/${category}/index.json`)
+                        .then(res => res.json())
+                        .then(posts => {
+                            const post = posts.find(p => p.filename === file);
+                            if (post) {
+                                const tagsContainer = document.getElementById('article-tags');
+                                tagsContainer.innerHTML = post.tags.map(tag => 
+                                    `<span class="badge bg-secondary me-1">${tag}</span>`
+                                ).join('');
+                            }
+                        });
                 })
                 .catch(error => {
-                    document.getElementById('article-list').innerHTML = `
-                        <div class="text-center py-4 text-muted">
-                            加载文章列表失败
+                    document.getElementById('article-content').innerHTML = `
+                        <div class="text-center py-5">
+                            <h2 class="text-light">文章未找到</h2>
+                            <p class="text-muted">${error.message}</p>
+                            <a href="${category}.html" class="btn btn-primary mt-3">返回列表</a>
                         </div>
                     `;
                 });
