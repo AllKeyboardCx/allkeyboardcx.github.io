@@ -15,9 +15,6 @@
 </head>
 <body>
 
-    <!-- 整个页面容器，用于整体移动 -->
-    <div id="page-wrapper">
-
         <!-- 侧边栏 (默认隐藏，在屏幕左侧外) -->
         <div id="sidebar">
             <div class="sidebar-header">
@@ -43,7 +40,7 @@
 
             <!-- 顶部导航栏 (增加了侧边栏开关按钮) -->
             <nav class="navbar navbar-expand-lg navbar-dark bg-black">
-                <div class="container">
+                <div class="container-fluid">
                     <!-- 左侧：侧边栏开关 + 品牌 -->
                     <div class="d-flex align-items-center">
                         <button id="open-sidebar-btn" class="btn btn-outline-light me-3" aria-label="打开分类侧边栏">
@@ -133,7 +130,6 @@
             </footer>
 
         </div> <!-- /main-content -->
-    </div> <!-- /page-wrapper -->
 
     <!-- Bootstrap core JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
