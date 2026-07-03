@@ -407,6 +407,7 @@
         }
 
         let currentDeleteId = null;
+        let deleteModal = null;
 
         function confirmDelete(id) {
             currentDeleteId = id;
@@ -436,14 +437,15 @@
             if (!document.getElementById('deleteModal')) {
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
             }
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            const modalEl = document.getElementById('deleteModal');
+            deleteModal = bootstrap.Modal.getOrCreateInstance(modalEl);
             document.getElementById('delete-password').value = '';
-            modal.show();
+            deleteModal.show();
         }
 
         async function deleteNote() {
             const password = document.getElementById('delete-password').value.trim();
-            
+
             if (password !== PASSWORD) {
                 alert('口令错误！');
                 return;
@@ -457,24 +459,33 @@
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
                     }
                 });
 
                 if (!response.ok) {
-                    console.error('删除笔记失败:', await response.text());
-                    alert('删除笔记失败，请稍后重试');
+                    const errorText = await response.text();
+                    console.error('删除笔记失败:', errorText);
+                    alert('删除笔记失败，请稍后重试\n\n错误信息: ' + errorText);
                     return;
                 }
 
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-                modal.hide();
-                
+                const data = await response.json();
+                if (data.length === 0) {
+                    alert('未找到要删除的笔记');
+                    return;
+                }
+
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
+
                 loadNotes();
                 alert('删除成功！');
             } catch (error) {
                 console.error('删除笔记失败:', error);
-                alert('删除笔记失败，请稍后重试');
+                alert('删除笔记失败，请稍后重试\n\n错误: ' + error.message);
             }
         }
     </script>
