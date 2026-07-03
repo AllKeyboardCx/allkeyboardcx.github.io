@@ -3,13 +3,13 @@ DATE 2026-07-03
 SUMMARY 堆风水漏洞利用相关的东西
 TAG heap,ROP,漏洞利用
 
-![[Pasted image 20260630155845.png]]
+![Pasted image 20260630155845.png](<../pictures/Pasted image 20260630155845.png>)
 
 - 这里先释放了chunk2指向的chunk1，然后再释放了chunk2
 - \*(void \*\*)\*(&ptr+a1) 的意思是对地址解引用两次
 
 
-![[Pasted image 20260630162322.png]]
+![Pasted image 20260630162322.png](<../pictures/Pasted image 20260630162322.png>)
 
 - ptr是全局数组首地址，作用是存放所有用户自定义堆的堆指针
 

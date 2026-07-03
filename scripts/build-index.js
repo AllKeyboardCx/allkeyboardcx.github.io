@@ -3,6 +3,30 @@ const path = require('path');
 
 const CONTENT_DIR = path.join(__dirname, '../content');
 
+function convertObsidianImages(content) {
+    return content.replace(/!\[\[([^\]]+)\]\]/g, (match, inner) => {
+        const parts = inner.split('|');
+        const filename = parts[0].trim();
+        const width = parts[1] ? parts[1].trim() : '';
+
+        if (width) {
+            return `<img src="../pictures/${filename}" width="${width}" alt="${filename}">`;
+        }
+        return `![${filename}](<../pictures/${filename}>)`;
+    });
+}
+
+function processMarkdownFile(filePath) {
+    const original = fs.readFileSync(filePath, 'utf-8');
+    const converted = convertObsidianImages(original);
+    if (converted !== original) {
+        fs.writeFileSync(filePath, converted, 'utf-8');
+        console.log(`Converted Obsidian images in: ${filePath}`);
+        return converted;
+    }
+    return original;
+}
+
 function parseMetadata(content) {
     const lines = content.split('\n');
     const data = {
@@ -54,7 +78,7 @@ function buildIndex() {
         
         for (const file of files) {
             const filePath = path.join(categoryDir, file);
-            const content = fs.readFileSync(filePath, 'utf-8');
+            const content = processMarkdownFile(filePath);
             const { data } = parseMetadata(content);
             
             const stat = fs.statSync(filePath);
