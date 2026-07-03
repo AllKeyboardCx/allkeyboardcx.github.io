@@ -577,6 +577,17 @@ article img {
     .bg-dark, .bg-black, .bg-secondary, .bg-gray, .bg-gray-dark {
         background-color: rgba(22, 27, 34, 0.5) !important;
     }
+
+    /* 移动端关闭闪烁动画，保持常亮发光 */
+    .card, .card-header, .card-body, .card-footer,
+    .list-group-item, .bg-dark, .bg-black, .bg-secondary,
+    .bg-gray, .bg-gray-dark, .modal-content, pre,
+    .accordion-item, .accordion-button, .accordion-button:not(.collapsed),
+    article, .comment-card, .article-toc {
+        animation: none !important;
+        box-shadow: 0 0 12px rgba(88, 166, 255, 0.4), 0 0 24px rgba(88, 166, 255, 0.15) !important;
+        border-color: rgba(88, 166, 255, 0.45) !important;
+    }
     
     html, body {
         background-image: url('../assets/background.jpg') !important;
