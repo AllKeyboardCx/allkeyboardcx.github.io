@@ -107,7 +107,7 @@
     <script src="../js/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('../content/binary/index.json')
+            fetch('../content/binary/index.json?t=' + Date.now())
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('HTTP ' + response.status);

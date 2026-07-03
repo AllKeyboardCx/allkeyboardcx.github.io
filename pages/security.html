@@ -107,7 +107,7 @@
     <script src="../js/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('../content/security/index.json')
+            fetch('../content/security/index.json?t=' + Date.now())
                 .then(response => response.json())
                 .then(posts => {
                     const listContainer = document.getElementById('article-list');

@@ -1,6 +1,7 @@
-
-
-DATE 2026-07-03 SUMMARY 深入探讨... TAG XSS,前端安全,Web漏洞
+TITLE 堆风水
+DATA 2026-07-03
+SUMMARY 堆风水漏洞利用相关的东西
+TAG heap,ROP,漏洞利用
 
 ![[Pasted image 20260630155845.png]]
 
