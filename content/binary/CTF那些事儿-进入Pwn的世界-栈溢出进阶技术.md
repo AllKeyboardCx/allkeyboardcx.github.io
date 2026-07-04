@@ -302,7 +302,7 @@ p.interactive()
 [[Canary保护机制及其利用方式]]
 
 ## __libc_csu_init的利用方式
-[[__libc_csu_init的利用方式]]
+[[libc_csu_init的利用方式]]
 
 ## ret2_dl_runtime_resolve
 [[ret2_dl_runtime_resolve]]

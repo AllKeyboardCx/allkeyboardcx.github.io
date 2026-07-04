@@ -592,6 +592,75 @@ article a[href^="#"]:hover {
     animation: glowBorderBlue 3s ease-in-out infinite;
 }
 
+/* 评论列表样式 */
+.comment-item {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(88, 166, 255, 0.15);
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.comment-item p {
+    color: #c9d1d9;
+    line-height: 1.6;
+}
+
+.reply-to {
+    color: #58a6ff;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+.reply-btn {
+    color: #8b949e;
+    padding: 2px 8px;
+    font-size: 0.85em;
+    text-decoration: none;
+}
+
+.reply-btn:hover {
+    color: #58a6ff;
+}
+
+.replies-container {
+    margin-left: 60px;
+    margin-top: 12px;
+    padding-left: 16px;
+    border-left: 2px solid rgba(88, 166, 255, 0.2);
+}
+
+.comment-reply {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: none;
+}
+
+.comment-reply:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.reply-form-container .form-control {
+    background-color: rgba(13, 17, 23, 0.5) !important;
+    border-color: rgba(88, 166, 255, 0.3);
+    color: #f0f6fc !important;
+}
+
+.reply-form-container .form-control:focus {
+    background-color: rgba(13, 17, 23, 0.7) !important;
+    border-color: rgba(88, 166, 255, 0.6);
+    color: #f0f6fc !important;
+}
+
+.reply-form-container .form-control::placeholder {
+    color: rgba(240, 246, 252, 0.4);
+}
+
 /* Live2D 看板娘强制位置（防止被库内联样式覆盖） */
 #live2d-container {
     position: fixed !important;

@@ -553,27 +553,111 @@
             }
         }
 
+        let currentReplyTarget = null;
+
         function renderComments(comments) {
             const commentsList = document.getElementById('comments-list');
             if (comments.length === 0) {
                 commentsList.innerHTML = '<div class="text-center text-muted py-4">暂无评论，快来发表第一条吧！</div>';
                 return;
             }
-            commentsList.innerHTML = comments.map(comment => `
-                <div class="d-flex mb-4">
-                    <div class="flex-shrink-0">
-                        ${generateAvatar(comment.username)}
+
+            const commentMap = {};
+            const topLevel = [];
+
+            comments.forEach(c => {
+                commentMap[c.id] = { ...c, replies: [] };
+            });
+
+            comments.forEach(c => {
+                if (c.parent_id && commentMap[c.parent_id]) {
+                    commentMap[c.parent_id].replies.push(commentMap[c.id]);
+                } else {
+                    topLevel.push(commentMap[c.id]);
+                }
+            });
+
+            function renderComment(comment, isReply = false) {
+                const replyToText = comment.reply_to ? `回复 <span class="reply-to">@${escapeHtml(comment.reply_to)}</span>` : '';
+                return `
+                    <div class="comment-item ${isReply ? 'comment-reply' : ''}" data-comment-id="${comment.id}">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                ${generateAvatar(comment.username)}
+                            </div>
+                            <div class="ms-3 flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <span class="fw-bold">${escapeHtml(comment.username)}</span>
+                                        ${replyToText}
+                                    </div>
+                                    <span class="text-muted text-sm">${formatDate(comment.created_at)}</span>
+                                </div>
+                                <p class="mt-1 mb-1">${escapeHtml(comment.content)}</p>
+                                <button class="btn btn-sm btn-link reply-btn" onclick="toggleReplyForm('${comment.id}', '${escapeHtml(comment.username)}')">
+                                    💬 回复
+                                </button>
+                                <div class="reply-form-container" id="reply-form-${comment.id}" style="display: none; margin-top: 10px;">
+                                    <form class="reply-form" data-parent-id="${comment.id}" data-reply-to="${escapeHtml(comment.username)}">
+                                        <div class="mb-2">
+                                            <input type="text" class="form-control form-control-sm reply-username" placeholder="您的昵称" required />
+                                        </div>
+                                        <div class="mb-2">
+                                            <textarea class="form-control form-control-sm reply-content" rows="2" placeholder="回复 @${escapeHtml(comment.username)}..." required></textarea>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary btn-sm">发表回复</button>
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleReplyForm('${comment.id}')">取消</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        ${comment.replies && comment.replies.length > 0 ? `
+                            <div class="replies-container">
+                                ${comment.replies.map(r => renderComment(r, true)).join('')}
+                            </div>
+                        ` : ''}
                     </div>
-                    <div class="ms-3">
-                        <div class="fw-bold">${escapeHtml(comment.username)}</div>
-                        <div class="text-muted text-sm">${formatDate(comment.created_at)}</div>
-                        <p>${escapeHtml(comment.content)}</p>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }
+
+            commentsList.innerHTML = topLevel.map(c => renderComment(c, false)).join('');
+
+            document.querySelectorAll('.reply-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const parentId = this.dataset.parentId;
+                    const replyTo = this.dataset.replyTo;
+                    const username = this.querySelector('.reply-username').value.trim();
+                    const content = this.querySelector('.reply-content').value.trim();
+                    if (!username || !content) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    submitComment(username, content, parentId, replyTo);
+                });
+            });
         }
 
-        async function submitComment() {
+        function toggleReplyForm(commentId, replyToUsername) {
+            const formContainer = document.getElementById(`reply-form-${commentId}`);
+            if (!formContainer) return;
+
+            const isVisible = formContainer.style.display !== 'none';
+
+            document.querySelectorAll('.reply-form-container').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            if (!isVisible) {
+                formContainer.style.display = 'block';
+                const textarea = formContainer.querySelector('.reply-content');
+                if (textarea) textarea.focus();
+            }
+        }
+
+        async function submitComment(usernameInput, contentInput, parentId = null, replyTo = null) {
             const SUPABASE_URL = 'https://dgwuzhngmrksrtdrmjvm.supabase.co';
             const SUPABASE_KEY = 'sb_publishable_fMMt5IGPP8ub6Ys-QfRD4Q_OEse9xv1';
             const urlParams = new URLSearchParams(window.location.search);
@@ -581,12 +665,34 @@
             const file = urlParams.get('file');
             const postId = `${category}/${file}`;
 
-            const username = document.getElementById('comment-username').value.trim();
-            const content = document.getElementById('comment-content').value.trim();
-            
+            let username, content;
+            let isReply = parentId !== null;
+
+            if (isReply) {
+                username = usernameInput;
+                content = contentInput;
+            } else {
+                username = document.getElementById('comment-username').value.trim();
+                content = document.getElementById('comment-content').value.trim();
+            }
+
             if (!username || !content) {
                 alert('请填写完整信息');
                 return;
+            }
+
+            const bodyData = {
+                post_id: postId,
+                username: username,
+                content: content,
+                created_at: new Date().toISOString()
+            };
+
+            if (parentId) {
+                bodyData.parent_id = parentId;
+            }
+            if (replyTo) {
+                bodyData.reply_to = replyTo;
             }
 
             try {
@@ -597,12 +703,7 @@
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        post_id: postId,
-                        username: username,
-                        content: content,
-                        created_at: new Date().toISOString()
-                    })
+                    body: JSON.stringify(bodyData)
                 });
                 
                 if (!response.ok) {
@@ -611,7 +712,13 @@
                     return;
                 }
                 
-                document.getElementById('comment-form').reset();
+                if (!isReply) {
+                    document.getElementById('comment-form').reset();
+                } else {
+                    document.querySelectorAll('.reply-form-container').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                }
                 loadComments();
             } catch (error) {
                 console.error('发表评论失败:', error);
