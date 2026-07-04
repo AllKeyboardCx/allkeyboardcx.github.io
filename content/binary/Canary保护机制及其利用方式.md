@@ -24,7 +24,7 @@ mov qword ptr [rbp - 8], rax
 
 在函数返回之前，会将该值取出，与fs:0x28的值进行异或，若为0，则未被修改，函数正常返回
 
-![[Pasted image 20260209212102.png]]
+![Pasted image 20260209212102.png](<../pictures/Pasted image 20260209212102.png>)
 
 
 # Canary保护机制绕过：泄露Canary值（leak_canary）
@@ -64,8 +64,8 @@ p.interactive()
 - **计算原始 Canary**：`u32`将泄露的 4 字节解析为 32 位整数，减去`ord('b')`（`0x62`），即可还原出原始 Canary 值（最低字节恢复为`0x00`）。
 
 ---
-![[Pasted image 20260209213421.png]]
-![[Pasted image 20260209213532.png]]
+![Pasted image 20260209213421.png](<../pictures/Pasted image 20260209213421.png>)
+![Pasted image 20260209213532.png](<../pictures/Pasted image 20260209213532.png>)
 
 
 - **恢复 Canary**：用`\x00`填满`buf`，再写入原始 Canary 值，确保 Canary 检查通过。
@@ -73,7 +73,7 @@ p.interactive()
 - **覆盖返回地址**：将返回地址替换为`target`函数的地址，使`vulnfunc`返回时跳转到`target`。
 - **交互 shell**：发送 Payload 后，程序执行`target`函数，调用`system("/bin/sh")`，进入交互模式获取 shell。
 （这里的 3 是因为，覆盖到ebp是0x10C，即为268，而buf是256，相差12，由于Canary在buf之后，所以为了确保正确覆盖返回地址，此外，由于canary本身占了4个字节，所以加上ebp，总共需要覆盖3个32位字节，即可覆盖至ebp）
-![[Pasted image 20260209213736.png]]
+![Pasted image 20260209213736.png](<../pictures/Pasted image 20260209213736.png>)
 32位canary结构：从低地址到高地址，canary有四个字节，即 x x x \x00，末尾字节为\x00，在栈中存储的时候是\x00在高地址，所以这也就说明了为什么在canary末尾加一个\x00可以防止泄露。
 
 而覆盖为 b 时，由于\x00被修改了，所以可以打出剩下的三个字节，达到泄露的目的。
@@ -174,7 +174,7 @@ for i in range(1, 100):
 - 每次进程重启后的 Canary 不同、同一进程每个线程的 Canary 也不同
 - 在CTF中，有通过 fork 函数开启子进程交互的题目，因为fork函数会直接拷贝父进程的内存，所以每次创建的子进程Canary是相同的
 
-![[Pasted image 20260210152039.png]]
+![Pasted image 20260210152039.png](<../pictures/Pasted image 20260210152039.png>)
 
 根据源代码，第一个read处可以循环输入，可以用来爆破canary，然后准备好了就可以输入 'y' 进行 go
 
@@ -291,7 +291,7 @@ payload解释：
 3. buf那里有一个canary，而子进程的栈底的0x28偏移处通常是stack_guard的存储地址
    （linux amd64）glibc版本也会影响
 4. 通过调试找到buf的起始地址与子进程thr_fn的栈底地址
-   ![[Pasted image 20260216144757.png]]
+   ![Pasted image 20260216144757.png](<../pictures/Pasted image 20260216144757.png>)
 5. （b thr_fn）不难看出，线程2的基址为0x7ffff77ef700，而buf的地址则为rbp - 0x110（IDA中可看出），用distance算一下距离即可得到具体溢出长度（注意要加上0x28才是stack_guard的地址【linux amd64】）
 
 因为**编译器和操作系统约定好了**：

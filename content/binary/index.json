@@ -9,6 +9,36 @@
     "summary": "入门&熟悉基础堆漏洞，fastbin、tcache基础利用，unsorted bin&libc泄露，劫持钩子&one gadget"
   },
   {
+    "title": "栈溢出进阶技术",
+    "filename": "CTF那些事儿-进入Pwn的世界-栈溢出进阶技术",
+    "date": "2026-07-04",
+    "tags": [
+      "栈劫持",
+      "canary",
+      "libc_csu_init",
+      "ret2_dl_runtime_resolve"
+    ],
+    "summary": "包含对栈劫持、Canary保护机制及利用方式、__libc_csu_init的利用方式、ret2_dl_runtime_resolve的相关讲解"
+  },
+  {
+    "title": "Canary保护机制介绍",
+    "filename": "Canary保护机制及其利用方式",
+    "date": "2026-07-04",
+    "tags": [
+      "canary"
+    ],
+    "summary": "详细讲解了canary的保护机制及绕过方法，同时介绍了send和sendline的使用场景"
+  },
+  {
+    "title": "__libc_csu_init攻击方法详细讲解",
+    "filename": "__libc_csu_init的利用方式",
+    "date": "2026-07-04",
+    "tags": [
+      "__libc_csu_init"
+    ],
+    "summary": "详细介绍了__libc_csu_init文件及利用方法"
+  },
+  {
     "title": "UAF与unlink攻击",
     "filename": "hitcon2014_stkof-UAF-unlink-堆利用漏洞-堆溢出 - 副本",
     "date": "2026-07-04",
