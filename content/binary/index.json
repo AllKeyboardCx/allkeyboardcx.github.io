@@ -1,5 +1,14 @@
 [
   {
+    "title": "Buuctf堆利用专项训练（概念理论向）",
+    "filename": "Buuctf堆利用专项训练",
+    "date": "2026-07-04",
+    "tags": [
+      "heap理论"
+    ],
+    "summary": "入门&熟悉基础堆漏洞，fastbin、tcache基础利用，unsorted bin&libc泄露，劫持钩子&one gadget"
+  },
+  {
     "title": "UAF与unlink攻击",
     "filename": "hitcon2014_stkof-UAF-unlink-堆利用漏洞-堆溢出 - 副本",
     "date": "2026-07-04",
