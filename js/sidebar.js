@@ -57,4 +57,57 @@ document.addEventListener('DOMContentLoaded', function() {
             backToTopBtn.classList.remove('show');
         }
     });
+
+    // 点击爆炸特效（仅电脑端）
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+    const hasHover = window.matchMedia('(hover: hover)').matches;
+    if (isFinePointer && hasHover) {
+        const emojis = ['🎉', '🎊', '✨', '💥', '💫', '⭐', '🌟', '🔥', '💖', '💝', '🥳', '😎', '🤩', '😋', '🚀', '💎', '🌈', '🎈', '🎁', '⚡'];
+
+        document.addEventListener('click', function(e) {
+            // 忽略表单元素、按钮、链接的点击（避免影响交互）
+            const target = e.target;
+            if (target.closest('input, textarea, select, button, a, form, .reply-form, #back-to-top, #sidebar')) {
+                return;
+            }
+
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // 烟花粒子
+            const particleCount = 16;
+            const colors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d96ff', '#ff8e3c', '#c780fa', '#ff5ebc'];
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'click-particle';
+                const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.3;
+                const distance = 60 + Math.random() * 60;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.setProperty('--dx', dx + 'px');
+                particle.style.setProperty('--dy', dy + 'px');
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+
+            // 随机表情
+            const emojiCount = 1 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < emojiCount; i++) {
+                const emoji = document.createElement('div');
+                emoji.className = 'click-emoji';
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = (x + (Math.random() - 0.5) * 40) + 'px';
+                emoji.style.top = y + 'px';
+                const drift = (Math.random() - 0.5) * 80;
+                emoji.style.setProperty('--drift', drift + 'px');
+                const scale = 1.5 + Math.random() * 1.5;
+                emoji.style.setProperty('--scale', scale);
+                document.body.appendChild(emoji);
+                setTimeout(() => emoji.remove(), 1500);
+            }
+        });
+    }
 });

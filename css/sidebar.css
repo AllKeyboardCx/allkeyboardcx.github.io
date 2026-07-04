@@ -661,6 +661,55 @@ article a[href^="#"]:hover {
     color: rgba(240, 246, 252, 0.4);
 }
 
+/* 点击爆炸特效（仅电脑端） */
+.click-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    animation: particleBurst 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes particleBurst {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2);
+        opacity: 0;
+    }
+}
+
+.click-emoji {
+    position: fixed;
+    font-size: 32px;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    animation: emojiPop 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    user-select: none;
+}
+
+@keyframes emojiPop {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+        opacity: 0;
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(var(--scale)) rotate(-15deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--drift)), calc(-50% - 150px)) scale(var(--scale)) rotate(15deg);
+        opacity: 0;
+    }
+}
+
 /* Live2D 看板娘强制位置（防止被库内联样式覆盖） */
 #live2d-container {
     position: fixed !important;
