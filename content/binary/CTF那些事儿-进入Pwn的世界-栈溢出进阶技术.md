@@ -30,7 +30,7 @@ TAG 栈劫持, canary, libc_csu_init, ret2_dl_runtime_resolve
 - 参考：[[Pwn-栈结构-了解科普]]
 
 ### 程序分析：
-![[Pasted image 20260203204200.png]]
+![Pasted image 20260203204200.png](<../pictures/Pasted image 20260203204200.png>)
 - read函数负责将用户输入的 12字节 数据存到全局变量magic的地址处(magic、dword_804A384、dword_804A388这三个变量连续存储在.bss段或者.data段【经确认，存储在.bss段】)
 - \*a1 = magic 这里的magic是全局变量的值，不是地址，将用户输入的第一个 4字节 复制给 a1 指向的内存，即v1\[0]
 - 后面依次复制
@@ -127,12 +127,12 @@ p.interactive()
 ## 栈劫持Demo3：64位栈劫持：栈迁移
 - 先学习一下amd64平台和i386的区别：
 ## amd64学习
-![[Pasted image 20260207124325.png]]
-![[Pasted image 20260207124337.png]]
+![Pasted image 20260207124325.png](<../pictures/Pasted image 20260207124325.png>)
+![Pasted image 20260207124337.png](<../pictures/Pasted image 20260207124337.png>)
 
 ---
-![[Pasted image 20260207124354.png]]
-![[Pasted image 20260207124408.png]]
+![Pasted image 20260207124354.png](<../pictures/Pasted image 20260207124354.png>)
+![Pasted image 20260207124408.png](<../pictures/Pasted image 20260207124408.png>)
 
 ---
 
@@ -201,7 +201,7 @@ p.interactive()
 6. 计算：根据pop的数量，计算需传入的地址：0x601060 + 0x18
 ## 当bss段的空间不足或被占用时，堆是更灵活的方案，可以info proc mappings查看
 ## 或者寻找其他rw-p权限的地址区间（第二行）
-![[Pasted image 20260207182743.png]]
+![Pasted image 20260207182743.png](<../pictures/Pasted image 20260207182743.png>)
 
 # 栈劫持Demo4：read不同于gets的特殊 栈迁移
 - 这道题由于读取函数只有read，所以会限制读取的字数，由于限制为272，所以只能溢出16字节，也就是只能覆盖到返回地址，所以只能另辟蹊径
@@ -315,7 +315,7 @@ p.interactive()
 
 ## 这是寄存器界面
 
-![[Pasted image 20260206154953.png]]
+![Pasted image 20260206154953.png](<../pictures/Pasted image 20260206154953.png>)
 
 - **红色星号**：自上次单步执行（n/s/c等）后，值发生了变化的寄存器
 - **白色寄存器**：如eax、ebx，是寄存器的名称，默认显示颜色
@@ -332,7 +332,7 @@ p.interactive()
 ---
 ## 这是汇编界面与栈结构界面以及栈追踪界面
 
-![[Pasted image 20260206165326.png]]
+![Pasted image 20260206165326.png](<../pictures/Pasted image 20260206165326.png>)
 
-![[Pasted image 20260206170002.png]]
-![[Pasted image 20260206170011.png]]
+![Pasted image 20260206170002.png](<../pictures/Pasted image 20260206170002.png>)
+![Pasted image 20260206170011.png](<../pictures/Pasted image 20260206170011.png>)

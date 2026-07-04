@@ -27,17 +27,17 @@ DATE 2026-07-04
 
 # __libc_csu_init汇编（关键部分）
 
-![[Pasted image 20260314213724.png]]
+![Pasted image 20260314213724.png](<../pictures/Pasted image 20260314213724.png>)
 
 # ROP的构建（找到基本ROP）：
 
-![[Pasted image 20260314213947.png]]
+![Pasted image 20260314213947.png](<../pictures/Pasted image 20260314213947.png>)
 
 **这里是第一个坑点**，当时就选的是0x40079c，结果因为__libc_csu_init函数的这串asm最后要验证rbx和rbp的值，如果不进行修改的话就会不断循环，所以一定要设置含设置这两个寄存器的ROP
 
-![[Pasted image 20260314214044.png]]
+![Pasted image 20260314214044.png](<../pictures/Pasted image 20260314214044.png>)
 
-![[Pasted image 20260314214203.png]]
+![Pasted image 20260314214203.png](<../pictures/Pasted image 20260314214203.png>)
 
 - 在asm中可以看到，从0x40079A开始，asm会一直执行，直到遇到ret
 
@@ -45,7 +45,7 @@ DATE 2026-07-04
 函数存在明显栈溢出点
 checksec显示：
 
-![[Pasted image 20260314214413.png]]
+![Pasted image 20260314214413.png](<../pictures/Pasted image 20260314214413.png>)
 
 可以确定基本的思路：
 
@@ -57,7 +57,7 @@ checksec显示：
 - 获取libc基址
 - 运用write函数打印处write的地址，进而计算得到libc基址
 - 运用程序中__libc_csu_init已有的ROP，call r12，可以调用程序自带的got（read，write）
-- ![[Pasted image 20260314214856.png]]
+- ![Pasted image 20260314214856.png](<../pictures/Pasted image 20260314214856.png>)
 - 运用已知的ROP，可以依次设定参数值，然后调用函数
 - 栈溢出
 **这里要注意**，结合所有的步骤，可以考虑到payload可能过长，导致程序崩溃无法getshell，所以要先栈劫持，将payload写到安全的地方。
@@ -65,10 +65,10 @@ checksec显示：
 # exp解析：
 
 1. 最开始的函数，是因为考虑到后续的函数执行都需要构造这么一长串payload，所以简化为函数
-2. pop6_ret，为![[Pasted image 20260314215527.png]]
-3. call_rop为![[Pasted image 20260314215554.png]]
+2. pop6_ret，为![Pasted image 20260314215527.png](<../pictures/Pasted image 20260314215527.png>)
+3. call_rop为![Pasted image 20260314215554.png](<../pictures/Pasted image 20260314215554.png>)
 4. 先看下面的
-   ![[Pasted image 20260314215623.png]]
+   ![Pasted image 20260314215623.png](<../pictures/Pasted image 20260314215623.png>)
    - 前面是再熟悉不过的栈溢出，然后是rop调用read函数
    - 接着rsp3，然后rop_addr - 0x18，这里是栈劫持，rop_addr是后续真正攻击payload的存储地，一般选data或者bss段作为存储的地址较为保险。这里的rop_addr选的是data段
    - 0x000000000040079d : pop rsp ; pop r13 ; pop r14 ; pop r15 ; ret
