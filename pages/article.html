@@ -267,6 +267,83 @@
             return tempDiv.innerHTML;
         }
 
+        function headingToId(text) {
+            let id = text
+                .toLowerCase()
+                .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            return id || 'heading';
+        }
+
+        function convertObsidianSyntax(content, currentCategory) {
+            // 先处理图片语法 ![[file.png]] 和 ![[file.png|width]]
+            content = content.replace(/!\[\[([^\]]+)\]\]/g, (match, inner) => {
+                const parts = inner.split('|');
+                const filename = parts[0].trim();
+                const width = parts[1] ? parts[1].trim() : '';
+                if (width) {
+                    return `<img src="../pictures/${filename}" width="${width}" alt="${filename}">`;
+                }
+                return `![${filename}](<../pictures/${filename}>)`;
+            });
+
+            // 再处理双链语法 [[...]]
+            content = content.replace(/\[\[([^\]]+)\]\]/g, (match, inner) => {
+                const parts = inner.split('|');
+                const link = parts[0].trim();
+                const alias = parts[1] ? parts[1].trim() : '';
+
+                // [[#标题]] 同文档锚点
+                if (link.startsWith('#')) {
+                    const heading = link.substring(1).trim();
+                    const displayText = alias || heading;
+                    return `[${displayText}](#${headingToId(heading)})`;
+                }
+
+                // [[文件名#标题]] 跨文档锚点
+                let heading = '';
+                let fileLink = link;
+                const hashIndex = link.indexOf('#');
+                if (hashIndex !== -1) {
+                    fileLink = link.substring(0, hashIndex);
+                    heading = link.substring(hashIndex + 1);
+                }
+
+                // 判断是否有路径（包含 /）
+                let targetCategory, targetFile;
+                if (fileLink.includes('/')) {
+                    const pathParts = fileLink.split('/');
+                    targetCategory = pathParts[0];
+                    targetFile = pathParts.slice(1).join('/');
+                } else {
+                    targetCategory = currentCategory;
+                    targetFile = fileLink;
+                }
+
+                const displayText = alias || fileLink;
+                let url = `article.html?category=${encodeURIComponent(targetCategory)}&file=${encodeURIComponent(targetFile)}`;
+                if (heading) {
+                    url += `#${headingToId(heading)}`;
+                }
+                return `[${displayText}](${url})`;
+            });
+
+            // 修复标题与列表之间缺少空行（标题行后紧跟列表项）
+            content = content.replace(/^([#]+ .+)\n([-*+] |\d+\. )/gm, '$1\n\n$2');
+            // 修复列表与标题之间缺少空行（列表项后紧跟标题）
+            content = content.replace(/^([-*+] .+)\n([#]+ )/gm, '$1\n\n$2');
+            // 修复图片与列表之间缺少空行
+            content = content.replace(/^(!\[.*\))\n([-*+] |\d+\. )/gm, '$1\n\n$2');
+            content = content.replace(/^(<img[^>]*>)\n([-*+] |\d+\. )/gm, '$1\n\n$2');
+            // 修复图片与标题之间缺少空行
+            content = content.replace(/^(!\[.*\))\n([#]+ )/gm, '$1\n\n$2');
+            content = content.replace(/^(<img[^>]*>)\n([#]+ )/gm, '$1\n\n$2');
+
+            return content;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const category = urlParams.get('category');
@@ -359,7 +436,8 @@
                     })
                     .then(mdContent => {
                         const { data, body } = parseMetadata(mdContent);
-                        const htmlContent = marked.parse(body);
+                        const convertedBody = convertObsidianSyntax(body, category);
+                        const htmlContent = marked.parse(convertedBody);
                         const { html: finalHtml, toc } = generateTOC(htmlContent);
                         const calloutHtml = renderCallouts(finalHtml);
                         document.getElementById('article-content').innerHTML = `
