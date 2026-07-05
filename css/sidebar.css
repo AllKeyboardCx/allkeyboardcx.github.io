@@ -715,7 +715,16 @@ article a[href^="#"]:hover {
     position: fixed !important;
     z-index: 1000 !important;
     pointer-events: auto !important;
-    transition: transform 0.4s ease, left 0.4s ease, bottom 0.4s ease, width 0.4s ease, height 0.4s ease;
+    cursor: grab;
+    transition: transform 0.4s ease, left 0.4s ease, bottom 0.4s ease, width 0.4s ease, height 0.4s ease, top 0.4s ease, opacity 0.3s ease;
+}
+
+#live2d-container:active {
+    cursor: grabbing;
+}
+
+#live2d-container.minimized {
+    cursor: default;
 }
 
 #live2d-container > * {

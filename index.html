@@ -272,6 +272,9 @@
             var container = document.getElementById('live2d-container');
             if (!container) return;
 
+            // 用户已手动拖动过，保留用户设置的位置，不覆盖
+            if (window.__live2dUserMoved && window.__live2dUserMoved()) return;
+
             var isMobile = window.innerWidth <= 768;
             var left = isMobile ? '20px' : '60px';
             var bottom = isMobile ? '-30px' : '-50px';
@@ -318,16 +321,122 @@
 
         window.addEventListener('resize', fixLive2DPosition);
 
-        // 看板娘点击交互：弹出缩小按钮
+        // 看板娘点击/拖动交互
         (function() {
             const container = document.getElementById('live2d-container');
             const shrinkBtn = document.getElementById('live2d-shrink-btn');
             const expandBtn = document.getElementById('live2d-expand-btn');
             let shrinkTimer = null;
 
-            // 点击看板娘：显示缩小按钮
-            container.addEventListener('click', function() {
+            // 拖动状态
+            let isDragging = false;
+            let hasMoved = false;
+            let startX = 0, startY = 0;
+            let startLeft = 0, startTop = 0;
+            let userMoved = false;  // 用户是否手动拖动过
+
+            function getEventPos(e) {
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+                return { x: e.clientX, y: e.clientY };
+            }
+
+            function syncShrinkBtnPosition() {
                 if (container.classList.contains('minimized')) return;
+                var rect = container.getBoundingClientRect();
+                shrinkBtn.style.left = (rect.right - 18) + 'px';
+                shrinkBtn.style.bottom = (window.innerHeight - rect.top - 18) + 'px';
+            }
+
+            function startDrag(e) {
+                if (container.classList.contains('minimized')) return;
+                // 忽略对内部 canvas 的特定交互（Live2D 自身的点击）
+                // 但允许拖动
+                const pos = getEventPos(e);
+                const rect = container.getBoundingClientRect();
+
+                isDragging = true;
+                hasMoved = false;
+                startX = pos.x;
+                startY = pos.y;
+                startLeft = rect.left;
+                startTop = rect.top;
+
+                // 切换为 top/left 定位（脱离 bottom）
+                container.style.transition = 'none';
+                container.style.left = rect.left + 'px';
+                container.style.top = rect.top + 'px';
+                container.style.bottom = 'auto';
+                container.style.right = 'auto';
+
+                document.body.style.userSelect = 'none';
+            }
+
+            function onDrag(e) {
+                if (!isDragging) return;
+                const pos = getEventPos(e);
+                const dx = pos.x - startX;
+                const dy = pos.y - startY;
+
+                if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+                    hasMoved = true;
+                }
+
+                if (!hasMoved) return;
+
+                let newLeft = startLeft + dx;
+                let newTop = startTop + dy;
+
+                // 边界限制
+                const cw = container.offsetWidth;
+                const ch = container.offsetHeight;
+                newLeft = Math.max(-cw * 0.5, Math.min(window.innerWidth - cw * 0.5, newLeft));
+                newTop = Math.max(0, Math.min(window.innerHeight - ch * 0.3, newTop));
+
+                container.style.left = newLeft + 'px';
+                container.style.top = newTop + 'px';
+
+                // 同步缩小按钮位置
+                shrinkBtn.style.left = (newLeft + cw - 18) + 'px';
+                shrinkBtn.style.bottom = (window.innerHeight - newTop - 18) + 'px';
+
+                e.preventDefault();
+            }
+
+            function endDrag() {
+                if (!isDragging) return;
+                isDragging = false;
+                document.body.style.userSelect = '';
+                // 恢复过渡动画（用于后续的缩小/展开）
+                setTimeout(function() {
+                    container.style.transition = '';
+                }, 50);
+                if (hasMoved) {
+                    userMoved = true;
+                    // 拖动后隐藏缩小按钮（避免位置突兀）
+                    shrinkBtn.style.display = 'none';
+                }
+            }
+
+            // 鼠标事件
+            container.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+
+            // 触摸事件
+            container.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchmove', onDrag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+
+            // 点击看板娘：显示缩小按钮（拖动过则不触发）
+            container.addEventListener('click', function() {
+                if (hasMoved) {
+                    hasMoved = false;  // 重置，下次点击可正常触发
+                    return;
+                }
+                if (container.classList.contains('minimized')) return;
+                syncShrinkBtnPosition();
                 shrinkBtn.style.display = 'flex';
                 clearTimeout(shrinkTimer);
                 shrinkTimer = setTimeout(function() {
@@ -358,6 +467,10 @@
                     shrinkBtn.style.display = 'none';
                 }, 1500);
             });
+
+            // 暴露状态给 fixLive2DPosition
+            window.__live2dUserMoved = function() { return userMoved; };
+            window.__live2dResetUserMoved = function() { userMoved = false; };
         })();
 
         function showQQModal() {
