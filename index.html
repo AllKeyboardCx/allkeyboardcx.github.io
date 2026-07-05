@@ -50,29 +50,43 @@
 
         /* L2Dwidget 库把 widget 渲染到 body 末尾的 #live2d-widget，而非 #live2d-container，
            因此交互/定位样式必须作用于 #live2d-widget。 */
+        /* 电脑端样式（默认，屏幕宽度 > 768px） */
         #live2d-widget {
             position: fixed !important;
             left: 60px !important;
-            bottom: -50px !important;
-            width: 200px !important;
-            height: 260px !important;
+            bottom: -70px !important;
+            width: 260px !important;
+            height: 340px !important;
             z-index: 1000 !important;
             pointer-events: auto !important;
             right: auto !important;
             top: auto !important;
         }
-        /* canvas 跟随 widget：static 定位 + 缩放到 widget 尺寸，事件交给 widget 处理 */
         #live2d-widget canvas,
         #live2d-widget > div {
             position: static !important;
-            width: 200px !important;
-            height: 260px !important;
+            width: 260px !important;
+            height: 340px !important;
             pointer-events: none !important;
             left: auto !important;
             right: auto !important;
             top: auto !important;
             bottom: auto !important;
             transform: none !important;
+        }
+        /* 手机端样式（屏幕宽度 <= 768px） */
+        @media (max-width: 768px) {
+            #live2d-widget {
+                left: 20px !important;
+                bottom: -20px !important;
+                width: 90px !important;
+                height: 120px !important;
+            }
+            #live2d-widget canvas,
+            #live2d-widget > div {
+                width: 90px !important;
+                height: 120px !important;
+            }
         }
         /* 旧的 #live2d-container 是空壳，禁用事件避免拦截 */
         #live2d-container {
@@ -348,11 +362,11 @@
                     },
                     display: {
                         superSample: 2,
-                        width: 200,
-                        height: 260,
+                        width: 260,
+                        height: 340,
                         positionX: 0.5,
                         positionY: 0.2,
-                        scale: 0.7
+                        scale: 0.9
                     },
                     mobile: {
                         show: true,
@@ -402,9 +416,9 @@
 
             var isMobile = window.innerWidth <= 768;
             var left = isMobile ? '20px' : '60px';
-            var bottom = isMobile ? '-20px' : '-50px';
-            var width = isMobile ? '90px' : '200px';
-            var height = isMobile ? '120px' : '260px';
+            var bottom = isMobile ? '-20px' : '-70px';
+            var width = isMobile ? '90px' : '260px';
+            var height = isMobile ? '120px' : '340px';
 
             widget.style.position = 'fixed';
             widget.style.left = left;
@@ -425,9 +439,9 @@
             if (shrinkBtn) {
                 var isMobileBtn = window.innerWidth <= 768;
                 var widgetLeft = parseInt(isMobileBtn ? '20' : '60');
-                var widgetWidth = isMobileBtn ? 90 : 200;
+                var widgetWidth = isMobileBtn ? 90 : 260;
                 shrinkBtn.style.left = (widgetLeft + widgetWidth - 18) + 'px';
-                shrinkBtn.style.bottom = (isMobileBtn ? 100 : 210) + 'px';
+                shrinkBtn.style.bottom = (isMobileBtn ? 100 : 290) + 'px';
             }
 
             // 修复内部元素（canvas 等）跟随 widget
