@@ -737,6 +737,11 @@ article a[href^="#"]:hover {
     float: none !important;
 }
 
+/* 让所有鼠标事件直接在 container 上触发，不被内部 canvas/元素拦截 */
+#live2d-container * {
+    pointer-events: none !important;
+}
+
 /* 看板娘缩小状态 */
 #live2d-container.minimized {
     transform: scale(0.35) !important;

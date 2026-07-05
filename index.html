@@ -350,6 +350,10 @@
                 shrinkBtn.style.bottom = (window.innerHeight - rect.top - 18) + 'px';
             }
 
+            function setStyle(el, prop, val) {
+                el.style.setProperty(prop, val, 'important');
+            }
+
             function startDrag(e) {
                 if (container.classList.contains('minimized')) return;
                 const pos = getEventPos(e);
@@ -379,10 +383,11 @@
                     startLeft = rect.left;
                     startTop = rect.top;
                     container.style.transition = 'none';
-                    container.style.left = rect.left + 'px';
-                    container.style.top = rect.top + 'px';
-                    container.style.bottom = 'auto';
-                    container.style.right = 'auto';
+                    // 用 !important 覆盖 <style> 中的 !important 默认值
+                    setStyle(container, 'left', rect.left + 'px');
+                    setStyle(container, 'top', rect.top + 'px');
+                    setStyle(container, 'bottom', 'auto');
+                    setStyle(container, 'right', 'auto');
                     document.body.style.userSelect = 'none';
                 }
 
@@ -395,8 +400,8 @@
                 newLeft = Math.max(-cw * 0.5, Math.min(window.innerWidth - cw * 0.5, newLeft));
                 newTop = Math.max(0, Math.min(window.innerHeight - ch * 0.3, newTop));
 
-                container.style.left = newLeft + 'px';
-                container.style.top = newTop + 'px';
+                setStyle(container, 'left', newLeft + 'px');
+                setStyle(container, 'top', newTop + 'px');
 
                 // 同步缩小按钮位置
                 shrinkBtn.style.left = (newLeft + cw - 18) + 'px';
