@@ -207,6 +207,9 @@
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="small text-muted">${formatDate(note.created_at)}</span>
+                                <button class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation(); openEditModal(${note.id})" title="编辑笔记">
+                                    ✏️
+                                </button>
                                 <button class="btn btn-outline-danger btn-sm" onclick="event.stopPropagation(); confirmDelete(${note.id})" title="删除笔记">
                                     🗑️
                                 </button>
@@ -492,6 +495,104 @@
             } catch (error) {
                 console.error('删除笔记失败:', error);
                 alert('删除笔记失败，请稍后重试\n\n错误: ' + error.message);
+            }
+        }
+
+        let currentEditId = null;
+        let editModal = null;
+
+        function openEditModal(id) {
+            currentEditId = id;
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            const modalHtml = `
+                <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content bg-dark border-gray">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-light" id="editModalLabel">✏️ 编辑笔记</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label text-light">笔记标题</label>
+                                    <input type="text" class="form-control" id="edit-title" value="${escapeHtml(note.title)}" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-light">笔记内容</label>
+                                    <textarea class="form-control" id="edit-content" rows="10">${escapeHtml(note.content)}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-light">请输入发布口令</label>
+                                    <input type="password" class="form-control" id="edit-password" placeholder="请输入口令" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary" onclick="saveEdit()">保存修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (!document.getElementById('editModal')) {
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            }
+            const modalEl = document.getElementById('editModal');
+            editModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            document.getElementById('edit-password').value = '';
+            editModal.show();
+        }
+
+        async function saveEdit() {
+            const title = document.getElementById('edit-title').value.trim();
+            const content = document.getElementById('edit-content').value.trim();
+            const password = document.getElementById('edit-password').value.trim();
+
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+
+            if (password !== PASSWORD) {
+                alert('口令错误！');
+                return;
+            }
+
+            if (!currentEditId) return;
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/notes?id=eq.${currentEditId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        content: content,
+                        created_at: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('更新笔记失败:', await response.text());
+                    alert('更新笔记失败，请稍后重试');
+                    return;
+                }
+
+                if (editModal) {
+                    editModal.hide();
+                }
+
+                loadNotes();
+                alert('修改成功！');
+            } catch (error) {
+                console.error('更新笔记失败:', error);
+                alert('更新笔记失败，请稍后重试\n\n错误: ' + error.message);
             }
         }
     </script>

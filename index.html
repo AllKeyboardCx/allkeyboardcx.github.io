@@ -96,13 +96,62 @@
             overflow: hidden !important;
         }
     </style>
+    <script>
+        (function() {
+            const loadingBarContainer = document.createElement('div');
+            loadingBarContainer.id = 'loading-bar-container';
+            loadingBarContainer.innerHTML = '<div id="loading-bar"></div>';
+            document.documentElement.insertBefore(loadingBarContainer, document.documentElement.firstChild);
+
+            const loadingBar = document.getElementById('loading-bar');
+            let progress = 0;
+
+            function setProgress(value) {
+                progress = Math.min(100, Math.max(0, value));
+                loadingBar.style.width = progress + '%';
+            }
+
+            function incrementProgress(amount) {
+                setProgress(progress + amount);
+            }
+
+            setProgress(5);
+
+            let loadedCount = 0;
+            let totalResources = 0;
+
+            function checkResourceLoaded() {
+                loadedCount++;
+                if (totalResources > 0) {
+                    const newProgress = 10 + (loadedCount / totalResources) * 50;
+                    setProgress(newProgress);
+                }
+            }
+
+            const interval = setInterval(function() {
+                if (progress < 90) {
+                    incrementProgress(Math.random() * 3);
+                }
+            }, 150);
+
+            window.addEventListener('DOMContentLoaded', function() {
+                incrementProgress(20);
+            });
+
+            window.addEventListener('load', function() {
+                clearInterval(interval);
+                setProgress(95);
+                setTimeout(function() {
+                    setProgress(100);
+                    setTimeout(function() {
+                        loadingBarContainer.classList.add('hidden');
+                    }, 500);
+                }, 300);
+            });
+        })();
+    </script>
 </head>
 <body>
-        <!-- 加载进度条 -->
-        <div id="loading-bar-container">
-            <div id="loading-bar"></div>
-        </div>
-
         <!-- 侧边栏 (默认隐藏，在屏幕左侧外) -->
         <div id="sidebar">
             <div class="sidebar-header">
@@ -268,79 +317,6 @@
     <script>
         const SUPABASE_URL = 'https://dgwuzhngmrksrtdrmjvm.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_fMMt5IGPP8ub6Ys-QfRD4Q_OEse9xv1';
-
-        // 加载进度条逻辑
-        (function() {
-            const loadingBar = document.getElementById('loading-bar');
-            const loadingContainer = document.getElementById('loading-bar-container');
-            let progress = 0;
-
-            function setProgress(value) {
-                progress = Math.min(100, Math.max(0, value));
-                loadingBar.style.width = progress + '%';
-            }
-
-            function incrementProgress(amount) {
-                setProgress(progress + amount);
-            }
-
-            // 页面开始加载时的初始进度
-            setProgress(5);
-
-            // 监听资源加载
-            let loadedCount = 0;
-            const totalResources = document.images.length + document.querySelectorAll('link[rel="stylesheet"]').length + 
-                                   document.querySelectorAll('script').length;
-
-            function checkResourceLoaded() {
-                loadedCount++;
-                const newProgress = 10 + (loadedCount / totalResources) * 50;
-                setProgress(newProgress);
-            }
-
-            // 监听所有图片加载
-            document.images.forEach(function(img) {
-                if (img.complete) {
-                    checkResourceLoaded();
-                } else {
-                    img.addEventListener('load', checkResourceLoaded);
-                    img.addEventListener('error', checkResourceLoaded);
-                }
-            });
-
-            // 监听所有脚本加载
-            document.querySelectorAll('script').forEach(function(script) {
-                script.addEventListener('load', checkResourceLoaded);
-                script.addEventListener('error', checkResourceLoaded);
-            });
-
-            // DOMContentLoaded 时增加进度
-            document.addEventListener('DOMContentLoaded', function() {
-                incrementProgress(20);
-            });
-
-            // 页面完全加载时完成进度
-            window.addEventListener('load', function() {
-                setProgress(95);
-                setTimeout(function() {
-                    setProgress(100);
-                    setTimeout(function() {
-                        loadingContainer.classList.add('hidden');
-                    }, 500);
-                }, 300);
-            });
-
-            // 模拟渐进式加载动画（防止长时间卡住）
-            const simulateInterval = setInterval(function() {
-                if (progress < 90) {
-                    incrementProgress(Math.random() * 2);
-                }
-            }, 200);
-
-            window.addEventListener('load', function() {
-                clearInterval(simulateInterval);
-            });
-        })();
 
         document.addEventListener('DOMContentLoaded', function() {
             loadTags();
