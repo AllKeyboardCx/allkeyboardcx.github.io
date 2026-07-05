@@ -36,91 +36,91 @@ body {
 }
 
 body.theme-dawn {
-    --theme-bg-overlay: rgba(245, 240, 232, 0.85);
-    --theme-primary-color: #e8b89d;
-    --theme-primary-glow: rgba(232, 184, 157, 0.4);
-    --theme-primary-glow-strong: rgba(232, 184, 157, 0.7);
-    --theme-border-color: rgba(232, 184, 157, 0.4);
+    --theme-bg-overlay: rgba(200, 190, 175, 0.65);
+    --theme-primary-color: #d4a07a;
+    --theme-primary-glow: rgba(212, 160, 122, 0.35);
+    --theme-primary-glow-strong: rgba(212, 160, 122, 0.55);
+    --theme-border-color: rgba(212, 160, 122, 0.35);
     --theme-text-color: #4a3b2a;
     --theme-text-light: #2d2318;
-    --theme-text-muted: #8b7a6a;
-    --theme-card-bg: rgba(255, 248, 238, 0.6);
-    --theme-card-border: rgba(232, 184, 157, 0.4);
+    --theme-text-muted: #7a6a5a;
+    --theme-card-bg: rgba(220, 210, 195, 0.55);
+    --theme-card-border: rgba(212, 160, 122, 0.35);
     --theme-btn-text: #2d2318;
-    --theme-btn-hover-bg: rgba(232, 184, 157, 0.9);
-    --theme-btn-hover-text: #f5f0e8;
-    --theme-code-color: #9b59b6;
-    --theme-code-bg: rgba(232, 184, 157, 0.2);
-    --theme-link-color: #8e44ad;
-    --theme-link-hover-color: #9b59b6;
+    --theme-btn-hover-bg: rgba(212, 160, 122, 0.85);
+    --theme-btn-hover-text: #f0e8dc;
+    --theme-code-color: #8b5a9b;
+    --theme-code-bg: rgba(212, 160, 122, 0.15);
+    --theme-link-color: #7e3a8d;
+    --theme-link-hover-color: #8b5a9b;
     --theme-icon-color: #2d2318;
-    --theme-accent-color: #e8b89d;
+    --theme-accent-color: #d4a07a;
 }
 
 body.theme-morning {
-    --theme-bg-overlay: rgba(232, 237, 243, 0.85);
-    --theme-primary-color: #8ca3b8;
-    --theme-primary-glow: rgba(140, 163, 184, 0.4);
-    --theme-primary-glow-strong: rgba(140, 163, 184, 0.7);
-    --theme-border-color: rgba(140, 163, 184, 0.4);
+    --theme-bg-overlay: rgba(180, 190, 200, 0.65);
+    --theme-primary-color: #6a8a9e;
+    --theme-primary-glow: rgba(106, 138, 158, 0.35);
+    --theme-primary-glow-strong: rgba(106, 138, 158, 0.55);
+    --theme-border-color: rgba(106, 138, 158, 0.35);
     --theme-text-color: #3a4a5a;
     --theme-text-light: #1a2a3a;
-    --theme-text-muted: #7a8a9a;
-    --theme-card-bg: rgba(245, 248, 252, 0.6);
-    --theme-card-border: rgba(140, 163, 184, 0.4);
+    --theme-text-muted: #6a7a8a;
+    --theme-card-bg: rgba(200, 210, 220, 0.55);
+    --theme-card-border: rgba(106, 138, 158, 0.35);
     --theme-btn-text: #1a2a3a;
-    --theme-btn-hover-bg: rgba(140, 163, 184, 0.9);
-    --theme-btn-hover-text: #e8edf3;
-    --theme-code-color: #9b59b6;
-    --theme-code-bg: rgba(140, 163, 184, 0.2);
-    --theme-link-color: #8e44ad;
-    --theme-link-hover-color: #9b59b6;
+    --theme-btn-hover-bg: rgba(106, 138, 158, 0.85);
+    --theme-btn-hover-text: #e0e8f0;
+    --theme-code-color: #8b5a9b;
+    --theme-code-bg: rgba(106, 138, 158, 0.15);
+    --theme-link-color: #7e3a8d;
+    --theme-link-hover-color: #8b5a9b;
     --theme-icon-color: #1a2a3a;
-    --theme-accent-color: #8ca3b8;
+    --theme-accent-color: #6a8a9e;
 }
 
 body.theme-noon {
-    --theme-bg-overlay: rgba(248, 250, 252, 0.9);
-    --theme-primary-color: #60a5fa;
-    --theme-primary-glow: rgba(96, 165, 250, 0.4);
-    --theme-primary-glow-strong: rgba(96, 165, 250, 0.7);
-    --theme-border-color: rgba(96, 165, 250, 0.4);
+    --theme-bg-overlay: rgba(190, 200, 210, 0.65);
+    --theme-primary-color: #4a8ad4;
+    --theme-primary-glow: rgba(74, 138, 212, 0.35);
+    --theme-primary-glow-strong: rgba(74, 138, 212, 0.55);
+    --theme-border-color: rgba(74, 138, 212, 0.35);
     --theme-text-color: #1e293b;
     --theme-text-light: #0f172a;
-    --theme-text-muted: #64748b;
-    --theme-card-bg: rgba(255, 255, 255, 0.7);
-    --theme-card-border: rgba(96, 165, 250, 0.4);
+    --theme-text-muted: #54647b;
+    --theme-card-bg: rgba(210, 220, 230, 0.55);
+    --theme-card-border: rgba(74, 138, 212, 0.35);
     --theme-btn-text: #0f172a;
-    --theme-btn-hover-bg: rgba(96, 165, 250, 0.9);
-    --theme-btn-hover-text: #f8fafc;
-    --theme-code-color: #9333ea;
-    --theme-code-bg: rgba(96, 165, 250, 0.15);
-    --theme-link-color: #8b5cf6;
-    --theme-link-hover-color: #a78bfa;
+    --theme-btn-hover-bg: rgba(74, 138, 212, 0.85);
+    --theme-btn-hover-text: #e8f0f8;
+    --theme-code-color: #7b2ea8;
+    --theme-code-bg: rgba(74, 138, 212, 0.15);
+    --theme-link-color: #7b4cd6;
+    --theme-link-hover-color: #9b6cf6;
     --theme-icon-color: #0f172a;
-    --theme-accent-color: #60a5fa;
+    --theme-accent-color: #4a8ad4;
 }
 
 body.theme-afternoon {
-    --theme-bg-overlay: rgba(254, 249, 243, 0.85);
-    --theme-primary-color: #f5a623;
-    --theme-primary-glow: rgba(245, 166, 35, 0.4);
-    --theme-primary-glow-strong: rgba(245, 166, 35, 0.7);
-    --theme-border-color: rgba(245, 166, 35, 0.4);
-    --theme-text-color: #5a4a2a;
-    --theme-text-light: #3a2a1a;
-    --theme-text-muted: #8a7a5a;
-    --theme-card-bg: rgba(255, 250, 240, 0.6);
-    --theme-card-border: rgba(245, 166, 35, 0.4);
-    --theme-btn-text: #3a2a1a;
-    --theme-btn-hover-bg: rgba(245, 166, 35, 0.9);
-    --theme-btn-hover-text: #fef9f3;
-    --theme-code-color: #9b59b6;
-    --theme-code-bg: rgba(245, 166, 35, 0.15);
-    --theme-link-color: #8e44ad;
-    --theme-link-hover-color: #9b59b6;
-    --theme-icon-color: #3a2a1a;
-    --theme-accent-color: #f5a623;
+    --theme-bg-overlay: rgba(210, 190, 165, 0.65);
+    --theme-primary-color: #c99030;
+    --theme-primary-glow: rgba(201, 144, 48, 0.35);
+    --theme-primary-glow-strong: rgba(201, 144, 48, 0.55);
+    --theme-border-color: rgba(201, 144, 48, 0.35);
+    --theme-text-color: #4a3a1a;
+    --theme-text-light: #2a1a0a;
+    --theme-text-muted: #7a6a4a;
+    --theme-card-bg: rgba(220, 200, 175, 0.55);
+    --theme-card-border: rgba(201, 144, 48, 0.35);
+    --theme-btn-text: #2a1a0a;
+    --theme-btn-hover-bg: rgba(201, 144, 48, 0.85);
+    --theme-btn-hover-text: #f0e8d8;
+    --theme-code-color: #8b5a9b;
+    --theme-code-bg: rgba(201, 144, 48, 0.15);
+    --theme-link-color: #7e3a8d;
+    --theme-link-hover-color: #8b5a9b;
+    --theme-icon-color: #2a1a0a;
+    --theme-accent-color: #c99030;
 }
 
 body.theme-dusk {
