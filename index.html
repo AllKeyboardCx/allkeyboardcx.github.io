@@ -331,6 +331,7 @@
             // 拖动状态
             let isDragging = false;
             let hasMoved = false;
+            let dragInitialized = false;
             let startX = 0, startY = 0;
             let startLeft = 0, startTop = 0;
             let userMoved = false;  // 用户是否手动拖动过
@@ -351,26 +352,12 @@
 
             function startDrag(e) {
                 if (container.classList.contains('minimized')) return;
-                // 忽略对内部 canvas 的特定交互（Live2D 自身的点击）
-                // 但允许拖动
                 const pos = getEventPos(e);
-                const rect = container.getBoundingClientRect();
-
                 isDragging = true;
                 hasMoved = false;
+                dragInitialized = false;
                 startX = pos.x;
                 startY = pos.y;
-                startLeft = rect.left;
-                startTop = rect.top;
-
-                // 切换为 top/left 定位（脱离 bottom）
-                container.style.transition = 'none';
-                container.style.left = rect.left + 'px';
-                container.style.top = rect.top + 'px';
-                container.style.bottom = 'auto';
-                container.style.right = 'auto';
-
-                document.body.style.userSelect = 'none';
             }
 
             function onDrag(e) {
@@ -384,6 +371,20 @@
                 }
 
                 if (!hasMoved) return;
+
+                // 第一次移动时才初始化拖动（避免点击时改变样式）
+                if (!dragInitialized) {
+                    dragInitialized = true;
+                    const rect = container.getBoundingClientRect();
+                    startLeft = rect.left;
+                    startTop = rect.top;
+                    container.style.transition = 'none';
+                    container.style.left = rect.left + 'px';
+                    container.style.top = rect.top + 'px';
+                    container.style.bottom = 'auto';
+                    container.style.right = 'auto';
+                    document.body.style.userSelect = 'none';
+                }
 
                 let newLeft = startLeft + dx;
                 let newTop = startTop + dy;
@@ -407,29 +408,31 @@
             function endDrag() {
                 if (!isDragging) return;
                 isDragging = false;
-                document.body.style.userSelect = '';
-                // 恢复过渡动画（用于后续的缩小/展开）
-                setTimeout(function() {
-                    container.style.transition = '';
-                }, 50);
+                if (dragInitialized) {
+                    document.body.style.userSelect = '';
+                    // 恢复过渡动画（用于后续的缩小/展开）
+                    setTimeout(function() {
+                        container.style.transition = '';
+                    }, 50);
+                }
                 if (hasMoved) {
                     userMoved = true;
-                    // 拖动后隐藏缩小按钮（避免位置突兀）
                     shrinkBtn.style.display = 'none';
                 }
             }
 
-            // 鼠标事件
-            container.addEventListener('mousedown', startDrag);
+            // 鼠标事件（使用捕获阶段，确保先于 Live2D 内部 canvas 处理）
+            container.addEventListener('mousedown', startDrag, true);
             document.addEventListener('mousemove', onDrag);
             document.addEventListener('mouseup', endDrag);
 
-            // 触摸事件
-            container.addEventListener('touchstart', startDrag, { passive: false });
+            // 触摸事件（使用捕获阶段）
+            container.addEventListener('touchstart', startDrag, { passive: true, capture: true });
             document.addEventListener('touchmove', onDrag, { passive: false });
             document.addEventListener('touchend', endDrag);
 
             // 点击看板娘：显示缩小按钮（拖动过则不触发）
+            // 使用捕获阶段，确保先于 Live2D 内部 canvas 处理 click
             container.addEventListener('click', function() {
                 if (hasMoved) {
                     hasMoved = false;  // 重置，下次点击可正常触发
@@ -442,7 +445,7 @@
                 shrinkTimer = setTimeout(function() {
                     shrinkBtn.style.display = 'none';
                 }, 3000);
-            });
+            }, true);
 
             // 点击缩小按钮：缩小并移到角落
             shrinkBtn.addEventListener('click', function(e) {
