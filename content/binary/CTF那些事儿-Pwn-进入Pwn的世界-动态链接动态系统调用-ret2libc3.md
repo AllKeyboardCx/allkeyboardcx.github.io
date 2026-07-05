@@ -12,11 +12,11 @@ TAG 栈溢出, ret2syscall
 > [!TIP]
 > 一样的，还是只是开启了NX保护
 > 但是可以发现，如果还是按照之前那个进行系统调用的话，发现没有对应的gadget可以用
-> ![[Pasted image 20260117153607.png]]
+> ![Pasted image 20260117153607.png](<../pictures/Pasted image 20260117153607.png>)
 
 > [!CAUTION]
 > 值得注意的是，这里的IDA可以发现没有很多的内部函数，也就是类似__func这种的名称的函数，所以我们可以判断上一个题目是静态编译而这次是动态编译
-> ![[Pasted image 20260117153637.png]]
+> ![Pasted image 20260117153637.png](<../pictures/Pasted image 20260117153637.png>)
 
 
 > [!TIP]
@@ -34,12 +34,12 @@ TAG 栈溢出, ret2syscall
 
 
 ## 先在setvbuf这里下一个断点
-![[Pasted image 20260117163515.png]]
+![Pasted image 20260117163515.png](<../pictures/Pasted image 20260117163515.png>)
 
 ## 然后si单步（其实我们这里不用si）进入下一条指令，会发现PLT中的第一句代码是跳转到一个地址里面的内容，也就是跳转到0x804a01c地址里的内容，而这个地址的内容实际上是0x080483f6，而这个地址实际上是PLT中0x80483f0的下一条指令的地址，也就是说，通过一个jmp指令完成了跳转的顺序执行。
-![[Pasted image 20260117163851.png]]
+![Pasted image 20260117163851.png](<../pictures/Pasted image 20260117163851.png>)
 
-![[Pasted image 20260117164022.png]]
+![Pasted image 20260117164022.png](<../pictures/Pasted image 20260117164022.png>)
 
 
 ---
@@ -92,7 +92,7 @@ TAG 栈溢出, ret2syscall
 
 
 ### 针对第二个输出的解析
-![[Pasted image 20260117165650.png]]
+![Pasted image 20260117165650.png](<../pictures/Pasted image 20260117165650.png>)
 首先，第一个语句前面的 `x80483a0   push   dword ptr [_GLOBAL_OFFSET_TABLE_+4]` （这个在gdb中看）中的GLOBAL 是 GOT 的初始位置，也就是 `0x804a000`，这里 +4 也就是 push GOT 中的第二个元素，也可以叫做 **GOT\[1]**， 这里保存的内容是**link_map** [[#^795db6]] 。
 
 第二个语句，`0x80483a6  jmp    dword ptr [_GLOBAL_OFFSET_TABLE_+8] <_dl_runtime_resolve>`, 是GOT的第三个元素，也可以叫作 GOT\[2]，保存了_dl_runtime_resolve函数的地址[[#^555]]
