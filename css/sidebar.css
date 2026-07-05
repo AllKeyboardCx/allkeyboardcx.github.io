@@ -1,5 +1,4 @@
 :root {
-    --theme-bg-color: #0d1117;
     --theme-bg-overlay: rgba(0, 0, 0, 0.45);
     --theme-primary-color: #58a6ff;
     --theme-primary-glow: rgba(88, 166, 255, 0.4);
@@ -7,12 +6,23 @@
     --theme-border-color: rgba(88, 166, 255, 0.35);
     --theme-text-color: #c9d1d9;
     --theme-text-light: #f0f6fc;
+    --theme-text-muted: #8b949e;
     --theme-card-bg: rgba(22, 27, 34, 0.35);
     --theme-card-border: rgba(88, 166, 255, 0.35);
+    --theme-btn-text: #f0f6fc;
+    --theme-btn-hover-bg: rgba(88, 166, 255, 0.9);
+    --theme-btn-hover-text: #0d1117;
+    --theme-code-color: #d2a8ff;
+    --theme-code-bg: rgba(13, 17, 23, 0.45);
+    --theme-link-color: #a371f7;
+    --theme-link-hover-color: #d2a8ff;
+    --theme-icon-color: #f0f6fc;
+    --theme-accent-color: #58a6ff;
 }
 
 body {
-    background-color: var(--theme-bg-color) !important;
+    background-image: url('../assets/background.jpg') !important;
+    background-color: #0d1117 !important;
     background-size: cover !important;
     background-position: center !important;
     background-attachment: fixed !important;
@@ -23,76 +33,119 @@ body {
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
-    transition: background-color 1.5s ease;
 }
 
 body.theme-dawn {
-    --theme-bg-color: #f5f0e8;
-    --theme-bg-overlay: rgba(245, 240, 232, 0.2);
+    --theme-bg-overlay: rgba(245, 240, 232, 0.85);
     --theme-primary-color: #e8b89d;
     --theme-primary-glow: rgba(232, 184, 157, 0.4);
     --theme-primary-glow-strong: rgba(232, 184, 157, 0.7);
     --theme-border-color: rgba(232, 184, 157, 0.4);
     --theme-text-color: #4a3b2a;
     --theme-text-light: #2d2318;
+    --theme-text-muted: #8b7a6a;
     --theme-card-bg: rgba(255, 248, 238, 0.6);
     --theme-card-border: rgba(232, 184, 157, 0.4);
+    --theme-btn-text: #2d2318;
+    --theme-btn-hover-bg: rgba(232, 184, 157, 0.9);
+    --theme-btn-hover-text: #f5f0e8;
+    --theme-code-color: #9b59b6;
+    --theme-code-bg: rgba(232, 184, 157, 0.2);
+    --theme-link-color: #8e44ad;
+    --theme-link-hover-color: #9b59b6;
+    --theme-icon-color: #2d2318;
+    --theme-accent-color: #e8b89d;
 }
 
 body.theme-morning {
-    --theme-bg-color: #e8edf3;
-    --theme-bg-overlay: rgba(232, 237, 243, 0.2);
+    --theme-bg-overlay: rgba(232, 237, 243, 0.85);
     --theme-primary-color: #8ca3b8;
     --theme-primary-glow: rgba(140, 163, 184, 0.4);
     --theme-primary-glow-strong: rgba(140, 163, 184, 0.7);
     --theme-border-color: rgba(140, 163, 184, 0.4);
     --theme-text-color: #3a4a5a;
     --theme-text-light: #1a2a3a;
+    --theme-text-muted: #7a8a9a;
     --theme-card-bg: rgba(245, 248, 252, 0.6);
     --theme-card-border: rgba(140, 163, 184, 0.4);
+    --theme-btn-text: #1a2a3a;
+    --theme-btn-hover-bg: rgba(140, 163, 184, 0.9);
+    --theme-btn-hover-text: #e8edf3;
+    --theme-code-color: #9b59b6;
+    --theme-code-bg: rgba(140, 163, 184, 0.2);
+    --theme-link-color: #8e44ad;
+    --theme-link-hover-color: #9b59b6;
+    --theme-icon-color: #1a2a3a;
+    --theme-accent-color: #8ca3b8;
 }
 
 body.theme-noon {
-    --theme-bg-color: #f8fafc;
-    --theme-bg-overlay: rgba(248, 250, 252, 0.1);
+    --theme-bg-overlay: rgba(248, 250, 252, 0.9);
     --theme-primary-color: #60a5fa;
     --theme-primary-glow: rgba(96, 165, 250, 0.4);
     --theme-primary-glow-strong: rgba(96, 165, 250, 0.7);
     --theme-border-color: rgba(96, 165, 250, 0.4);
     --theme-text-color: #1e293b;
     --theme-text-light: #0f172a;
+    --theme-text-muted: #64748b;
     --theme-card-bg: rgba(255, 255, 255, 0.7);
     --theme-card-border: rgba(96, 165, 250, 0.4);
+    --theme-btn-text: #0f172a;
+    --theme-btn-hover-bg: rgba(96, 165, 250, 0.9);
+    --theme-btn-hover-text: #f8fafc;
+    --theme-code-color: #9333ea;
+    --theme-code-bg: rgba(96, 165, 250, 0.15);
+    --theme-link-color: #8b5cf6;
+    --theme-link-hover-color: #a78bfa;
+    --theme-icon-color: #0f172a;
+    --theme-accent-color: #60a5fa;
 }
 
 body.theme-afternoon {
-    --theme-bg-color: #fef9f3;
-    --theme-bg-overlay: rgba(254, 249, 243, 0.2);
+    --theme-bg-overlay: rgba(254, 249, 243, 0.85);
     --theme-primary-color: #f5a623;
     --theme-primary-glow: rgba(245, 166, 35, 0.4);
     --theme-primary-glow-strong: rgba(245, 166, 35, 0.7);
     --theme-border-color: rgba(245, 166, 35, 0.4);
     --theme-text-color: #5a4a2a;
     --theme-text-light: #3a2a1a;
+    --theme-text-muted: #8a7a5a;
     --theme-card-bg: rgba(255, 250, 240, 0.6);
     --theme-card-border: rgba(245, 166, 35, 0.4);
+    --theme-btn-text: #3a2a1a;
+    --theme-btn-hover-bg: rgba(245, 166, 35, 0.9);
+    --theme-btn-hover-text: #fef9f3;
+    --theme-code-color: #9b59b6;
+    --theme-code-bg: rgba(245, 166, 35, 0.15);
+    --theme-link-color: #8e44ad;
+    --theme-link-hover-color: #9b59b6;
+    --theme-icon-color: #3a2a1a;
+    --theme-accent-color: #f5a623;
 }
 
 body.theme-dusk {
-    --theme-bg-color: #3d2e26;
-    --theme-bg-overlay: rgba(61, 46, 38, 0.3);
+    --theme-bg-overlay: rgba(61, 46, 38, 0.8);
     --theme-primary-color: #d4a05a;
     --theme-primary-glow: rgba(212, 160, 90, 0.4);
     --theme-primary-glow-strong: rgba(212, 160, 90, 0.7);
     --theme-border-color: rgba(212, 160, 90, 0.4);
     --theme-text-color: #e8d8c8;
     --theme-text-light: #f8e8d8;
+    --theme-text-muted: #a89888;
     --theme-card-bg: rgba(71, 56, 48, 0.6);
     --theme-card-border: rgba(212, 160, 90, 0.4);
+    --theme-btn-text: #f8e8d8;
+    --theme-btn-hover-bg: rgba(212, 160, 90, 0.9);
+    --theme-btn-hover-text: #3d2e26;
+    --theme-code-color: #d2a8ff;
+    --theme-code-bg: rgba(212, 160, 90, 0.15);
+    --theme-link-color: #d2a8ff;
+    --theme-link-hover-color: #e8b8ff;
+    --theme-icon-color: #f8e8d8;
+    --theme-accent-color: #d4a05a;
 }
 
 body.theme-night {
-    --theme-bg-color: #0d1117;
     --theme-bg-overlay: rgba(0, 0, 0, 0.45);
     --theme-primary-color: #58a6ff;
     --theme-primary-glow: rgba(88, 166, 255, 0.4);
@@ -100,8 +153,18 @@ body.theme-night {
     --theme-border-color: rgba(88, 166, 255, 0.35);
     --theme-text-color: #c9d1d9;
     --theme-text-light: #f0f6fc;
+    --theme-text-muted: #8b949e;
     --theme-card-bg: rgba(22, 27, 34, 0.35);
     --theme-card-border: rgba(88, 166, 255, 0.35);
+    --theme-btn-text: #f0f6fc;
+    --theme-btn-hover-bg: rgba(88, 166, 255, 0.9);
+    --theme-btn-hover-text: #0d1117;
+    --theme-code-color: #d2a8ff;
+    --theme-code-bg: rgba(13, 17, 23, 0.45);
+    --theme-link-color: #a371f7;
+    --theme-link-hover-color: #d2a8ff;
+    --theme-icon-color: #f0f6fc;
+    --theme-accent-color: #58a6ff;
 }
 
 html, body {
@@ -152,7 +215,7 @@ body::before {
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #30363d;
+    border-bottom: 1px solid var(--theme-border-color);
     flex-shrink: 0;
 }
 
@@ -207,15 +270,15 @@ body::before {
 }
 
 #open-sidebar-btn {
-    border-color: #58a6ff;
-    color: #58a6ff;
+    border-color: var(--theme-primary-color);
+    color: var(--theme-primary-color);
     transition: all 0.2s;
     z-index: 2000;
     position: relative;
 }
 #open-sidebar-btn:hover {
-    background-color: #58a6ff;
-    color: #0d1117;
+    background-color: var(--theme-btn-hover-bg);
+    color: var(--theme-btn-hover-text);
 }
 
 @media (max-width: 768px) {
@@ -321,7 +384,7 @@ pre {
 }
 
 code {
-    color: #d2a8ff !important;
+    color: var(--theme-code-color) !important;
 }
 
 #sidebar {
@@ -418,6 +481,10 @@ footer p {
     color: var(--theme-text-color) !important;
 }
 
+.text-white {
+    color: var(--theme-text-color) !important;
+}
+
 .navbar-dark .navbar-brand,
 .navbar-dark .nav-link {
     color: var(--theme-text-color) !important;
@@ -442,8 +509,8 @@ footer p {
 /* 文本区域透明 */
 textarea {
     background-color: rgba(13, 17, 23, 0.3) !important;
-    border: 1px solid rgba(88, 166, 255, 0.4) !important;
-    color: #c9d1d9 !important;
+    border: 1px solid var(--theme-border-color) !important;
+    color: var(--theme-text-color) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -541,15 +608,15 @@ article li a[href^="article.html"]:hover {
 }
 
 article a[href^="#"] {
-    color: #a371f7;
+    color: var(--theme-link-color);
     text-decoration: none;
     border-bottom: 1px dotted rgba(163, 113, 247, 0.5);
     transition: color 0.2s;
 }
 
 article a[href^="#"]:hover {
-    color: #d2a8ff;
-    border-bottom-color: #d2a8ff;
+    color: var(--theme-link-hover-color);
+    border-bottom-color: var(--theme-link-hover-color);
 }
 
 .callout {
@@ -686,25 +753,25 @@ article a[href^="#"]:hover {
 }
 
 .comment-item p {
-    color: #c9d1d9;
+    color: var(--theme-text-color);
     line-height: 1.6;
 }
 
 .reply-to {
-    color: #58a6ff;
+    color: var(--theme-primary-color);
     font-weight: normal;
     font-size: 0.9em;
 }
 
 .reply-btn {
-    color: #8b949e;
+    color: var(--theme-text-muted);
     padding: 2px 8px;
     font-size: 0.85em;
     text-decoration: none;
 }
 
 .reply-btn:hover {
-    color: #58a6ff;
+    color: var(--theme-primary-color);
 }
 
 .replies-container {
@@ -727,18 +794,18 @@ article a[href^="#"]:hover {
 
 .reply-form-container .form-control {
     background-color: rgba(13, 17, 23, 0.5) !important;
-    border-color: rgba(88, 166, 255, 0.3);
-    color: #f0f6fc !important;
+    border-color: var(--theme-border-color);
+    color: var(--theme-text-color) !important;
 }
 
 .reply-form-container .form-control:focus {
     background-color: rgba(13, 17, 23, 0.7) !important;
-    border-color: rgba(88, 166, 255, 0.6);
-    color: #f0f6fc !important;
+    border-color: var(--theme-primary-color);
+    color: var(--theme-text-color) !important;
 }
 
 .reply-form-container .form-control::placeholder {
-    color: rgba(240, 246, 252, 0.4);
+    color: rgba(201, 209, 217, 0.6);
 }
 
 /* 点击爆炸特效（仅电脑端） */
@@ -845,14 +912,14 @@ article a[href^="#"]:hover {
     background: rgba(22, 27, 34, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(88, 166, 255, 0.6);
-    color: #f0f6fc;
+    border: 1px solid var(--theme-border-color);
+    color: var(--theme-icon-color);
     font-size: 16px;
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 12px rgba(88, 166, 255, 0.5);
-    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 12px var(--theme-primary-glow);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s, border-color 1.5s ease, color 1.5s ease;
     padding: 0;
     line-height: 1;
 }
@@ -875,14 +942,14 @@ article a[href^="#"]:hover {
     background: rgba(22, 27, 34, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(88, 166, 255, 0.6);
-    color: #f0f6fc;
+    border: 1px solid var(--theme-border-color);
+    color: var(--theme-icon-color);
     font-size: 22px;
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 14px rgba(88, 166, 255, 0.5);
-    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 14px var(--theme-primary-glow);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s, border-color 1.5s ease, color 1.5s ease;
     padding: 0;
     line-height: 1;
 }
@@ -937,7 +1004,7 @@ article a[href^="#"]:hover {
     
     html, body {
         background-image: url('../assets/background.jpg') !important;
-        background-color: var(--theme-bg-color) !important;
+        background-color: #0d1117 !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
@@ -1006,18 +1073,18 @@ article a[href^="#"]:hover {
     height: 48px;
     border-radius: 50%;
     background-color: rgba(88, 166, 255, 0.5);
-    border: 1px solid rgba(88, 166, 255, 0.6);
-    color: #f0f6fc;
+    border: 1px solid var(--theme-border-color);
+    color: var(--theme-icon-color);
     font-size: 22px;
     font-weight: bold;
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s, background-color 0.3s, transform 0.3s;
+    transition: opacity 0.3s, visibility 0.3s, background-color 0.3s, transform 0.3s, border-color 1.5s ease, color 1.5s ease;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 1000;
-    box-shadow: 0 0 12px rgba(88, 166, 255, 0.4);
+    box-shadow: 0 0 12px var(--theme-primary-glow);
     display: flex;
     align-items: center;
     justify-content: center;
