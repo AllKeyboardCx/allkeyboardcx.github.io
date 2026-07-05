@@ -710,8 +710,9 @@ article a[href^="#"]:hover {
     }
 }
 
-/* Live2D 看板娘强制位置（防止被库内联样式覆盖） */
-#live2d-container {
+/* Live2D 看板娘：L2Dwidget 库把 widget 渲染到 #live2d-widget（body 末尾），
+   所以交互/定位样式必须作用于 #live2d-widget。 */
+#live2d-widget {
     position: fixed !important;
     z-index: 1000 !important;
     pointer-events: auto !important;
@@ -719,15 +720,15 @@ article a[href^="#"]:hover {
     transition: transform 0.4s ease, left 0.4s ease, bottom 0.4s ease, width 0.4s ease, height 0.4s ease, top 0.4s ease, opacity 0.3s ease;
 }
 
-#live2d-container:active {
+#live2d-widget:active {
     cursor: grabbing;
 }
 
-#live2d-container.minimized {
+#live2d-widget.minimized {
     cursor: default;
 }
 
-#live2d-container > * {
+#live2d-widget > * {
     position: static !important;
     left: auto !important;
     right: auto !important;
@@ -737,20 +738,20 @@ article a[href^="#"]:hover {
     float: none !important;
 }
 
-/* 让所有鼠标事件直接在 container 上触发，不被内部 canvas/元素拦截 */
-#live2d-container * {
+/* 让所有鼠标事件直接在 widget 上触发，不被内部 canvas/元素拦截 */
+#live2d-widget * {
     pointer-events: none !important;
 }
 
 /* 看板娘缩小状态 */
-#live2d-container.minimized {
+#live2d-widget.minimized {
     transform: scale(0.35) !important;
     transform-origin: bottom left !important;
     opacity: 0.55 !important;
     pointer-events: none !important;
 }
 
-#live2d-container.minimized:hover {
+#live2d-widget.minimized:hover {
     opacity: 0.8 !important;
 }
 
@@ -814,24 +815,20 @@ article a[href^="#"]:hover {
 
 /* 移动端适配 */
 @media (max-width: 768px) {
-    #live2d-container {
+    #live2d-widget {
         left: 20px !important;
         bottom: -30px !important;
         width: 140px !important;
         height: 180px !important;
         right: auto !important;
     }
-    
-    #live2d-container canvas,
-    #live2d-container > div {
+
+    #live2d-widget canvas,
+    #live2d-widget > div {
         position: static !important;
+        width: 140px !important;
+        height: 180px !important;
         transform: none !important;
-        left: auto !important;
-        right: auto !important;
-    }
-    
-    .l2d-widget {
-        position: static !important;
         left: auto !important;
         right: auto !important;
     }

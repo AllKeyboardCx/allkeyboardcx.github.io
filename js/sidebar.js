@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('click', function(e) {
             // 忽略表单元素、按钮、链接的点击（避免影响交互）
             const target = e.target;
-            if (target.closest('input, textarea, select, button, a, form, .reply-form, #back-to-top, #sidebar')) {
+            if (target.closest('input, textarea, select, button, a, form, .reply-form, #back-to-top, #sidebar, #live2d-widget, #live2d-shrink-btn, #live2d-expand-btn')) {
                 return;
             }
 
