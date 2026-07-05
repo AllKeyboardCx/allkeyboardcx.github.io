@@ -715,6 +715,7 @@ article a[href^="#"]:hover {
     position: fixed !important;
     z-index: 1000 !important;
     pointer-events: auto !important;
+    transition: transform 0.4s ease, left 0.4s ease, bottom 0.4s ease, width 0.4s ease, height 0.4s ease;
 }
 
 #live2d-container > * {
@@ -725,6 +726,76 @@ article a[href^="#"]:hover {
     bottom: auto !important;
     transform: none !important;
     float: none !important;
+}
+
+/* 看板娘缩小状态 */
+#live2d-container.minimized {
+    transform: scale(0.35) !important;
+    transform-origin: bottom left !important;
+    opacity: 0.55 !important;
+    pointer-events: none !important;
+}
+
+#live2d-container.minimized:hover {
+    opacity: 0.8 !important;
+}
+
+/* 缩小按钮（点击看板娘后弹出） */
+#live2d-shrink-btn {
+    position: fixed;
+    z-index: 1001;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(22, 27, 34, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(88, 166, 255, 0.6);
+    color: #f0f6fc;
+    font-size: 16px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.5);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    padding: 0;
+    line-height: 1;
+}
+
+#live2d-shrink-btn:hover {
+    background: rgba(88, 166, 255, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 0 18px rgba(88, 166, 255, 0.8);
+}
+
+/* 展开按钮（缩小后显示） */
+#live2d-expand-btn {
+    position: fixed;
+    z-index: 1001;
+    left: 15px;
+    bottom: 15px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(22, 27, 34, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(88, 166, 255, 0.6);
+    color: #f0f6fc;
+    font-size: 22px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 14px rgba(88, 166, 255, 0.5);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    padding: 0;
+    line-height: 1;
+}
+
+#live2d-expand-btn:hover {
+    background: rgba(88, 166, 255, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(88, 166, 255, 0.8);
 }
 
 /* 移动端适配 */

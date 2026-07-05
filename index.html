@@ -182,6 +182,8 @@
 
             <!-- Live2D看板娘 -->
             <div id="live2d-container"></div>
+            <button id="live2d-shrink-btn" title="缩小看板娘" style="display: none;">➖</button>
+            <button id="live2d-expand-btn" title="展开看板娘" style="display: none;">👧</button>
 
             <!-- 页脚 -->
             <footer class="py-5 bg-black">
@@ -284,8 +286,21 @@
             container.style.width = width;
             container.style.height = height;
             container.style.zIndex = '1000';
-            container.style.transform = 'none';
+            // 处于缩小状态时不重置 transform
+            if (!container.classList.contains('minimized')) {
+                container.style.transform = 'none';
+            }
             container.style.float = 'none';
+
+            // 同步缩小按钮位置（看板娘右上角）
+            var shrinkBtn = document.getElementById('live2d-shrink-btn');
+            if (shrinkBtn) {
+                var isMobileBtn = window.innerWidth <= 768;
+                var containerLeft = parseInt(isMobileBtn ? '20' : '60');
+                var containerWidth = isMobileBtn ? 140 : 200;
+                shrinkBtn.style.left = (containerLeft + containerWidth - 18) + 'px';
+                shrinkBtn.style.bottom = (isMobileBtn ? 150 : 220) + 'px';
+            }
 
             // 修复内部元素
             var children = container.querySelectorAll('*');
@@ -302,6 +317,48 @@
         }
 
         window.addEventListener('resize', fixLive2DPosition);
+
+        // 看板娘点击交互：弹出缩小按钮
+        (function() {
+            const container = document.getElementById('live2d-container');
+            const shrinkBtn = document.getElementById('live2d-shrink-btn');
+            const expandBtn = document.getElementById('live2d-expand-btn');
+            let shrinkTimer = null;
+
+            // 点击看板娘：显示缩小按钮
+            container.addEventListener('click', function() {
+                if (container.classList.contains('minimized')) return;
+                shrinkBtn.style.display = 'flex';
+                clearTimeout(shrinkTimer);
+                shrinkTimer = setTimeout(function() {
+                    shrinkBtn.style.display = 'none';
+                }, 3000);
+            });
+
+            // 点击缩小按钮：缩小并移到角落
+            shrinkBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                container.classList.add('minimized');
+                shrinkBtn.style.display = 'none';
+                expandBtn.style.display = 'flex';
+            });
+
+            // 点击展开按钮：恢复正常
+            expandBtn.addEventListener('click', function() {
+                container.classList.remove('minimized');
+                expandBtn.style.display = 'none';
+            });
+
+            // 鼠标移入缩小按钮时保持显示
+            shrinkBtn.addEventListener('mouseenter', function() {
+                clearTimeout(shrinkTimer);
+            });
+            shrinkBtn.addEventListener('mouseleave', function() {
+                shrinkTimer = setTimeout(function() {
+                    shrinkBtn.style.display = 'none';
+                }, 1500);
+            });
+        })();
 
         function showQQModal() {
             const modalHtml = `
