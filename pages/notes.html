@@ -506,42 +506,46 @@
             const note = allNotes.find(n => n.id === id);
             if (!note) return;
 
-            const modalHtml = `
-                <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content bg-dark border-gray">
-                            <div class="modal-header">
-                                <h5 class="modal-title text-light" id="editModalLabel">✏️ 编辑笔记</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label text-light">笔记标题</label>
-                                    <input type="text" class="form-control" id="edit-title" value="${escapeHtml(note.title)}" />
+            if (!document.getElementById('editModal')) {
+                const modalHtml = `
+                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content bg-dark border-gray">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-light" id="editModalLabel">✏️ 编辑笔记</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label text-light">笔记内容</label>
-                                    <textarea class="form-control" id="edit-content" rows="10">${escapeHtml(note.content)}</textarea>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label text-light">笔记标题</label>
+                                        <input type="text" class="form-control" id="edit-title" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-light">笔记内容</label>
+                                        <textarea class="form-control" id="edit-content" rows="10"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-light">请输入发布口令</label>
+                                        <input type="password" class="form-control" id="edit-password" placeholder="请输入口令" />
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label text-light">请输入发布口令</label>
-                                    <input type="password" class="form-control" id="edit-password" placeholder="请输入口令" />
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary" onclick="saveEdit()">保存修改</button>
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                <button type="button" class="btn btn-primary" onclick="saveEdit()">保存修改</button>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
-            if (!document.getElementById('editModal')) {
+                `;
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
             }
+
+            document.getElementById('edit-title').value = note.title;
+            document.getElementById('edit-content').value = note.content;
+            document.getElementById('edit-password').value = '';
+
             const modalEl = document.getElementById('editModal');
             editModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            document.getElementById('edit-password').value = '';
             editModal.show();
         }
 
@@ -579,8 +583,16 @@
                 });
 
                 if (!response.ok) {
-                    console.error('更新笔记失败:', await response.text());
-                    alert('更新笔记失败，请稍后重试');
+                    const errorText = await response.text();
+                    console.error('更新笔记失败:', errorText);
+                    alert('更新笔记失败，请稍后重试\n\n错误信息: ' + errorText);
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    alert('更新失败：Supabase RLS 策略阻止了更新操作。\n\n请在 Supabase SQL Editor 中执行以下 SQL：\n\nCREATE POLICY "Allow public update" ON notes FOR UPDATE USING (true);');
                     return;
                 }
 
