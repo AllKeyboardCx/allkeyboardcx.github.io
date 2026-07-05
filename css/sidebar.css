@@ -817,17 +817,17 @@ article a[href^="#"]:hover {
 @media (max-width: 768px) {
     #live2d-widget {
         left: 20px !important;
-        bottom: -20px !important;
-        width: 90px !important;
-        height: 120px !important;
+        bottom: -30px !important;
+        width: 135px !important;
+        height: 180px !important;
         right: auto !important;
     }
 
     #live2d-widget canvas,
     #live2d-widget > div {
         position: static !important;
-        width: 90px !important;
-        height: 120px !important;
+        width: 135px !important;
+        height: 180px !important;
         transform: none !important;
         left: auto !important;
         right: auto !important;
