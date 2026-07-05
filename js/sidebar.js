@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', function() {
+    applyTimeBasedTheme();
+
+    function applyTimeBasedTheme() {
+        try {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const totalMinutes = hour * 60 + minute;
+
+            let theme = 'theme-night';
+
+            if (totalMinutes >= 300 && totalMinutes < 540) {
+                theme = 'theme-dawn';
+            } else if (totalMinutes >= 540 && totalMinutes < 720) {
+                theme = 'theme-morning';
+            } else if (totalMinutes >= 720 && totalMinutes < 840) {
+                theme = 'theme-noon';
+            } else if (totalMinutes >= 840 && totalMinutes < 1020) {
+                theme = 'theme-afternoon';
+            } else if (totalMinutes >= 1020 && totalMinutes < 1200) {
+                theme = 'theme-dusk';
+            }
+
+            document.body.classList.add(theme);
+        } catch (error) {
+            document.body.classList.add('theme-night');
+        }
+    }
+
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('main-content');
     const openBtn = document.getElementById('open-sidebar-btn');
