@@ -1,5 +1,27 @@
 [
   {
+    "title": "CTF那些事儿-Pwn-进入Pwn的世界-动态链接动态系统调用-ret2libc3",
+    "filename": "CTF那些事儿-Pwn-进入Pwn的世界-动态链接动态系统调用-ret2libc3",
+    "date": "2026-07-05",
+    "tags": [
+      "栈溢出",
+      "ret2syscall"
+    ],
+    "summary": "有关动态链接动态系统调用的相关真题演练与详细解析"
+  },
+  {
+    "title": "堆利用相关概念阐释",
+    "filename": "堆利用相关概念阐释",
+    "date": "2026-07-05",
+    "tags": [
+      "heap理论",
+      "ptmalloc",
+      "堆利用",
+      "知识对比"
+    ],
+    "summary": "堆利用的相关概念、基础漏洞类型、glibc ptmalloc特有的利用手法、针对不同的bins的利用、针对不同版本的libc"
+  },
+  {
     "title": "Buuctf堆利用专项训练（概念理论向）",
     "filename": "Buuctf堆利用专项训练",
     "date": "2026-07-04",
