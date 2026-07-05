@@ -18,9 +18,9 @@
         #live2d-widget {
             position: fixed !important;
             left: 60px !important;
-            bottom: -70px !important;
-            width: 260px !important;
-            height: 340px !important;
+            bottom: -140px !important;
+            width: 520px !important;
+            height: 680px !important;
             z-index: 1000 !important;
             pointer-events: auto !important;
             right: auto !important;
@@ -30,8 +30,8 @@
         #live2d-widget canvas,
         #live2d-widget > div {
             position: static !important;
-            width: 260px !important;
-            height: 340px !important;
+            width: 520px !important;
+            height: 680px !important;
             pointer-events: none !important;
             left: auto !important;
             right: auto !important;
@@ -236,11 +236,11 @@
                     },
                     display: {
                         superSample: 2,
-                        width: 260,
-                        height: 340,
+                        width: 520,
+                        height: 680,
                         positionX: 0.5,
                         positionY: 0.2,
-                        scale: 0.9
+                        scale: 1.0
                     },
                     mobile: {
                         show: true,
@@ -290,9 +290,9 @@
 
             var isMobile = window.innerWidth <= 768;
             var left = isMobile ? '20px' : '60px';
-            var bottom = isMobile ? '-40px' : '-70px';
-            var width = isMobile ? '180px' : '260px';
-            var height = isMobile ? '240px' : '340px';
+            var bottom = isMobile ? '-40px' : '-140px';
+            var width = isMobile ? '180px' : '520px';
+            var height = isMobile ? '240px' : '680px';
 
             widget.style.position = 'fixed';
             widget.style.left = left;
@@ -313,9 +313,9 @@
             if (shrinkBtn) {
                 var isMobileBtn = window.innerWidth <= 768;
                 var widgetLeft = parseInt(isMobileBtn ? '20' : '60');
-                var widgetWidth = isMobileBtn ? 180 : 260;
+                var widgetWidth = isMobileBtn ? 180 : 520;
                 shrinkBtn.style.left = (widgetLeft + widgetWidth - 18) + 'px';
-                shrinkBtn.style.bottom = (isMobileBtn ? 200 : 290) + 'px';
+                shrinkBtn.style.bottom = (isMobileBtn ? 200 : 570) + 'px';
             }
 
             // 修复内部元素（canvas 等）跟随 widget
