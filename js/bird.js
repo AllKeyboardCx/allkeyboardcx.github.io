@@ -383,45 +383,54 @@ function initBirds() {
         const day = today.getDate();
         const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         
-        const numPeriods = Math.floor(Math.random() * 3) + 2;
         const periods = [];
         
-        for (let i = 0; i < numPeriods; i++) {
+        periods.push({
+            start: 22 * 60 + 30,
+            end: 24 * 60,
+            duration: 90,
+            fixed: true
+        });
+        
+        periods.push({
+            start: 0,
+            end: 7 * 60,
+            duration: 420,
+            fixed: true
+        });
+        
+        const numRandomPeriods = Math.floor(Math.random() * 3) + 1;
+        
+        for (let i = 0; i < numRandomPeriods; i++) {
             let startHour, startMinute, duration;
             
             if (i === 0) {
-                startHour = 21 + Math.floor(Math.random() * 3);
-                startMinute = Math.floor(Math.random() * 60);
-                duration = 30 + Math.floor(Math.random() * 60);
-            } else if (i === 1 && numPeriods > 1) {
                 startHour = 11 + Math.floor(Math.random() * 3);
                 startMinute = Math.floor(Math.random() * 60);
                 duration = 15 + Math.floor(Math.random() * 45);
             } else {
                 const rand = Math.random();
-                if (rand < 0.33) {
+                if (rand < 0.5) {
                     startHour = 9 + Math.floor(Math.random() * 2);
                     startMinute = Math.floor(Math.random() * 60);
                     duration = 5 + Math.floor(Math.random() * 20);
-                } else if (rand < 0.66) {
-                    startHour = 14 + Math.floor(Math.random() * 3);
-                    startMinute = Math.floor(Math.random() * 60);
-                    duration = 5 + Math.floor(Math.random() * 20);
                 } else {
-                    startHour = 16 + Math.floor(Math.random() * 3);
+                    startHour = 14 + Math.floor(Math.random() * 4);
                     startMinute = Math.floor(Math.random() * 60);
                     duration = 5 + Math.floor(Math.random() * 20);
                 }
             }
             
             const startTotal = startHour * 60 + startMinute;
-            const endTotal = Math.min(startTotal + duration, 24 * 60);
+            const endTotal = Math.min(startTotal + duration, 22 * 60 + 30);
             
-            periods.push({
-                start: startTotal,
-                end: endTotal,
-                duration: duration
-            });
+            if (startTotal >= 7 * 60 && endTotal <= 22 * 60 + 30) {
+                periods.push({
+                    start: startTotal,
+                    end: endTotal,
+                    duration: duration
+                });
+            }
         }
         
         periods.sort((a, b) => a.start - b.start);
@@ -441,6 +450,14 @@ function initBirds() {
         const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         
         try {
+            const localStorageKey = `bird_sleep_${dateStr}`;
+            const cached = localStorage.getItem(localStorageKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        } catch (e) {}
+        
+        try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule?date=eq.${dateStr}`, {
                 headers: {
                     'apikey': SUPABASE_KEY,
@@ -451,7 +468,15 @@ function initBirds() {
             if (response.ok) {
                 const data = await response.json();
                 if (data.length > 0) {
-                    return JSON.parse(data[0].schedule);
+                    const schedule = typeof data[0].schedule === 'string' 
+                        ? JSON.parse(data[0].schedule) 
+                        : data[0].schedule;
+                    
+                    try {
+                        localStorage.setItem(`bird_sleep_${dateStr}`, JSON.stringify(schedule));
+                    } catch (e) {}
+                    
+                    return schedule;
                 }
             }
         } catch (error) {
@@ -463,16 +488,21 @@ function initBirds() {
     
     async function saveSleepSchedule(schedule) {
         try {
+            localStorage.setItem(`bird_sleep_${schedule.date}`, JSON.stringify(schedule));
+        } catch (e) {}
+        
+        try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule`, {
                 method: 'POST',
                 headers: {
                     'apikey': SUPABASE_KEY,
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Prefer': 'resolution=merge-duplicates'
                 },
                 body: JSON.stringify({
                     date: schedule.date,
-                    schedule: JSON.stringify(schedule)
+                    schedule: schedule
                 })
             });
             
@@ -635,35 +665,45 @@ function initBirds() {
     });
     
     const feeder = document.getElementById('bird-feeder');
-    const feederRect = feeder.getBoundingClientRect();
     const feederOriginalX = 20;
     const feederOriginalY = 100;
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
     
-    feeder.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        initialLeft = parseFloat(feeder.style.left) || feederRect.left;
-        initialTop = parseFloat(feeder.style.top) || feederRect.top;
-        feeder.classList.add('dragging');
-    });
+    function getEventPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
     
-    document.addEventListener('pointermove', (e) => {
+    function startDrag(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = true;
+        const pos = getEventPos(e);
+        startX = pos.x;
+        startY = pos.y;
+        const feederRect = feeder.getBoundingClientRect();
+        initialLeft = feederRect.left;
+        initialTop = feederRect.top;
+        feeder.classList.add('dragging');
+    }
+    
+    function moveDrag(e) {
         if (!isDragging) return;
         
         e.preventDefault();
         
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+        const pos = getEventPos(e);
+        const dx = pos.x - startX;
+        const dy = pos.y - startY;
         
         feeder.style.left = (initialLeft + dx) + 'px';
         feeder.style.top = (initialTop + dy) + 'px';
-    });
+    }
     
-    document.addEventListener('pointerup', () => {
+    function endDrag() {
         if (isDragging) {
             const feederBounds = feeder.getBoundingClientRect();
             let fed = false;
@@ -687,5 +727,14 @@ function initBirds() {
             isDragging = false;
             feeder.classList.remove('dragging');
         }
-    });
+    }
+    
+    feeder.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('mouseup', endDrag);
+    
+    feeder.addEventListener('touchstart', startDrag, { passive: false });
+    document.addEventListener('touchmove', moveDrag, { passive: false });
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('touchcancel', endDrag);
 }
