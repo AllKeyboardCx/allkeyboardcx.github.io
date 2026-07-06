@@ -165,8 +165,8 @@
             overflow: hidden !important;
         }
 
-        /* 蓝色小鸟样式 */
-        #blue-bird {
+        /* 小鸟样式 */
+        .bird {
             position: fixed;
             width: 60px;
             height: 60px;
@@ -176,15 +176,15 @@
             pointer-events: auto;
             will-change: transform, left, top;
         }
-        #blue-bird:hover {
+        .bird:hover {
             transform: scale(1.2);
         }
-        #bird-inner {
+        .bird-inner {
             width: 100%;
             height: 100%;
             transition: transform 0.3s ease;
         }
-        #bird-inner svg {
+        .bird-inner svg {
             width: 100%;
             height: 100%;
         }
@@ -213,7 +213,7 @@
         }
 
         /* 电线杆 */
-        #bird-wire {
+        .bird-wire {
             position: fixed;
             width: 2px;
             height: 100px;
@@ -222,7 +222,7 @@
             pointer-events: none;
             display: none;
         }
-        #bird-wire::before {
+        .bird-wire::before {
             content: '';
             position: absolute;
             top: 0;
@@ -231,7 +231,7 @@
             height: 2px;
             background: linear-gradient(to right, #444, #666, #444);
         }
-        #bird-wire::after {
+        .bird-wire::after {
             content: '';
             position: absolute;
             top: 30px;
@@ -242,7 +242,7 @@
         }
 
         /* 对话框 */
-        #bird-speech-bubble {
+        .bird-speech-bubble {
             position: fixed;
             background: white;
             color: #333;
@@ -258,11 +258,11 @@
             transition: all 0.3s ease;
             max-width: 200px;
         }
-        #bird-speech-bubble.show {
+        .bird-speech-bubble.show {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-        #bird-speech-bubble::before {
+        .bird-speech-bubble::before {
             content: '';
             position: absolute;
             bottom: -8px;
@@ -533,8 +533,8 @@
             <button id="live2d-expand-btn" title="展开看板娘" style="display: none;">👧</button>
 
             <!-- 蓝色小鸟 -->
-            <div id="blue-bird" class="bird-flying">
-                <div id="bird-inner">
+            <div id="bird-blue" class="bird bird-flying">
+                <div class="bird-inner">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="bird-blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -542,7 +542,7 @@
                                 <stop offset="50%" stop-color="#3b82f6" />
                                 <stop offset="100%" stop-color="#2563eb" />
                             </linearGradient>
-                            <linearGradient id="bird-belly-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="bird-blue-belly" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#dbeafe" />
                                 <stop offset="100%" stop-color="#bfdbfe" />
                             </linearGradient>
@@ -551,7 +551,7 @@
                             </filter>
                         </defs>
                         <ellipse cx="50" cy="55" rx="28" ry="22" fill="url(#bird-blue-gradient)" filter="url(#bird-shadow)" />
-                        <ellipse cx="50" cy="60" rx="18" ry="14" fill="url(#bird-belly-gradient)" />
+                        <ellipse cx="50" cy="60" rx="18" ry="14" fill="url(#bird-blue-belly)" />
                         <ellipse cx="42" cy="40" rx="10" ry="12" fill="url(#bird-blue-gradient)" />
                         <path d="M52 40 L65 36 L56 48 Z" fill="#fbbf24" />
                         <circle cx="45" cy="38" r="5" fill="white" />
@@ -567,8 +567,39 @@
                     </svg>
                 </div>
             </div>
-            <div id="bird-wire"></div>
-            <div id="bird-speech-bubble"></div>
+
+            <!-- 橙色小鸟 -->
+            <div id="bird-orange" class="bird bird-flying">
+                <div class="bird-inner">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="bird-orange-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fb923c" />
+                                <stop offset="50%" stop-color="#f97316" />
+                                <stop offset="100%" stop-color="#ea580c" />
+                            </linearGradient>
+                            <linearGradient id="bird-orange-belly" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fed7aa" />
+                                <stop offset="100%" stop-color="#fdba74" />
+                            </linearGradient>
+                        </defs>
+                        <ellipse cx="50" cy="55" rx="28" ry="22" fill="url(#bird-orange-gradient)" filter="url(#bird-shadow)" />
+                        <ellipse cx="50" cy="60" rx="18" ry="14" fill="url(#bird-orange-belly)" />
+                        <ellipse cx="42" cy="40" rx="10" ry="12" fill="url(#bird-orange-gradient)" />
+                        <path d="M52 40 L65 36 L56 48 Z" fill="#fbbf24" />
+                        <circle cx="45" cy="38" r="5" fill="white" />
+                        <circle cx="46" cy="39" r="2.5" fill="#1f2937" />
+                        <circle cx="47" cy="38" r="1" fill="white" />
+                        <path d="M22 52 Q12 42 18 56 Q26 64 32 56 Z" fill="url(#bird-orange-gradient)" class="wing-left" />
+                        <path d="M78 52 Q88 42 82 56 Q74 64 68 56 Z" fill="url(#bird-orange-gradient)" class="wing-right" />
+                        <path d="M42 72 Q35 85 40 90 Q45 88 48 80" fill="url(#bird-orange-gradient)" />
+                        <path d="M54 72 Q61 85 56 90 Q51 88 48 80" fill="url(#bird-orange-gradient)" />
+                        <path d="M36 30 Q32 20 40 25 Q46 28 42 35" fill="url(#bird-orange-gradient)" />
+                        <path d="M48 30 Q52 20 50 25 Q44 28 46 35" fill="url(#bird-orange-gradient)" />
+                        <circle cx="30" cy="48" r="4" fill="#fca5a5" opacity="0.5" />
+                    </svg>
+                </div>
+            </div>
 
             <!-- 页脚 -->
             <footer class="py-5 bg-black">
@@ -1089,55 +1120,120 @@
             });
         }
 
-        (function() {
-            const bird = document.getElementById('blue-bird');
-            const birdInner = document.getElementById('bird-inner');
-            const wire = document.getElementById('bird-wire');
-            const speechBubble = document.getElementById('bird-speech-bubble');
-            
-            const messages = [
-                '你好呀！👋',
-                'Hello! 😊',
-                '今天适合喝咖啡 ☕',
-                '天气真好！☀️',
-                '要不要一起玩耍？',
-                '啾啾~ 🐦',
-                '记得休息一下哦！',
-                '祝你今天好运！🍀',
-                '今天也要加油！💪',
-                '看到你真开心！😄',
-                '世界这么大，我想去看看！🌍',
-                '喝杯茶放松一下吧~ 🍵',
-                '今天的云真好看！☁️',
-                '早点休息哦！🌙',
-                '保持微笑！😊',
-                '努力就会有收获！💯',
-                '哇，今天心情不错！✨',
-                '要吃点零食吗？🍪',
-                '美好的一天开始了！🌞',
-                '加油加油！🚀',
-                '别太累了！💆',
-                '我是一只快乐的小鸟！🎵',
-                '今天也要元气满满！💖',
-                '有什么好玩的事吗？🎮',
-                '读书使人进步！📚',
-                '运动一下吧！🏃',
-                '听首歌放松心情！🎶',
-                '生活真美好！🌈',
-                '明天会更好！🌟',
-                '你是最棒的！👍'
-            ];
+        const birdMessages = [
+            '你好呀！👋',
+            'Hello! 😊',
+            '今天适合喝咖啡 ☕',
+            '天气真好！☀️',
+            '要不要一起玩耍？',
+            '啾啾~ 🐦',
+            '记得休息一下哦！',
+            '祝你今天好运！🍀',
+            '今天也要加油！💪',
+            '看到你真开心！😄',
+            '世界这么大，我想去看看！🌍',
+            '喝杯茶放松一下吧~ 🍵',
+            '今天的云真好看！☁️',
+            '早点休息哦！🌙',
+            '保持微笑！😊',
+            '努力就会有收获！💯',
+            '哇，今天心情不错！✨',
+            '要吃点零食吗？🍪',
+            '美好的一天开始了！🌞',
+            '加油加油！🚀',
+            '别太累了！💆',
+            '我是一只快乐的小鸟！🎵',
+            '今天也要元气满满！💖',
+            '有什么好玩的事吗？🎮',
+            '读书使人进步！📚',
+            '运动一下吧！🏃',
+            '听首歌放松心情！🎶',
+            '生活真美好！🌈',
+            '明天会更好！🌟',
+            '你是最棒的！👍'
+        ];
 
-            let isPerched = false;
-            let currentX = window.innerWidth / 2;
-            let currentY = window.innerHeight / 2;
-            let targetX = currentX;
-            let targetY = currentY;
-            let animationId = null;
-            let flightDelay = null;
-            let flipDirection = 1;
+        const birdGreetings = [
+            '嘿！好久不见！👋',
+            '你好呀！最近怎么样？',
+            '啾啾！见到你真开心！🐦',
+            '嗨！一起飞吧！✨',
+            '今天天气真好，对吧？☀️',
+            '你也出来玩呀！😄',
+            '最近有什么有趣的事吗？',
+            '要不要一起唱歌？🎵',
+            '早上好呀！🌞',
+            '晚上好！今天辛苦了！🌙',
+            '哇，你飞得真快！🚀',
+            '我们去那边看看吧！👀',
+            '你的羽毛真漂亮！💖',
+            '要不要休息一下？🍵',
+            '今天也是美好的一天！🌈',
+            '见到你真好！😊',
+            '你要去哪里呀？🌍',
+            '一起去找食物吧！🍪',
+            '你的歌声真好听！🎶',
+            '我们做朋友吧！🤝',
+            '今天玩得开心吗？😄',
+            '明天见！👋',
+            '小心点飞哦！⚠️',
+            '你飞得好高呀！🗼',
+            '这里风景不错！�',
+            '要不要比赛谁飞得快？🏁',
+            '你看起来精神不错！�',
+            '一起去冒险吧！🧭',
+            '好巧啊！又遇到你了！🎉',
+            '祝你好运！🍀'
+        ];
 
-            function getRandomPosition() {
+        class Bird {
+            constructor(elementId, startX, startY) {
+                this.bird = document.getElementById(elementId);
+                this.birdInner = this.bird.querySelector('.bird-inner');
+                this.currentX = startX;
+                this.currentY = startY;
+                this.targetX = startX;
+                this.targetY = startY;
+                this.isPerched = false;
+                this.isGreeting = false;
+                this.animationId = null;
+                this.flightDelay = null;
+                this.flipDirection = 1;
+                
+                this.wire = document.createElement('div');
+                this.wire.className = 'bird-wire';
+                document.body.appendChild(this.wire);
+                
+                this.speechBubble = document.createElement('div');
+                this.speechBubble.className = 'bird-speech-bubble';
+                document.body.appendChild(this.speechBubble);
+                
+                this.init();
+            }
+
+            init() {
+                this.bird.style.left = this.currentX + 'px';
+                this.bird.style.top = this.currentY + 'px';
+                
+                this.bird.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!this.isPerched && !this.isGreeting) {
+                        this.showPerched();
+                    }
+                });
+                
+                this.bird.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!this.isPerched && !this.isGreeting) {
+                        this.showPerched();
+                    }
+                }, { passive: false });
+                
+                this.flyToRandomPosition();
+            }
+
+            getRandomPosition() {
                 const padding = 80;
                 return {
                     x: padding + Math.random() * (window.innerWidth - padding * 2),
@@ -1145,111 +1241,167 @@
                 };
             }
 
-            function flyToRandomPosition() {
-                if (isPerched) return;
+            flyToRandomPosition() {
+                if (this.isPerched || this.isGreeting) return;
                 
-                const target = getRandomPosition();
-                targetX = target.x;
-                targetY = target.y;
+                const target = this.getRandomPosition();
+                this.targetX = target.x;
+                this.targetY = target.y;
                 
-                flipDirection = targetX > currentX ? 1 : -1;
-                birdInner.style.transform = `scaleX(${flipDirection})`;
+                this.flipDirection = this.targetX > this.currentX ? 1 : -1;
+                this.birdInner.style.transform = `scaleX(${this.flipDirection})`;
                 
-                animateFlight();
+                this.animateFlight();
             }
 
-            function animateFlight() {
-                if (isPerched) return;
+            animateFlight() {
+                if (this.isPerched || this.isGreeting) return;
 
-                const dx = targetX - currentX;
-                const dy = targetY - currentY;
+                const dx = this.targetX - this.currentX;
+                const dy = this.targetY - this.currentY;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < 5) {
-                    setTimeout(flyToRandomPosition, 1000 + Math.random() * 2000);
+                    setTimeout(() => this.flyToRandomPosition(), 1000 + Math.random() * 2000);
                     return;
                 }
 
                 const speed = 2 + Math.random();
-                currentX += (dx / distance) * speed;
-                currentY += (dy / distance) * speed + Math.sin(Date.now() / 200) * 0.5;
+                this.currentX += (dx / distance) * speed;
+                this.currentY += (dy / distance) * speed + Math.sin(Date.now() / 200) * 0.5;
 
-                bird.style.left = currentX + 'px';
-                bird.style.top = currentY + 'px';
+                this.bird.style.left = this.currentX + 'px';
+                this.bird.style.top = this.currentY + 'px';
 
-                animationId = requestAnimationFrame(animateFlight);
+                this.animationId = requestAnimationFrame(() => this.animateFlight());
             }
 
-            function showPerched() {
-                isPerched = true;
-                if (animationId) cancelAnimationFrame(animationId);
+            showPerched() {
+                this.isPerched = true;
+                if (this.animationId) cancelAnimationFrame(this.animationId);
                 
-                bird.classList.remove('bird-flying');
-                bird.classList.add('bird-perched');
+                this.bird.classList.remove('bird-flying');
+                this.bird.classList.add('bird-perched');
                 
-                const perchX = Math.max(100, Math.min(window.innerWidth - 100, currentX));
-                const perchY = Math.max(100, Math.min(window.innerHeight - 200, currentY));
+                const perchX = Math.max(100, Math.min(window.innerWidth - 100, this.currentX));
+                const perchY = Math.max(100, Math.min(window.innerHeight - 200, this.currentY));
                 
-                bird.style.left = perchX + 'px';
-                bird.style.top = perchY + 'px';
-                birdInner.style.transform = 'scaleX(1)';
+                this.bird.style.left = perchX + 'px';
+                this.bird.style.top = perchY + 'px';
+                this.birdInner.style.transform = 'scaleX(1)';
                 
-                wire.style.left = (perchX + 30) + 'px';
-                wire.style.top = (perchY + 40) + 'px';
-                wire.style.display = 'block';
+                this.wire.style.left = (perchX + 30) + 'px';
+                this.wire.style.top = (perchY + 40) + 'px';
+                this.wire.style.display = 'block';
                 
                 const shouldSpeak = Math.random() < 0.5;
                 
                 if (shouldSpeak) {
-                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                    speechBubble.textContent = randomMessage;
-                    speechBubble.style.left = (perchX - 20) + 'px';
-                    speechBubble.style.top = (perchY - 80) + 'px';
+                    const randomMessage = birdMessages[Math.floor(Math.random() * birdMessages.length)];
+                    this.speechBubble.textContent = randomMessage;
+                    this.speechBubble.style.left = (perchX - 20) + 'px';
+                    this.speechBubble.style.top = (perchY - 80) + 'px';
                     
                     setTimeout(() => {
-                        speechBubble.classList.add('show');
+                        this.speechBubble.classList.add('show');
                     }, 100);
                 }
                 
-                flightDelay = setTimeout(() => {
-                    hidePerched();
+                this.flightDelay = setTimeout(() => {
+                    this.hidePerched();
                 }, 4000);
             }
 
-            function hidePerched() {
-                isPerched = false;
+            hidePerched() {
+                this.isPerched = false;
                 
-                speechBubble.classList.remove('show');
+                this.speechBubble.classList.remove('show');
                 
                 setTimeout(() => {
-                    wire.style.display = 'none';
-                    bird.classList.remove('bird-perched');
-                    bird.classList.add('bird-flying');
-                    flyToRandomPosition();
+                    this.wire.style.display = 'none';
+                    this.bird.classList.remove('bird-perched');
+                    this.bird.classList.add('bird-flying');
+                    this.flyToRandomPosition();
                 }, 300);
             }
 
-            bird.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!isPerched) {
-                    showPerched();
-                }
-            });
+            greet(otherBird) {
+                this.isGreeting = true;
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                
+                this.bird.classList.remove('bird-flying');
+                this.bird.classList.add('bird-perched');
+                
+                const midX = (this.currentX + otherBird.currentX) / 2;
+                const midY = (this.currentY + otherBird.currentY) / 2;
+                
+                const offset = this === birdBlue ? -40 : 40;
+                const perchX = midX + offset;
+                const perchY = midY;
+                
+                this.bird.style.left = perchX + 'px';
+                this.bird.style.top = perchY + 'px';
+                this.birdInner.style.transform = `scaleX(${offset > 0 ? -1 : 1})`;
+                
+                this.wire.style.left = (perchX + 30) + 'px';
+                this.wire.style.top = (perchY + 40) + 'px';
+                this.wire.style.display = 'block';
+                
+                const greeting = birdGreetings[Math.floor(Math.random() * birdGreetings.length)];
+                this.speechBubble.textContent = greeting;
+                
+                const bubbleOffset = offset > 0 ? 20 : -80;
+                this.speechBubble.style.left = (perchX + bubbleOffset) + 'px';
+                this.speechBubble.style.top = (perchY - 80) + 'px';
+                
+                setTimeout(() => {
+                    this.speechBubble.classList.add('show');
+                }, 100);
+            }
 
-            bird.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!isPerched) {
-                    showPerched();
-                }
-            }, { passive: false });
+            endGreet() {
+                this.isGreeting = false;
+                
+                this.speechBubble.classList.remove('show');
+                
+                setTimeout(() => {
+                    this.wire.style.display = 'none';
+                    this.bird.classList.remove('bird-perched');
+                    this.bird.classList.add('bird-flying');
+                    this.flyToRandomPosition();
+                }, 300);
+            }
+        }
 
-            document.addEventListener('DOMContentLoaded', () => {
-                bird.style.left = currentX + 'px';
-                bird.style.top = currentY + 'px';
-                flyToRandomPosition();
-            });
-        })();
+        let birdBlue, birdOrange;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            birdBlue = new Bird('bird-blue', window.innerWidth * 0.3, window.innerHeight * 0.5);
+            birdOrange = new Bird('bird-orange', window.innerWidth * 0.7, window.innerHeight * 0.5);
+            
+            let lastGreetTime = 0;
+            setInterval(() => {
+                if (birdBlue.isPerched || birdOrange.isPerched || birdBlue.isGreeting || birdOrange.isGreeting) {
+                    return;
+                }
+                
+                const dx = birdBlue.currentX - birdOrange.currentX;
+                const dy = birdBlue.currentY - birdOrange.currentY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                const now = Date.now();
+                if (distance < 150 && now - lastGreetTime > 10000) {
+                    birdBlue.greet(birdOrange);
+                    birdOrange.greet(birdBlue);
+                    lastGreetTime = now;
+                    
+                    setTimeout(() => {
+                        birdBlue.endGreet();
+                        birdOrange.endGreet();
+                    }, 4000);
+                }
+            }, 500);
+        });
     </script>
 </body>
 </html>
