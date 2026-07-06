@@ -115,6 +115,7 @@ class Bird {
     init() {
         this.bird.style.left = this.currentX + 'px';
         this.bird.style.top = this.currentY + 'px';
+        this.bird.classList.add('bird-flying');
         
         this.bird.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -346,11 +347,8 @@ class Bird {
 }
 
 let birdBlue, birdOrange;
-let SUPABASE_URL, SUPABASE_KEY;
 
-function initBirds(supabaseUrl, supabaseKey) {
-    SUPABASE_URL = supabaseUrl;
-    SUPABASE_KEY = supabaseKey;
+function initBirds() {
     
     birdBlue = new Bird('bird-blue', window.innerWidth * 0.3, window.innerHeight * 0.5, 'birdhouse-blue');
     birdOrange = new Bird('bird-orange', window.innerWidth * 0.7, window.innerHeight * 0.5, 'birdhouse-orange');
@@ -522,8 +520,14 @@ function initBirds(supabaseUrl, supabaseKey) {
             if (totalMinutes >= period.start && totalMinutes < period.end) {
                 shouldBeSleeping = true;
                 currentPeriodIndex = i;
-            } else if (totalMinutes < period.start && nextPeriodIndex === -1) {
+            }
+        }
+        
+        for (let i = 0; i < currentSleepSchedule.periods.length; i++) {
+            const period = currentSleepSchedule.periods[i];
+            if (totalMinutes < period.start) {
                 nextPeriodIndex = i;
+                break;
             }
         }
         
@@ -561,27 +565,34 @@ function initBirds(supabaseUrl, supabaseKey) {
             const minutes = remainingMinutes % 60;
             timeLeftEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
             countdownEl.classList.add('show');
-        }
-        
-        if (nextPeriodIndex !== -1) {
-            const nextPeriod = currentSleepSchedule.periods[nextPeriodIndex];
-            const nextSleepHour = Math.floor(nextPeriod.start / 60);
-            const nextSleepMinute = nextPeriod.start % 60;
-            const nextWakeHour = Math.floor(nextPeriod.end / 60);
-            const nextWakeMinute = nextPeriod.end % 60;
             
-            nextSleepEl.textContent = `${nextSleepHour.toString().padStart(2, '0')}:${nextSleepMinute.toString().padStart(2, '0')}`;
-            nextWakeEl.textContent = `${nextWakeHour.toString().padStart(2, '0')}:${nextWakeMinute.toString().padStart(2, '0')}`;
-        } else if (currentPeriodIndex !== -1) {
-            const currentPeriod = currentSleepSchedule.periods[currentPeriodIndex];
-            const nextWakeHour = Math.floor(currentPeriod.end / 60);
-            const nextWakeMinute = currentPeriod.end % 60;
-            
-            nextSleepEl.textContent = '已完成';
-            nextWakeEl.textContent = `${nextWakeHour.toString().padStart(2, '0')}:${nextWakeMinute.toString().padStart(2, '0')}`;
+            if (nextPeriodIndex !== -1) {
+                const nextPeriod = currentSleepSchedule.periods[nextPeriodIndex];
+                const nextSleepHour = Math.floor(nextPeriod.start / 60);
+                const nextSleepMinute = nextPeriod.start % 60;
+                const nextWakeHour = Math.floor(nextPeriod.end / 60);
+                const nextWakeMinute = nextPeriod.end % 60;
+                
+                nextSleepEl.textContent = `${nextSleepHour.toString().padStart(2, '0')}:${nextSleepMinute.toString().padStart(2, '0')}`;
+                nextWakeEl.textContent = `${nextWakeHour.toString().padStart(2, '0')}:${nextWakeMinute.toString().padStart(2, '0')}`;
+            } else {
+                nextSleepEl.textContent = '明天';
+                nextWakeEl.textContent = '--:--';
+            }
         } else {
-            nextSleepEl.textContent = '--:--';
-            nextWakeEl.textContent = '--:--';
+            if (nextPeriodIndex !== -1) {
+                const nextPeriod = currentSleepSchedule.periods[nextPeriodIndex];
+                const nextSleepHour = Math.floor(nextPeriod.start / 60);
+                const nextSleepMinute = nextPeriod.start % 60;
+                const nextWakeHour = Math.floor(nextPeriod.end / 60);
+                const nextWakeMinute = nextPeriod.end % 60;
+                
+                nextSleepEl.textContent = `${nextSleepHour.toString().padStart(2, '0')}:${nextSleepMinute.toString().padStart(2, '0')}`;
+                nextWakeEl.textContent = `${nextWakeHour.toString().padStart(2, '0')}:${nextWakeMinute.toString().padStart(2, '0')}`;
+            } else {
+                nextSleepEl.textContent = '明天';
+                nextWakeEl.textContent = '--:--';
+            }
         }
     }
     
