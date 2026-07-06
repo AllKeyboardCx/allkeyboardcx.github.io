@@ -1618,31 +1618,97 @@
                 }
             }, 500);
             
-            let hasGoneToSleep = false;
-            setInterval(() => {
+            let sleepState = {
+                night: false,
+                noon: false,
+                nap1: false,
+                nap2: false
+            };
+            
+            function checkSleepSchedule() {
                 const now = new Date();
                 const hour = now.getHours();
                 const minute = now.getMinutes();
+                const totalMinutes = hour * 60 + minute;
                 
-                if (hour === 22 && minute >= 0 && minute <= 30) {
-                    if (!hasGoneToSleep) {
+                if (totalMinutes >= 22 * 60 && totalMinutes < 22 * 60 + 30) {
+                    if (!sleepState.night) {
                         const sleepDelay = Math.random() * 30 * 60 * 1000;
                         setTimeout(() => {
                             birdBlue.goToSleep();
                             birdOrange.goToSleep();
                         }, sleepDelay);
-                        hasGoneToSleep = true;
+                        sleepState.night = true;
+                    }
+                } else if (totalMinutes >= 12 * 60 && totalMinutes < 13 * 60) {
+                    if (!sleepState.noon) {
+                        const sleepDelay = Math.random() * 15 * 60 * 1000;
+                        setTimeout(() => {
+                            birdBlue.goToSleep();
+                            birdOrange.goToSleep();
+                        }, sleepDelay);
+                        sleepState.noon = true;
+                    }
+                } else if (totalMinutes >= 10 * 60 + 30 && totalMinutes < 10 * 60 + 45) {
+                    if (!sleepState.nap1) {
+                        const sleepDelay = Math.random() * 5 * 60 * 1000;
+                        setTimeout(() => {
+                            birdBlue.goToSleep();
+                            birdOrange.goToSleep();
+                        }, sleepDelay);
+                        sleepState.nap1 = true;
+                    }
+                } else if (totalMinutes >= 15 * 60 && totalMinutes < 15 * 60 + 15) {
+                    if (!sleepState.nap2) {
+                        const sleepDelay = Math.random() * 5 * 60 * 1000;
+                        setTimeout(() => {
+                            birdBlue.goToSleep();
+                            birdOrange.goToSleep();
+                        }, sleepDelay);
+                        sleepState.nap2 = true;
                     }
                 } else if (hour === 7 && minute === 0) {
-                    if (hasGoneToSleep) {
+                    birdBlue.wakeUp();
+                    birdOrange.wakeUp();
+                    sleepState.night = false;
+                } else {
+                    if ((hour !== 22 || minute > 30) && sleepState.night) {
                         birdBlue.wakeUp();
                         birdOrange.wakeUp();
-                        hasGoneToSleep = false;
+                        sleepState.night = false;
                     }
-                } else if (hour !== 22 && hour !== 7) {
-                    hasGoneToSleep = false;
+                    if ((hour !== 12 || minute >= 60) && sleepState.noon) {
+                        birdBlue.wakeUp();
+                        birdOrange.wakeUp();
+                        sleepState.noon = false;
+                    }
+                    if ((hour !== 10 || minute >= 45) && sleepState.nap1) {
+                        birdBlue.wakeUp();
+                        birdOrange.wakeUp();
+                        sleepState.nap1 = false;
+                    }
+                    if ((hour !== 15 || minute >= 15) && sleepState.nap2) {
+                        birdBlue.wakeUp();
+                        birdOrange.wakeUp();
+                        sleepState.nap2 = false;
+                    }
                 }
-            }, 30000);
+            }
+            
+            setInterval(checkSleepSchedule, 30000);
+            checkSleepSchedule();
+            
+            document.getElementById('birdhouse-blue').addEventListener('click', () => {
+                if (birdBlue.isSleeping) {
+                    birdBlue.wakeUp();
+                }
+            });
+            
+            document.getElementById('birdhouse-orange').addEventListener('click', () => {
+                if (birdOrange.isSleeping) {
+                    birdOrange.wakeUp();
+                }
+            });
             
             const feeder = document.getElementById('bird-feeder');
             const feederRect = feeder.getBoundingClientRect();
