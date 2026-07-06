@@ -327,6 +327,23 @@
             z-index: 1001;
             pointer-events: none;
         }
+
+        .birdhouse-countdown {
+            position: fixed;
+            right: 20px;
+            top: 140px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 991;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .birdhouse-countdown.show {
+            opacity: 1;
+        }
     </style>
     <script>
         (function() {
@@ -677,6 +694,11 @@
                     <circle cx="30" cy="0" r="4" fill="#fbbf24" />
                     <line x1="30" y1="0" x2="30" y2="-10" stroke="#92400e" stroke-width="3" />
                 </svg>
+            </div>
+
+            <!-- 睡眠倒计时 -->
+            <div id="bird-sleep-countdown" class="birdhouse-countdown">
+                💤 小鸟睡觉中，还有 <span id="sleep-time-left">00:00</span> 醒来
             </div>
 
             <!-- 喂鸟器 -->
@@ -1765,6 +1787,9 @@
                     }
                 }
                 
+                const countdownEl = document.getElementById('bird-sleep-countdown');
+                const timeLeftEl = document.getElementById('sleep-time-left');
+                
                 if (shouldBeSleeping && activePeriodIndex !== currentPeriodIndex) {
                     const period = currentSleepSchedule.periods[currentPeriodIndex];
                     const timeUntilStart = (period.start - totalMinutes) * 60 * 1000;
@@ -1784,10 +1809,20 @@
                     birdBlue.wakeUp();
                     birdOrange.wakeUp();
                     activePeriodIndex = -1;
+                    countdownEl.classList.remove('show');
+                }
+                
+                if (shouldBeSleeping && activePeriodIndex === currentPeriodIndex) {
+                    const period = currentSleepSchedule.periods[currentPeriodIndex];
+                    const remainingMinutes = period.end - totalMinutes;
+                    const hours = Math.floor(remainingMinutes / 60);
+                    const minutes = remainingMinutes % 60;
+                    timeLeftEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                    countdownEl.classList.add('show');
                 }
             }
             
-            setInterval(checkSleepSchedule, 30000);
+            setInterval(checkSleepSchedule, 1000);
             
             function setupMidnightUpdate() {
                 const now = new Date();
@@ -1833,6 +1868,7 @@
             let startX, startY, initialLeft, initialTop;
             
             feeder.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
                 isDragging = true;
                 startX = e.clientX;
                 startY = e.clientY;
@@ -1844,36 +1880,34 @@
             document.addEventListener('pointermove', (e) => {
                 if (!isDragging) return;
                 
+                e.preventDefault();
+                
                 const dx = e.clientX - startX;
                 const dy = e.clientY - startY;
                 
                 feeder.style.left = (initialLeft + dx) + 'px';
                 feeder.style.top = (initialTop + dy) + 'px';
-                
-                const feederBounds = feeder.getBoundingClientRect();
-                
-                [birdBlue, birdOrange].forEach(bird => {
-                    if (bird.isSleeping) return;
-                    
-                    const birdBounds = bird.bird.getBoundingClientRect();
-                    
-                    if (feederBounds.left < birdBounds.right &&
-                        feederBounds.right > birdBounds.left &&
-                        feederBounds.top < birdBounds.bottom &&
-                        feederBounds.bottom > birdBounds.top) {
-                        bird.eat();
-                        setTimeout(() => {
-                            feeder.style.left = feederOriginalX + 'px';
-                            feeder.style.top = feederOriginalY + 'px';
-                        }, 200);
-                        isDragging = false;
-                        feeder.classList.remove('dragging');
-                    }
-                });
             });
             
             document.addEventListener('pointerup', () => {
                 if (isDragging) {
+                    const feederBounds = feeder.getBoundingClientRect();
+                    let fed = false;
+                    
+                    [birdBlue, birdOrange].forEach(bird => {
+                        if (bird.isSleeping || fed) return;
+                        
+                        const birdBounds = bird.bird.getBoundingClientRect();
+                        
+                        if (feederBounds.left < birdBounds.right &&
+                            feederBounds.right > birdBounds.left &&
+                            feederBounds.top < birdBounds.bottom &&
+                            feederBounds.bottom > birdBounds.top) {
+                            bird.eat();
+                            fed = true;
+                        }
+                    });
+                    
                     feeder.style.left = feederOriginalX + 'px';
                     feeder.style.top = feederOriginalY + 'px';
                     isDragging = false;
