@@ -164,6 +164,110 @@
             height: 0 !important;
             overflow: hidden !important;
         }
+
+        /* 蓝色小鸟样式 */
+        #blue-bird {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            z-index: 999;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            pointer-events: auto;
+            will-change: transform, left, top;
+        }
+        #blue-bird:hover {
+            transform: scale(1.2);
+        }
+        #blue-bird svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .bird-flying .wing-left {
+            animation: wingFlapLeft 0.3s ease-in-out infinite;
+            transform-origin: 30% 50%;
+        }
+        .bird-flying .wing-right {
+            animation: wingFlapRight 0.3s ease-in-out infinite;
+            transform-origin: 70% 50%;
+        }
+
+        @keyframes wingFlapLeft {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-30deg); }
+        }
+        @keyframes wingFlapRight {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(30deg); }
+        }
+
+        .bird-perched .wing-left,
+        .bird-perched .wing-right {
+            animation: none;
+        }
+
+        /* 电线杆 */
+        #bird-wire {
+            position: fixed;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, #666, #333);
+            z-index: 998;
+            pointer-events: none;
+            display: none;
+        }
+        #bird-wire::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -40px;
+            width: 82px;
+            height: 2px;
+            background: linear-gradient(to right, #444, #666, #444);
+        }
+        #bird-wire::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: -20px;
+            width: 42px;
+            height: 2px;
+            background: linear-gradient(to right, #444, #666, #444);
+        }
+
+        /* 对话框 */
+        #bird-speech-bubble {
+            position: fixed;
+            background: white;
+            color: #333;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px) scale(0.9);
+            transition: all 0.3s ease;
+            max-width: 200px;
+        }
+        #bird-speech-bubble.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        #bird-speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
     </style>
     <script>
         (function() {
@@ -422,6 +526,37 @@
             <div id="live2d-container"></div>
             <button id="live2d-shrink-btn" title="缩小看板娘" style="display: none;">➖</button>
             <button id="live2d-expand-btn" title="展开看板娘" style="display: none;">👧</button>
+
+            <!-- 蓝色小鸟 -->
+            <div id="blue-bird" class="bird-flying">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="bird-blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#58a6ff" />
+                            <stop offset="100%" stop-color="#3b82f6" />
+                        </linearGradient>
+                        <linearGradient id="bird-belly-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#93c5fd" />
+                            <stop offset="100%" stop-color="#bfdbfe" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="35" fill="url(#bird-blue-gradient)" />
+                    <ellipse cx="50" cy="58" rx="25" ry="18" fill="url(#bird-belly-gradient)" />
+                    <circle cx="38" cy="42" r="6" fill="white" />
+                    <circle cx="39" cy="43" r="3" fill="#1f2937" />
+                    <circle cx="62" cy="42" r="6" fill="white" />
+                    <circle cx="63" cy="43" r="3" fill="#1f2937" />
+                    <path d="M42 60 Q50 65 58 60" stroke="#1f2937" stroke-width="3" fill="none" stroke-linecap="round" />
+                    <path d="M35 35 L30 25 L40 30 Z" fill="#58a6ff" class="wing-left" />
+                    <path d="M65 35 L70 25 L60 30 Z" fill="#58a6ff" class="wing-right" />
+                    <path d="M45 75 L43 85" stroke="#1f2937" stroke-width="2" />
+                    <path d="M55 75 L57 85" stroke="#1f2937" stroke-width="2" />
+                    <circle cx="28" cy="48" r="5" fill="#f97316" opacity="0.6" />
+                    <circle cx="72" cy="48" r="5" fill="#f97316" opacity="0.6" />
+                </svg>
+            </div>
+            <div id="bird-wire"></div>
+            <div id="bird-speech-bubble"></div>
 
             <!-- 页脚 -->
             <footer class="py-5 bg-black">
@@ -941,6 +1076,143 @@
                 minute: '2-digit'
             });
         }
+
+        (function() {
+            const bird = document.getElementById('blue-bird');
+            const wire = document.getElementById('bird-wire');
+            const speechBubble = document.getElementById('bird-speech-bubble');
+            
+            const messages = [
+                '你好呀！👋',
+                'Hello! 😊',
+                '今天适合喝咖啡 ☕',
+                '天气真好！☀️',
+                '要不要一起玩耍？',
+                '啾啾~ 🐦',
+                '记得休息一下哦！',
+                '祝你今天好运！🍀',
+                '今天也要加油！💪',
+                '看到你真开心！😄'
+            ];
+
+            let isPerched = false;
+            let currentX = window.innerWidth / 2;
+            let currentY = window.innerHeight / 2;
+            let targetX = currentX;
+            let targetY = currentY;
+            let animationId = null;
+            let flightDelay = null;
+            let flipDirection = 1;
+
+            function getRandomPosition() {
+                const padding = 80;
+                return {
+                    x: padding + Math.random() * (window.innerWidth - padding * 2),
+                    y: padding + Math.random() * (window.innerHeight - padding * 2)
+                };
+            }
+
+            function flyToRandomPosition() {
+                if (isPerched) return;
+                
+                const target = getRandomPosition();
+                targetX = target.x;
+                targetY = target.y;
+                
+                flipDirection = targetX > currentX ? 1 : -1;
+                bird.style.transform = `scaleX(${flipDirection})`;
+                
+                animateFlight();
+            }
+
+            function animateFlight() {
+                if (isPerched) return;
+
+                const dx = targetX - currentX;
+                const dy = targetY - currentY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 5) {
+                    setTimeout(flyToRandomPosition, 1000 + Math.random() * 2000);
+                    return;
+                }
+
+                const speed = 2 + Math.random();
+                currentX += (dx / distance) * speed;
+                currentY += (dy / distance) * speed + Math.sin(Date.now() / 200) * 0.5;
+
+                bird.style.left = currentX + 'px';
+                bird.style.top = currentY + 'px';
+
+                animationId = requestAnimationFrame(animateFlight);
+            }
+
+            function showPerched() {
+                isPerched = true;
+                if (animationId) cancelAnimationFrame(animationId);
+                
+                bird.classList.remove('bird-flying');
+                bird.classList.add('bird-perched');
+                
+                const perchX = Math.max(100, Math.min(window.innerWidth - 100, currentX));
+                const perchY = Math.max(100, Math.min(window.innerHeight - 200, currentY));
+                
+                bird.style.left = perchX + 'px';
+                bird.style.top = perchY + 'px';
+                bird.style.transform = 'scaleX(1)';
+                
+                wire.style.left = (perchX + 30) + 'px';
+                wire.style.top = (perchY + 40) + 'px';
+                wire.style.display = 'block';
+                
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                speechBubble.textContent = randomMessage;
+                speechBubble.style.left = (perchX - 20) + 'px';
+                speechBubble.style.top = (perchY - 80) + 'px';
+                
+                setTimeout(() => {
+                    speechBubble.classList.add('show');
+                }, 100);
+                
+                flightDelay = setTimeout(() => {
+                    hidePerched();
+                }, 4000);
+            }
+
+            function hidePerched() {
+                isPerched = false;
+                
+                speechBubble.classList.remove('show');
+                
+                setTimeout(() => {
+                    wire.style.display = 'none';
+                    bird.classList.remove('bird-perched');
+                    bird.classList.add('bird-flying');
+                    flyToRandomPosition();
+                }, 300);
+            }
+
+            bird.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!isPerched) {
+                    showPerched();
+                }
+            });
+
+            bird.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!isPerched) {
+                    showPerched();
+                }
+            }, { passive: false });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                bird.style.left = currentX + 'px';
+                bird.style.top = currentY + 'px';
+                flyToRandomPosition();
+            });
+        })();
     </script>
 </body>
 </html>
