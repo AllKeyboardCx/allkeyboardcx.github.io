@@ -273,6 +273,60 @@
             border-right: 8px solid transparent;
             border-top: 8px solid white;
         }
+
+        /* 鸟房子 */
+        .birdhouse {
+            position: fixed;
+            width: 50px;
+            height: 55px;
+            z-index: 990;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .birdhouse:hover {
+            transform: scale(1.1);
+        }
+        .birdhouse svg {
+            width: 100%;
+            height: 100%;
+        }
+        .birdhouse-sleeping::after {
+            content: '💤';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            animation: sleepFloat 1s ease-in-out infinite;
+        }
+        @keyframes sleepFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* 喂鸟器 */
+        #bird-feeder {
+            position: fixed;
+            left: 20px;
+            top: 100px;
+            width: 50px;
+            height: 55px;
+            z-index: 995;
+            cursor: grab;
+            transition: transform 0.2s ease;
+        }
+        #bird-feeder:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+        #bird-feeder svg {
+            width: 100%;
+            height: 100%;
+        }
+        #bird-feeder.dragging {
+            z-index: 1001;
+            pointer-events: none;
+        }
     </style>
     <script>
         (function() {
@@ -599,6 +653,45 @@
                         <circle cx="30" cy="48" r="4" fill="#fca5a5" opacity="0.5" />
                     </svg>
                 </div>
+            </div>
+
+            <!-- 蓝色鸟房子 -->
+            <div id="birdhouse-blue" class="birdhouse" style="right: 20px; top: 80px;">
+                <svg viewBox="0 0 60 65" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="30,0 60,30 0,30" fill="#3b82f6" />
+                    <rect x="5" y="30" width="50" height="30" rx="2" fill="#1e40af" />
+                    <circle cx="30" cy="48" r="8" fill="#1f2937" />
+                    <circle cx="30" cy="48" r="5" fill="#374151" />
+                    <circle cx="30" cy="0" r="4" fill="#fbbf24" />
+                    <line x1="30" y1="0" x2="30" y2="-10" stroke="#92400e" stroke-width="3" />
+                </svg>
+            </div>
+
+            <!-- 橙色鸟房子 -->
+            <div id="birdhouse-orange" class="birdhouse" style="right: 80px; top: 80px;">
+                <svg viewBox="0 0 60 65" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="30,0 60,30 0,30" fill="#f97316" />
+                    <rect x="5" y="30" width="50" height="30" rx="2" fill="#ea580c" />
+                    <circle cx="30" cy="48" r="8" fill="#1f2937" />
+                    <circle cx="30" cy="48" r="5" fill="#374151" />
+                    <circle cx="30" cy="0" r="4" fill="#fbbf24" />
+                    <line x1="30" y1="0" x2="30" y2="-10" stroke="#92400e" stroke-width="3" />
+                </svg>
+            </div>
+
+            <!-- 喂鸟器 -->
+            <div id="bird-feeder">
+                <svg viewBox="0 0 60 65" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="22" y="0" width="16" height="15" rx="2" fill="#92400e" />
+                    <ellipse cx="30" cy="25" rx="25" ry="12" fill="#f59e0b" />
+                    <ellipse cx="30" cy="25" rx="20" ry="8" fill="#fed7aa" />
+                    <ellipse cx="30" cy="40" rx="22" ry="8" fill="#92400e" />
+                    <circle cx="20" cy="22" r="3" fill="#1f2937" />
+                    <circle cx="30" cy="20" r="3" fill="#1f2937" />
+                    <circle cx="40" cy="22" r="3" fill="#1f2937" />
+                    <circle cx="25" cy="28" r="2" fill="#1f2937" />
+                    <circle cx="35" cy="28" r="2" fill="#1f2937" />
+                </svg>
             </div>
 
             <!-- 页脚 -->
@@ -1223,16 +1316,31 @@
             '今天真美好！🌸'
         ];
 
+        const birdEatMessages = [
+            '好好吃！😋',
+            '太美味了！🍽️',
+            '谢谢你的食物！❤️',
+            '好吃好吃！🍪',
+            '真好吃呀！😁',
+            '美味极了！😍',
+            '这是什么？好好吃！🤤',
+            '再来一点！🍞',
+            '吃饱啦！😄',
+            '谢谢你喂我！🙏'
+        ];
+
         class Bird {
-            constructor(elementId, startX, startY) {
+            constructor(elementId, startX, startY, houseId) {
                 this.bird = document.getElementById(elementId);
                 this.birdInner = this.bird.querySelector('.bird-inner');
+                this.house = document.getElementById(houseId);
                 this.currentX = startX;
                 this.currentY = startY;
                 this.targetX = startX;
                 this.targetY = startY;
                 this.isPerched = false;
                 this.isGreeting = false;
+                this.isSleeping = false;
                 this.animationId = null;
                 this.flightDelay = null;
                 this.flipDirection = 1;
@@ -1254,7 +1362,7 @@
                 
                 this.bird.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!this.isPerched && !this.isGreeting) {
+                    if (!this.isPerched && !this.isGreeting && !this.isSleeping) {
                         this.showPerched();
                     }
                 });
@@ -1262,7 +1370,7 @@
                 this.bird.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!this.isPerched && !this.isGreeting) {
+                    if (!this.isPerched && !this.isGreeting && !this.isSleeping) {
                         this.showPerched();
                     }
                 }, { passive: false });
@@ -1279,7 +1387,7 @@
             }
 
             flyToRandomPosition() {
-                if (this.isPerched || this.isGreeting) return;
+                if (this.isPerched || this.isGreeting || this.isSleeping) return;
                 
                 const target = this.getRandomPosition();
                 this.targetX = target.x;
@@ -1292,7 +1400,7 @@
             }
 
             animateFlight() {
-                if (this.isPerched || this.isGreeting) return;
+                if (this.isPerched || this.isGreeting || this.isSleeping) return;
 
                 const dx = this.targetX - this.currentX;
                 const dy = this.targetY - this.currentY;
@@ -1404,17 +1512,92 @@
                     this.flyToRandomPosition();
                 }, 300);
             }
+
+            goToSleep() {
+                if (this.isSleeping) return;
+                
+                this.isSleeping = true;
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                
+                const houseRect = this.house.getBoundingClientRect();
+                const houseX = houseRect.left + houseRect.width / 2 - 30;
+                const houseY = houseRect.top + houseRect.height - 30;
+                
+                this.targetX = houseX;
+                this.targetY = houseY;
+                this.flipDirection = this.targetX > this.currentX ? 1 : -1;
+                this.birdInner.style.transform = `scaleX(${this.flipDirection})`;
+                
+                this.animateFlightToHouse();
+            }
+
+            animateFlightToHouse() {
+                if (!this.isSleeping) return;
+                
+                const dx = this.targetX - this.currentX;
+                const dy = this.targetY - this.currentY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 5) {
+                    this.bird.style.display = 'none';
+                    this.house.classList.add('birdhouse-sleeping');
+                    return;
+                }
+                
+                const speed = 3 + Math.random();
+                this.currentX += (dx / distance) * speed;
+                this.currentY += (dy / distance) * speed;
+                
+                this.bird.style.left = this.currentX + 'px';
+                this.bird.style.top = this.currentY + 'px';
+                
+                this.animationId = requestAnimationFrame(() => this.animateFlightToHouse());
+            }
+
+            wakeUp() {
+                if (!this.isSleeping) return;
+                
+                this.isSleeping = false;
+                this.house.classList.remove('birdhouse-sleeping');
+                this.bird.style.display = 'block';
+                
+                this.bird.classList.remove('bird-perched');
+                this.bird.classList.add('bird-flying');
+                
+                setTimeout(() => {
+                    this.flyToRandomPosition();
+                }, 500);
+            }
+
+            eat() {
+                if (this.isSleeping) return;
+                
+                this.speechBubble.classList.remove('show');
+                
+                const eatMessage = birdEatMessages[Math.floor(Math.random() * birdEatMessages.length)];
+                this.speechBubble.textContent = eatMessage;
+                this.speechBubble.style.left = (this.currentX - 20) + 'px';
+                this.speechBubble.style.top = (this.currentY - 80) + 'px';
+                
+                setTimeout(() => {
+                    this.speechBubble.classList.add('show');
+                }, 100);
+                
+                setTimeout(() => {
+                    this.speechBubble.classList.remove('show');
+                }, 3000);
+            }
         }
 
         let birdBlue, birdOrange;
 
         document.addEventListener('DOMContentLoaded', () => {
-            birdBlue = new Bird('bird-blue', window.innerWidth * 0.3, window.innerHeight * 0.5);
-            birdOrange = new Bird('bird-orange', window.innerWidth * 0.7, window.innerHeight * 0.5);
+            birdBlue = new Bird('bird-blue', window.innerWidth * 0.3, window.innerHeight * 0.5, 'birdhouse-blue');
+            birdOrange = new Bird('bird-orange', window.innerWidth * 0.7, window.innerHeight * 0.5, 'birdhouse-orange');
             
             let lastGreetTime = 0;
             setInterval(() => {
-                if (birdBlue.isPerched || birdOrange.isPerched || birdBlue.isGreeting || birdOrange.isGreeting) {
+                if (birdBlue.isPerched || birdOrange.isPerched || birdBlue.isGreeting || birdOrange.isGreeting || birdBlue.isSleeping || birdOrange.isSleeping) {
                     return;
                 }
                 
@@ -1434,6 +1617,88 @@
                     }, 4000);
                 }
             }, 500);
+            
+            let hasGoneToSleep = false;
+            setInterval(() => {
+                const now = new Date();
+                const hour = now.getHours();
+                const minute = now.getMinutes();
+                
+                if (hour === 22 && minute >= 0 && minute <= 30) {
+                    if (!hasGoneToSleep) {
+                        const sleepDelay = Math.random() * 30 * 60 * 1000;
+                        setTimeout(() => {
+                            birdBlue.goToSleep();
+                            birdOrange.goToSleep();
+                        }, sleepDelay);
+                        hasGoneToSleep = true;
+                    }
+                } else if (hour === 7 && minute === 0) {
+                    if (hasGoneToSleep) {
+                        birdBlue.wakeUp();
+                        birdOrange.wakeUp();
+                        hasGoneToSleep = false;
+                    }
+                } else if (hour !== 22 && hour !== 7) {
+                    hasGoneToSleep = false;
+                }
+            }, 30000);
+            
+            const feeder = document.getElementById('bird-feeder');
+            const feederRect = feeder.getBoundingClientRect();
+            const feederOriginalX = 20;
+            const feederOriginalY = 100;
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            feeder.addEventListener('pointerdown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = parseFloat(feeder.style.left) || feederRect.left;
+                initialTop = parseFloat(feeder.style.top) || feederRect.top;
+                feeder.classList.add('dragging');
+            });
+            
+            document.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                feeder.style.left = (initialLeft + dx) + 'px';
+                feeder.style.top = (initialTop + dy) + 'px';
+                
+                const feederBounds = feeder.getBoundingClientRect();
+                
+                [birdBlue, birdOrange].forEach(bird => {
+                    if (bird.isSleeping) return;
+                    
+                    const birdBounds = bird.bird.getBoundingClientRect();
+                    
+                    if (feederBounds.left < birdBounds.right &&
+                        feederBounds.right > birdBounds.left &&
+                        feederBounds.top < birdBounds.bottom &&
+                        feederBounds.bottom > birdBounds.top) {
+                        bird.eat();
+                        setTimeout(() => {
+                            feeder.style.left = feederOriginalX + 'px';
+                            feeder.style.top = feederOriginalY + 'px';
+                        }, 200);
+                        isDragging = false;
+                        feeder.classList.remove('dragging');
+                    }
+                });
+            });
+            
+            document.addEventListener('pointerup', () => {
+                if (isDragging) {
+                    feeder.style.left = feederOriginalX + 'px';
+                    feeder.style.top = feederOriginalY + 'px';
+                    isDragging = false;
+                    feeder.classList.remove('dragging');
+                }
+            });
         });
     </script>
 </body>
