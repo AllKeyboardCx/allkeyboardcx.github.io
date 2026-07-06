@@ -876,7 +876,14 @@
             const firstChar = username.charAt(0);
             const displayChar = /[\u4e00-\u9fa5]/.test(firstChar) ? firstChar : firstChar.toUpperCase();
             
-            return `<div class="rounded-circle" style="width: 50px; height: 50px; background-color: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${displayChar}</div>`;
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            const textColor = brightness > 128 ? '#1a1a1a' : '#ffffff';
+            
+            return `<div class="rounded-circle" style="width: 50px; height: 50px; background-color: ${color}; display: flex; align-items: center; justify-content: center; color: ${textColor}; font-weight: bold; font-size: 18px;">${displayChar}</div>`;
         }
 
         async function submitComment() {
