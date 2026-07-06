@@ -36,21 +36,21 @@ body {
 }
 
 body.theme-dawn {
-    --theme-bg-overlay: rgba(200, 190, 175, 0.65);
+    --theme-bg-overlay: rgba(240, 235, 225, 0.7);
     --theme-primary-color: #d4a07a;
-    --theme-primary-glow: rgba(212, 160, 122, 0.35);
-    --theme-primary-glow-strong: rgba(212, 160, 122, 0.55);
-    --theme-border-color: rgba(212, 160, 122, 0.35);
+    --theme-primary-glow: rgba(212, 160, 122, 0.3);
+    --theme-primary-glow-strong: rgba(212, 160, 122, 0.5);
+    --theme-border-color: rgba(212, 160, 122, 0.3);
     --theme-text-color: #4a3b2a;
     --theme-text-light: #2d2318;
     --theme-text-muted: #7a6a5a;
-    --theme-card-bg: rgba(220, 210, 195, 0.55);
-    --theme-card-border: rgba(212, 160, 122, 0.35);
+    --theme-card-bg: rgba(255, 250, 240, 0.4);
+    --theme-card-border: rgba(212, 160, 122, 0.3);
     --theme-btn-text: #2d2318;
     --theme-btn-hover-bg: rgba(212, 160, 122, 0.85);
     --theme-btn-hover-text: #f0e8dc;
     --theme-code-color: #8b5a9b;
-    --theme-code-bg: rgba(212, 160, 122, 0.15);
+    --theme-code-bg: rgba(212, 160, 122, 0.1);
     --theme-link-color: #7e3a8d;
     --theme-link-hover-color: #8b5a9b;
     --theme-icon-color: #2d2318;
@@ -58,21 +58,21 @@ body.theme-dawn {
 }
 
 body.theme-morning {
-    --theme-bg-overlay: rgba(180, 190, 200, 0.65);
+    --theme-bg-overlay: rgba(230, 235, 240, 0.7);
     --theme-primary-color: #6a8a9e;
-    --theme-primary-glow: rgba(106, 138, 158, 0.35);
-    --theme-primary-glow-strong: rgba(106, 138, 158, 0.55);
-    --theme-border-color: rgba(106, 138, 158, 0.35);
+    --theme-primary-glow: rgba(106, 138, 158, 0.3);
+    --theme-primary-glow-strong: rgba(106, 138, 158, 0.5);
+    --theme-border-color: rgba(106, 138, 158, 0.3);
     --theme-text-color: #3a4a5a;
     --theme-text-light: #1a2a3a;
     --theme-text-muted: #6a7a8a;
-    --theme-card-bg: rgba(200, 210, 220, 0.55);
-    --theme-card-border: rgba(106, 138, 158, 0.35);
+    --theme-card-bg: rgba(245, 250, 255, 0.4);
+    --theme-card-border: rgba(106, 138, 158, 0.3);
     --theme-btn-text: #1a2a3a;
     --theme-btn-hover-bg: rgba(106, 138, 158, 0.85);
     --theme-btn-hover-text: #e0e8f0;
     --theme-code-color: #8b5a9b;
-    --theme-code-bg: rgba(106, 138, 158, 0.15);
+    --theme-code-bg: rgba(106, 138, 158, 0.1);
     --theme-link-color: #7e3a8d;
     --theme-link-hover-color: #8b5a9b;
     --theme-icon-color: #1a2a3a;
@@ -80,21 +80,21 @@ body.theme-morning {
 }
 
 body.theme-noon {
-    --theme-bg-overlay: rgba(190, 200, 210, 0.65);
+    --theme-bg-overlay: rgba(245, 248, 252, 0.75);
     --theme-primary-color: #4a8ad4;
-    --theme-primary-glow: rgba(74, 138, 212, 0.35);
-    --theme-primary-glow-strong: rgba(74, 138, 212, 0.55);
-    --theme-border-color: rgba(74, 138, 212, 0.35);
+    --theme-primary-glow: rgba(74, 138, 212, 0.3);
+    --theme-primary-glow-strong: rgba(74, 138, 212, 0.5);
+    --theme-border-color: rgba(74, 138, 212, 0.3);
     --theme-text-color: #1e293b;
     --theme-text-light: #0f172a;
     --theme-text-muted: #54647b;
-    --theme-card-bg: rgba(210, 220, 230, 0.55);
-    --theme-card-border: rgba(74, 138, 212, 0.35);
+    --theme-card-bg: rgba(255, 255, 255, 0.45);
+    --theme-card-border: rgba(74, 138, 212, 0.3);
     --theme-btn-text: #0f172a;
     --theme-btn-hover-bg: rgba(74, 138, 212, 0.85);
     --theme-btn-hover-text: #e8f0f8;
     --theme-code-color: #7b2ea8;
-    --theme-code-bg: rgba(74, 138, 212, 0.15);
+    --theme-code-bg: rgba(74, 138, 212, 0.1);
     --theme-link-color: #7b4cd6;
     --theme-link-hover-color: #9b6cf6;
     --theme-icon-color: #0f172a;
@@ -102,21 +102,21 @@ body.theme-noon {
 }
 
 body.theme-afternoon {
-    --theme-bg-overlay: rgba(210, 190, 165, 0.65);
+    --theme-bg-overlay: rgba(245, 235, 220, 0.7);
     --theme-primary-color: #c99030;
-    --theme-primary-glow: rgba(201, 144, 48, 0.35);
-    --theme-primary-glow-strong: rgba(201, 144, 48, 0.55);
-    --theme-border-color: rgba(201, 144, 48, 0.35);
+    --theme-primary-glow: rgba(201, 144, 48, 0.3);
+    --theme-primary-glow-strong: rgba(201, 144, 48, 0.5);
+    --theme-border-color: rgba(201, 144, 48, 0.3);
     --theme-text-color: #4a3a1a;
     --theme-text-light: #2a1a0a;
     --theme-text-muted: #7a6a4a;
-    --theme-card-bg: rgba(220, 200, 175, 0.55);
-    --theme-card-border: rgba(201, 144, 48, 0.35);
+    --theme-card-bg: rgba(250, 240, 225, 0.4);
+    --theme-card-border: rgba(201, 144, 48, 0.3);
     --theme-btn-text: #2a1a0a;
     --theme-btn-hover-bg: rgba(201, 144, 48, 0.85);
     --theme-btn-hover-text: #f0e8d8;
     --theme-code-color: #8b5a9b;
-    --theme-code-bg: rgba(201, 144, 48, 0.15);
+    --theme-code-bg: rgba(201, 144, 48, 0.1);
     --theme-link-color: #7e3a8d;
     --theme-link-hover-color: #8b5a9b;
     --theme-icon-color: #2a1a0a;
@@ -558,6 +558,22 @@ footer p {
 }
 
 .list-group-item-action {
+    color: var(--theme-text-color) !important;
+}
+
+.text-light {
+    color: var(--theme-text-light) !important;
+}
+
+.fw-bold {
+    color: var(--theme-text-light) !important;
+}
+
+.card-header {
+    color: var(--theme-text-light) !important;
+}
+
+.card-body {
     color: var(--theme-text-color) !important;
 }
 
