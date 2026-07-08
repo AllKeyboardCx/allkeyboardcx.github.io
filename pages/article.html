@@ -53,13 +53,14 @@
             </div>
         </nav>
         <div class="container mt-5">
-            <div class="mobile-toc-wrapper d-lg-none">
-                <button class="mobile-toc-toggle" id="mobile-toc-toggle" type="button" aria-expanded="false">
-                    <span>📑 文章目录</span>
-                    <span class="mobile-toc-arrow">▼</span>
+            <div class="mobile-toc-island" id="mobile-toc-island">
+                <button class="mobile-toc-pill" id="mobile-toc-toggle" type="button" aria-expanded="false">
+                    <span class="mobile-toc-icon">📑</span>
+                    <span class="mobile-toc-label">文章目录</span>
+                    <span class="mobile-toc-arrow">▾</span>
                 </button>
-                <div class="mobile-toc-content" id="mobile-toc-content">
-                    <div class="scrollable-list-container" id="mobile-toc-container">
+                <div class="mobile-toc-panel" id="mobile-toc-panel">
+                    <div class="mobile-toc-panel-inner" id="mobile-toc-container">
                         <span class="text-muted">加载中...</span>
                     </div>
                 </div>
@@ -521,27 +522,31 @@
             loadComments();
 
             const mobileTocToggle = document.getElementById('mobile-toc-toggle');
-            const mobileTocContent = document.getElementById('mobile-toc-content');
+            const mobileTocPanel = document.getElementById('mobile-toc-panel');
             const mobileTocArrow = mobileTocToggle.querySelector('.mobile-toc-arrow');
-            mobileTocContent.style.display = 'none';
+            const mobileTocIsland = document.getElementById('mobile-toc-island');
+            mobileTocPanel.style.display = 'none';
             mobileTocToggle.addEventListener('click', function() {
-                const isVisible = mobileTocContent.style.display !== 'none';
+                const isVisible = mobileTocPanel.style.display !== 'none';
                 if (isVisible) {
-                    mobileTocContent.style.display = 'none';
-                    mobileTocArrow.textContent = '▼';
+                    mobileTocPanel.style.display = 'none';
+                    mobileTocArrow.textContent = '▾';
                     mobileTocToggle.setAttribute('aria-expanded', 'false');
+                    mobileTocIsland.classList.remove('expanded');
                 } else {
-                    mobileTocContent.style.display = 'block';
-                    mobileTocArrow.textContent = '▲';
+                    mobileTocPanel.style.display = 'block';
+                    mobileTocArrow.textContent = '▴';
                     mobileTocToggle.setAttribute('aria-expanded', 'true');
+                    mobileTocIsland.classList.add('expanded');
                 }
             });
 
             document.getElementById('mobile-toc-container').addEventListener('click', function(e) {
                 if (e.target.tagName === 'A') {
-                    mobileTocContent.style.display = 'none';
-                    mobileTocArrow.textContent = '▼';
+                    mobileTocPanel.style.display = 'none';
+                    mobileTocArrow.textContent = '▾';
                     mobileTocToggle.setAttribute('aria-expanded', 'false');
+                    mobileTocIsland.classList.remove('expanded');
                 }
             });
         });
