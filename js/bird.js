@@ -448,14 +448,7 @@ function initBirds() {
         const month = today.getMonth() + 1;
         const day = today.getDate();
         const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        
-        try {
-            const localStorageKey = `bird_sleep_${dateStr}`;
-            const cached = localStorage.getItem(localStorageKey);
-            if (cached) {
-                return JSON.parse(cached);
-            }
-        } catch (e) {}
+        const localStorageKey = `bird_sleep_${dateStr}`;
         
         try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule?date=eq.${dateStr}`, {
@@ -473,15 +466,22 @@ function initBirds() {
                         : data[0].schedule;
                     
                     try {
-                        localStorage.setItem(`bird_sleep_${dateStr}`, JSON.stringify(schedule));
+                        localStorage.setItem(localStorageKey, JSON.stringify(schedule));
                     } catch (e) {}
                     
                     return schedule;
                 }
             }
         } catch (error) {
-            console.error('Error fetching sleep schedule:', error);
+            console.error('Error fetching sleep schedule from DB:', error);
         }
+        
+        try {
+            const cached = localStorage.getItem(localStorageKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        } catch (e) {}
         
         return null;
     }
@@ -490,6 +490,32 @@ function initBirds() {
         try {
             localStorage.setItem(`bird_sleep_${schedule.date}`, JSON.stringify(schedule));
         } catch (e) {}
+        
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule?date=eq.${schedule.date}`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.length > 0) {
+                    const existingSchedule = typeof data[0].schedule === 'string' 
+                        ? JSON.parse(data[0].schedule) 
+                        : data[0].schedule;
+                    
+                    try {
+                        localStorage.setItem(`bird_sleep_${schedule.date}`, JSON.stringify(existingSchedule));
+                    } catch (e) {}
+                    
+                    return existingSchedule;
+                }
+            }
+        } catch (error) {
+            console.error('Error checking existing schedule:', error);
+        }
         
         try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule`, {
@@ -513,6 +539,8 @@ function initBirds() {
         } catch (error) {
             console.error('Error saving sleep schedule:', error);
         }
+        
+        return schedule;
     }
     
     async function updateSleepScheduleForNewDay() {
@@ -525,11 +553,25 @@ function initBirds() {
     let activePeriodIndex = -1;
     
     async function initSleepSchedule() {
+        try {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const day = today.getDate();
+            const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('bird_sleep_') && key !== `bird_sleep_${dateStr}`) {
+                    localStorage.removeItem(key);
+                }
+            }
+        } catch (e) {}
+        
         currentSleepSchedule = await getTodaySleepSchedule();
         
         if (!currentSleepSchedule) {
-            currentSleepSchedule = generateRandomSleepSchedule();
-            await saveSleepSchedule(currentSleepSchedule);
+            currentSleepSchedule = await saveSleepSchedule(generateRandomSleepSchedule());
         }
         
         checkSleepSchedule();
