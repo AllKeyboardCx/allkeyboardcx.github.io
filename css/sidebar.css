@@ -927,10 +927,15 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 #article-toc-container .toc-level-6 { padding-left: 60px; }
 
 #article-toc-container.scrollable-list-container {
-    max-height: 400px;
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 8px;
+}
+
+.sticky-toc {
+    position: sticky;
+    top: 80px;
 }
 
 .comment-card {
