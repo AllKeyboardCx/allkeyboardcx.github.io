@@ -19,7 +19,7 @@
         const newLight = /theme-(dawn|morning|noon|afternoon)/.test(document.body.className);
         if (newLight !== lightTheme) {
             lightTheme = newLight;
-            canvas.style.mixBlendMode = lightTheme ? 'multiply' : 'screen';
+            canvas.style.mixBlendMode = lightTheme ? 'normal' : 'screen';
         }
     }
 
@@ -118,53 +118,64 @@
     function draw() {
         checkTheme();
         ctx.clearRect(0, 0, width, height);
-        const lightness = lightTheme ? 30 : 75;
-        const glowLightness = lightTheme ? 35 : 75;
+        const dim = lightTheme;
+        const starAlphaScale = dim ? 0.15 : 1;
+        const starLightness = dim ? 55 : 75;
+        const starSat = dim ? 45 : 80;
+        const step = dim ? 2 : 1;
 
-        for (let i = 0; i < stars.length; i++) {
+        for (let i = 0; i < stars.length; i += step) {
             const s = stars[i];
+            if (dim && s.size < 1.3) continue;
             const tw = (Math.sin(s.twinkle) + 1) / 2;
-            const alpha = s.opacity * (0.5 + tw * 0.5);
+            const alpha = s.opacity * (0.5 + tw * 0.5) * starAlphaScale;
+            if (alpha < 0.03) continue;
             ctx.beginPath();
-            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${s.hue}, 80%, ${lightness}%, ${alpha})`;
+            ctx.arc(s.x, s.y, s.size * (dim ? 0.7 : 1), 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${s.hue}, ${starSat}%, ${starLightness}%, ${alpha})`;
             ctx.fill();
 
-            if (s.size > 1.4) {
+            if (s.size > 1.4 && !dim) {
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.size * 3.2, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${s.hue}, 80%, ${glowLightness}%, ${alpha * 0.18})`;
+                ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha * 0.18})`;
                 ctx.fill();
             }
         }
 
-        const pLightness = lightTheme ? 35 : 70;
+        const pLightness = dim ? 50 : 70;
+        const pSat = dim ? 55 : 85;
+        const pAlphaScale = dim ? 0.6 : 1;
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${p.hue}, 85%, ${pLightness}%, ${p.life * 0.8})`;
+            ctx.fillStyle = `hsla(${p.hue}, ${pSat}%, ${pLightness}%, ${p.life * 0.8 * pAlphaScale})`;
             ctx.fill();
 
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${p.hue}, 85%, ${pLightness}%, ${p.life * 0.12})`;
-            ctx.fill();
+            if (!dim) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${p.hue}, 85%, 70%, ${p.life * 0.12})`;
+                ctx.fill();
+            }
         }
 
         if (mouse.active) {
-            const lineLightness = lightTheme ? 28 : 70;
-            for (let i = 0; i < stars.length; i++) {
+            const lineLightness = dim ? 50 : 70;
+            const lineAlphaScale = dim ? 0.4 : 1;
+            for (let i = 0; i < stars.length; i += step) {
                 const s = stars[i];
                 const dx = s.x - mouse.x;
                 const dy = s.y - mouse.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < 120) {
-                    const alpha = (1 - dist / 120) * 0.25;
+                    const alpha = (1 - dist / 120) * 0.25 * lineAlphaScale;
+                    if (alpha < 0.02) continue;
                     ctx.beginPath();
                     ctx.moveTo(mouse.x, mouse.y);
                     ctx.lineTo(s.x, s.y);
-                    ctx.strokeStyle = `hsla(${s.hue}, 80%, ${lineLightness}%, ${alpha})`;
+                    ctx.strokeStyle = `hsla(${s.hue}, 45%, ${lineLightness}%, ${alpha})`;
                     ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
