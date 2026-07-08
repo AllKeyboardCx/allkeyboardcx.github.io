@@ -101,6 +101,14 @@
                             <span class="text-muted">加载中...</span>
                         </div>
                     </div>
+                    <div class="card mb-4 bg-dark border-gray">
+                        <div class="card-header text-light">📑 文章目录</div>
+                        <div class="card-body">
+                            <div class="scrollable-list-container" id="article-toc-container">
+                                <span class="text-muted">加载中...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -172,14 +180,14 @@
                 heading.id = id;
             });
 
-            let tocHtml = '<div class="article-toc"><div class="toc-title">📑 目录</div><ul class="toc-list">';
+            let tocHtml = '<ul class="toc-list">';
             headings.forEach(heading => {
                 const level = parseInt(heading.tagName.substring(1));
                 const text = heading.textContent.trim();
                 const id = heading.id;
                 tocHtml += `<li class="toc-item toc-level-${level}"><a href="#${id}">${escapeHtml(text)}</a></li>`;
             });
-            tocHtml += '</ul></div>';
+            tocHtml += '</ul>';
 
             return { html: tempDiv.innerHTML, toc: tocHtml };
         }
@@ -442,9 +450,14 @@
                         const calloutHtml = renderCallouts(finalHtml);
                         document.getElementById('article-content').innerHTML = `
                             <div class="mb-4 text-muted">阅读量: ${viewCount}</div>
-                            ${toc}
                             ${calloutHtml}
                         `;
+                        
+                        if (toc) {
+                            document.getElementById('article-toc-container').innerHTML = toc;
+                        } else {
+                            document.getElementById('article-toc-container').innerHTML = '<span class="text-muted">暂无目录</span>';
+                        }
 
                         document.querySelectorAll('pre code').forEach(block => {
                             hljs.highlightElement(block);
