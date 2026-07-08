@@ -4,8 +4,9 @@
     const canvas = document.getElementById('celestial-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const LATITUDE = 35;
+    const DEFAULT_LAT = 39.9042, DEFAULT_LNG = 116.4074;
     let W, H, dpr;
+    let celestialData = null;
 
     function resize() {
         dpr = window.devicePixelRatio || 1;
@@ -29,7 +30,7 @@
         const cosH = -Math.tan(latRad) * Math.tan(declRad);
         const H = Math.acos(Math.max(-1, Math.min(1, cosH)));
         const Hhours = H * 180 / Math.PI / 15;
-        return { sunrise: 12 - Hhours, sunset: 12 + Hhours, decl };
+        return { sunrise: 12 - Hhours, sunset: 12 + Hhours };
     }
 
     function moonPhase(date) {
@@ -56,6 +57,82 @@
         const moonrise = (sunrise + phase * 24) % 24;
         const moonset = (moonrise + 12.4) % 24;
         return { moonrise, moonset };
+    }
+
+    function parseHour(iso) {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+    }
+
+    function getPosition() {
+        return new Promise(resolve => {
+            const cached = localStorage.getItem('celestial_pos');
+            if (cached) {
+                try { return resolve(JSON.parse(cached)); } catch (e) {}
+            }
+            if (!navigator.geolocation) return resolve({ lat: DEFAULT_LAT, lng: DEFAULT_LNG });
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    localStorage.setItem('celestial_pos', JSON.stringify(p));
+                    resolve(p);
+                },
+                () => resolve({ lat: DEFAULT_LAT, lng: DEFAULT_LNG }),
+                { timeout: 4000, maximumAge: 86400000 }
+            );
+        });
+    }
+
+    function fallbackData(now, lat) {
+        const { sunrise, sunset } = calcSun(now, lat);
+        const phase = moonPhase(now);
+        const { moonrise, moonset } = calcMoon(sunrise, sunset, phase);
+        return { sunrise, sunset, moonrise, moonset, phase, source: '天文公式估算' };
+    }
+
+    async function getCelestialData() {
+        const now = new Date();
+        const todayKey = now.toISOString().slice(0, 10);
+        const cacheKey = 'celestial_data_' + todayKey;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            try { return JSON.parse(cached); } catch (e) {}
+        }
+        const pos = await getPosition();
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${pos.lat.toFixed(3)}&longitude=${pos.lng.toFixed(3)}&daily=sunrise,sunset,moonrise,moonset,moon_phase&timezone=auto`;
+            const r = await fetch(url);
+            if (!r.ok) throw new Error('api error');
+            const data = await r.json();
+            const d = data.daily;
+            let sunrise = parseHour(d.sunrise[0]);
+            let sunset = parseHour(d.sunset[0]);
+            let moonrise = parseHour(d.moonrise[0]);
+            let moonset = parseHour(d.moonset[0]);
+            let phase = d.moon_phase[0];
+            const fb = fallbackData(now, pos.lat);
+            if (sunrise === null) sunrise = fb.sunrise;
+            if (sunset === null) sunset = fb.sunset;
+            if (phase === null || phase === undefined) phase = fb.phase;
+            if (moonrise === null) {
+                moonrise = fb.moonrise;
+                moonset = fb.moonset;
+            }
+            const result = { sunrise, sunset, moonrise, moonset, phase, source: '实时天气API' };
+            localStorage.setItem(cacheKey, JSON.stringify(result));
+            return result;
+        } catch (e) {
+            return fallbackData(now, pos.lat);
+        }
+    }
+
+    function normalizeMoonTimes(moonrise, moonset, nowH) {
+        if (moonset < moonrise && nowH < moonset) {
+            return { rise: moonrise - 24, set: moonset };
+        }
+        return { rise: moonrise, set: moonset };
     }
 
     function bodyPos(rise, set, now, cx, cy, R) {
@@ -127,7 +204,7 @@
         ctx.restore();
     }
 
-    function drawArc(cx, cy, R, color, label, riseStr, setStr) {
+    function drawArc(cx, cy, R, color, riseStr, setStr) {
         ctx.save();
         ctx.strokeStyle = color;
         ctx.lineWidth = 1;
@@ -248,33 +325,32 @@
 
     function fmt(h) {
         if (h === null || h === undefined || isNaN(h)) return '--:--';
-        let hh = Math.floor(h);
-        let mm = Math.floor((h - hh) * 60);
+        let hh = Math.floor((h % 24 + 24) % 24);
+        let mm = Math.floor(Math.abs(h - Math.floor(h)) * 60);
         return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
     }
 
     function render(time) {
         const now = new Date();
         const nowH = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
-        const { sunrise, sunset } = calcSun(now, LATITUDE);
-        const phase = moonPhase(now);
-        const { moonrise, moonset } = calcMoon(sunrise, sunset, phase);
+        const data = celestialData || fallbackData(now, DEFAULT_LAT);
 
         const cx = W / 2;
         const cy = H * 0.82;
         const R = Math.min(W * 0.42, H * 0.72);
 
-        const sun = bodyPos(sunrise, sunset, nowH, cx, cy, R);
-        const moon = bodyPos(moonrise, moonset, nowH, cx, cy, R * 0.95);
+        const sun = bodyPos(data.sunrise, data.sunset, nowH, cx, cy, R);
+        const moonNorm = normalizeMoonTimes(data.moonrise, data.moonset, nowH);
+        const moon = bodyPos(moonNorm.rise, moonNorm.set, nowH, cx, cy, R * 0.95);
         const sunElev = sun ? sun.elev : -0.3;
 
         ctx.clearRect(0, 0, W, H);
         drawSky(sunElev);
         drawStars(sunElev, time);
-        drawArc(cx, cy, R, 'rgba(255,210,77,0.25)', 'sun', fmt(sunrise), fmt(sunset));
-        drawArc(cx, cy, R * 0.95, 'rgba(220,230,255,0.18)', 'moon', fmt(moonrise), fmt(moonset));
+        drawArc(cx, cy, R, 'rgba(255,210,77,0.25)', fmt(data.sunrise), fmt(data.sunset));
+        drawArc(cx, cy, R * 0.95, 'rgba(220,230,255,0.18)', fmt(data.moonrise), fmt(data.moonset));
         if (sun) drawSun(sun.x, sun.y, Math.max(10, R * 0.05));
-        if (moon) drawMoon(moon.x, moon.y, Math.max(9, R * 0.045), phase);
+        if (moon) drawMoon(moon.x, moon.y, Math.max(9, R * 0.045), data.phase);
         drawMountains(cy);
         drawLabels(cx, cy, R, sun, moon);
 
@@ -282,7 +358,7 @@
         const phaseEl = document.getElementById('celestial-phase');
         if (clockEl) clockEl.textContent = now.toTimeString().slice(0, 5);
         if (phaseEl) {
-            phaseEl.textContent = `${moonPhaseName(phase)} · 日出 ${fmt(sunrise)} 日落 ${fmt(sunset)} · 月出 ${fmt(moonrise)} 月落 ${fmt(moonset)}`;
+            phaseEl.textContent = `${moonPhaseName(data.phase)} · 日出 ${fmt(data.sunrise)} 日落 ${fmt(data.sunset)} · 月出 ${fmt(data.moonrise)} 月落 ${fmt(data.moonset)} · ${data.source}`;
         }
     }
 
@@ -294,4 +370,5 @@
     window.addEventListener('resize', () => { resize(); });
     resize();
     requestAnimationFrame(loop);
+    getCelestialData().then(data => { celestialData = data; });
 })();

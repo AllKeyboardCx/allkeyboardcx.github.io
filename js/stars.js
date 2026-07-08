@@ -7,12 +7,21 @@
 
     const canvas = document.createElement('canvas');
     canvas.id = 'starfield-canvas';
-    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;mix-blend-mode:screen;';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;';
     document.body.insertBefore(canvas, document.body.firstChild);
 
     const ctx = canvas.getContext('2d');
     let width, height, stars = [], particles = [];
     let mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999, active: false };
+    let lightTheme = false;
+
+    function checkTheme() {
+        const newLight = /theme-(dawn|morning|noon|afternoon)/.test(document.body.className);
+        if (newLight !== lightTheme) {
+            lightTheme = newLight;
+            canvas.style.mixBlendMode = lightTheme ? 'multiply' : 'screen';
+        }
+    }
 
     function resize() {
         width = canvas.width = window.innerWidth;
@@ -107,7 +116,10 @@
     }
 
     function draw() {
+        checkTheme();
         ctx.clearRect(0, 0, width, height);
+        const lightness = lightTheme ? 30 : 75;
+        const glowLightness = lightTheme ? 35 : 75;
 
         for (let i = 0; i < stars.length; i++) {
             const s = stars[i];
@@ -115,31 +127,33 @@
             const alpha = s.opacity * (0.5 + tw * 0.5);
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha})`;
+            ctx.fillStyle = `hsla(${s.hue}, 80%, ${lightness}%, ${alpha})`;
             ctx.fill();
 
             if (s.size > 1.4) {
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.size * 3.2, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha * 0.18})`;
+                ctx.fillStyle = `hsla(${s.hue}, 80%, ${glowLightness}%, ${alpha * 0.18})`;
                 ctx.fill();
             }
         }
 
+        const pLightness = lightTheme ? 35 : 70;
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${p.hue}, 85%, 70%, ${p.life * 0.8})`;
+            ctx.fillStyle = `hsla(${p.hue}, 85%, ${pLightness}%, ${p.life * 0.8})`;
             ctx.fill();
 
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${p.hue}, 85%, 70%, ${p.life * 0.12})`;
+            ctx.fillStyle = `hsla(${p.hue}, 85%, ${pLightness}%, ${p.life * 0.12})`;
             ctx.fill();
         }
 
         if (mouse.active) {
+            const lineLightness = lightTheme ? 28 : 70;
             for (let i = 0; i < stars.length; i++) {
                 const s = stars[i];
                 const dx = s.x - mouse.x;
@@ -150,7 +164,7 @@
                     ctx.beginPath();
                     ctx.moveTo(mouse.x, mouse.y);
                     ctx.lineTo(s.x, s.y);
-                    ctx.strokeStyle = `hsla(${s.hue}, 80%, 70%, ${alpha})`;
+                    ctx.strokeStyle = `hsla(${s.hue}, 80%, ${lineLightness}%, ${alpha})`;
                     ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
