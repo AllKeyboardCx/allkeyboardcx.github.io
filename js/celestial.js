@@ -1,0 +1,297 @@
+(function() {
+    'use strict';
+
+    const canvas = document.getElementById('celestial-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const LATITUDE = 35;
+    let W, H, dpr;
+
+    function resize() {
+        dpr = window.devicePixelRatio || 1;
+        W = canvas.clientWidth;
+        H = canvas.clientHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function dayOfYear(d) {
+        const start = new Date(d.getFullYear(), 0, 0);
+        return Math.floor((d - start) / 86400000);
+    }
+
+    function calcSun(date, lat) {
+        const N = dayOfYear(date) + 1;
+        const decl = -23.45 * Math.cos(2 * Math.PI / 365 * (N + 10));
+        const latRad = lat * Math.PI / 180;
+        const declRad = decl * Math.PI / 180;
+        const cosH = -Math.tan(latRad) * Math.tan(declRad);
+        const H = Math.acos(Math.max(-1, Math.min(1, cosH)));
+        const Hhours = H * 180 / Math.PI / 15;
+        return { sunrise: 12 - Hhours, sunset: 12 + Hhours, decl };
+    }
+
+    function moonPhase(date) {
+        const ref = Date.UTC(2000, 0, 6, 18, 14) / 1000;
+        const synodic = 29.53058867 * 86400;
+        const now = date.getTime() / 1000;
+        let phase = ((now - ref) % synodic) / synodic;
+        if (phase < 0) phase += 1;
+        return phase;
+    }
+
+    function moonPhaseName(p) {
+        if (p < 0.03 || p > 0.97) return '新月';
+        if (p < 0.22) return '蛾眉月';
+        if (p < 0.28) return '上弦月';
+        if (p < 0.47) return '盈凸月';
+        if (p < 0.53) return '满月';
+        if (p < 0.72) return '亏凸月';
+        if (p < 0.78) return '下弦月';
+        return '残月';
+    }
+
+    function calcMoon(sunrise, sunset, phase) {
+        const moonrise = (sunrise + phase * 24) % 24;
+        const moonset = (moonrise + 12.4) % 24;
+        return { moonrise, moonset };
+    }
+
+    function bodyPos(rise, set, now, cx, cy, R) {
+        let progress;
+        if (set > rise) {
+            if (now >= rise && now <= set) progress = (now - rise) / (set - rise);
+            else return null;
+        } else {
+            if (now >= rise) progress = (now - rise) / (24 - rise + set);
+            else if (now <= set) progress = (24 - rise + now) / (24 - rise + set);
+            else return null;
+        }
+        const angle = Math.PI * (1 - progress);
+        return { x: cx + R * Math.cos(angle), y: cy - R * Math.sin(angle), elev: Math.sin(angle), progress };
+    }
+
+    function smoothstep(a, b, x) {
+        const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+        return t * t * (3 - 2 * t);
+    }
+
+    function lerpColor(c1, c2, t) {
+        return [
+            Math.round(c1[0] + (c2[0] - c1[0]) * t),
+            Math.round(c1[1] + (c2[1] - c1[1]) * t),
+            Math.round(c1[2] + (c2[2] - c1[2]) * t)
+        ];
+    }
+
+    function rgb(c) { return `rgb(${c[0]},${c[1]},${c[2]})`; }
+
+    function skyColors(sunElev) {
+        const nightTop = [8, 12, 28], nightBot = [22, 28, 48];
+        const dawnTop = [90, 50, 90], dawnBot = [240, 130, 90];
+        const dayTop = [60, 120, 200], dayBot = [150, 200, 235];
+        const t = smoothstep(-0.12, 0.18, sunElev);
+        const dawnMix = Math.max(0, 1 - Math.abs(sunElev) * 6);
+        let top, bot;
+        top = lerpColor(nightTop, dayTop, t);
+        bot = lerpColor(nightBot, dayBot, t);
+        top = lerpColor(top, dawnTop, dawnMix * 0.7);
+        bot = lerpColor(bot, dawnBot, dawnMix * 0.8);
+        return { top, bot };
+    }
+
+    function drawSky(sunElev) {
+        const { top, bot } = skyColors(sunElev);
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, rgb(top));
+        g.addColorStop(1, rgb(bot));
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawStars(sunElev, time) {
+        if (sunElev > 0.05) return;
+        const alpha = Math.max(0, 1 - sunElev * 8);
+        ctx.save();
+        for (let i = 0; i < 80; i++) {
+            const sx = (i * 137.5) % W;
+            const sy = (i * 73.3) % (H * 0.7);
+            const tw = (Math.sin(time / 1000 + i) + 1) / 2;
+            ctx.globalAlpha = alpha * (0.3 + tw * 0.7);
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 0.8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawArc(cx, cy, R, color, label, riseStr, setStr) {
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]);
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, Math.PI, 0, false);
+        ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = 'rgba(240,246,252,0.5)';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(riseStr, cx - R, cy + 18);
+        ctx.fillText(setStr, cx + R, cy + 18);
+    }
+
+    function drawSun(x, y, r) {
+        ctx.save();
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 5);
+        glow.addColorStop(0, 'rgba(255,220,120,0.5)');
+        glow.addColorStop(1, 'rgba(255,220,120,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,200,80,0.3)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 12; i++) {
+            const a = (i / 12) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(x + Math.cos(a) * r * 1.5, y + Math.sin(a) * r * 1.5);
+            ctx.lineTo(x + Math.cos(a) * r * 2.4, y + Math.sin(a) * r * 2.4);
+            ctx.stroke();
+        }
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+        grad.addColorStop(0, '#fff5d6');
+        grad.addColorStop(0.6, '#ffd24d');
+        grad.addColorStop(1, '#ff9d2e');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawMoon(x, y, r, phase) {
+        ctx.save();
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
+        glow.addColorStop(0, 'rgba(220,230,255,0.35)');
+        glow.addColorStop(1, 'rgba(220,230,255,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#e8e4d0';
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#1a1f2e';
+        const ang = 2 * Math.PI * phase;
+        const cosT = Math.cos(ang);
+        ctx.beginPath();
+        if (phase < 0.5) {
+            ctx.arc(x, y, r, 0.5 * Math.PI, 1.5 * Math.PI, false);
+            ctx.ellipse(x, y, r * Math.abs(cosT), r, 0, 1.5 * Math.PI, 0.5 * Math.PI, cosT > 0);
+        } else {
+            ctx.arc(x, y, r, -0.5 * Math.PI, 0.5 * Math.PI, false);
+            ctx.ellipse(x, y, r * Math.abs(cosT), r, 0, 0.5 * Math.PI, 1.5 * Math.PI, cosT > 0);
+        }
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawMountains(cy) {
+        const layers = [
+            { color: 'rgba(20,28,45,0.5)', amp: 30, base: cy - 20, seed: 1 },
+            { color: 'rgba(12,18,32,0.85)', amp: 22, base: cy - 5, seed: 2 },
+            { color: 'rgba(6,10,20,1)', amp: 16, base: cy + 10, seed: 3 }
+        ];
+        layers.forEach(L => {
+            ctx.fillStyle = L.color;
+            ctx.beginPath();
+            ctx.moveTo(0, H);
+            ctx.lineTo(0, L.base);
+            for (let x = 0; x <= W; x += 20) {
+                const y = L.base - Math.abs(Math.sin(x * 0.008 + L.seed) + Math.sin(x * 0.02 + L.seed * 2) * 0.5) * L.amp;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(W, H);
+            ctx.closePath();
+            ctx.fill();
+        });
+        ctx.strokeStyle = 'rgba(88,166,255,0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, cy);
+        ctx.lineTo(W, cy);
+        ctx.stroke();
+    }
+
+    function drawLabels(cx, cy, R, sunData, moonData) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(240,246,252,0.5)';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('东', cx - R, cy + 34);
+        ctx.fillText('南', cx, cy - R - 14);
+        ctx.fillText('西', cx + R, cy + 34);
+        if (sunData) {
+            ctx.fillStyle = 'rgba(255,210,77,0.85)';
+            ctx.fillText('日', sunData.x, sunData.y - 22);
+        }
+        if (moonData) {
+            ctx.fillStyle = 'rgba(220,230,255,0.85)';
+            ctx.fillText('月', moonData.x, moonData.y - 22);
+        }
+        ctx.restore();
+    }
+
+    function fmt(h) {
+        if (h === null || h === undefined || isNaN(h)) return '--:--';
+        let hh = Math.floor(h);
+        let mm = Math.floor((h - hh) * 60);
+        return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+    }
+
+    function render(time) {
+        const now = new Date();
+        const nowH = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+        const { sunrise, sunset } = calcSun(now, LATITUDE);
+        const phase = moonPhase(now);
+        const { moonrise, moonset } = calcMoon(sunrise, sunset, phase);
+
+        const cx = W / 2;
+        const cy = H * 0.82;
+        const R = Math.min(W * 0.42, H * 0.72);
+
+        const sun = bodyPos(sunrise, sunset, nowH, cx, cy, R);
+        const moon = bodyPos(moonrise, moonset, nowH, cx, cy, R * 0.95);
+        const sunElev = sun ? sun.elev : -0.3;
+
+        ctx.clearRect(0, 0, W, H);
+        drawSky(sunElev);
+        drawStars(sunElev, time);
+        drawArc(cx, cy, R, 'rgba(255,210,77,0.25)', 'sun', fmt(sunrise), fmt(sunset));
+        drawArc(cx, cy, R * 0.95, 'rgba(220,230,255,0.18)', 'moon', fmt(moonrise), fmt(moonset));
+        if (sun) drawSun(sun.x, sun.y, Math.max(10, R * 0.05));
+        if (moon) drawMoon(moon.x, moon.y, Math.max(9, R * 0.045), phase);
+        drawMountains(cy);
+        drawLabels(cx, cy, R, sun, moon);
+
+        const clockEl = document.getElementById('celestial-clock');
+        const phaseEl = document.getElementById('celestial-phase');
+        if (clockEl) clockEl.textContent = now.toTimeString().slice(0, 5);
+        if (phaseEl) {
+            phaseEl.textContent = `${moonPhaseName(phase)} · 日出 ${fmt(sunrise)} 日落 ${fmt(sunset)} · 月出 ${fmt(moonrise)} 月落 ${fmt(moonset)}`;
+        }
+    }
+
+    function loop(t) {
+        render(t);
+        requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', () => { resize(); });
+    resize();
+    requestAnimationFrame(loop);
+})();
