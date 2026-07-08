@@ -29,13 +29,13 @@
                 y: Math.random() * height,
                 baseX: 0,
                 baseY: 0,
-                size: Math.random() * 1.6 + 0.3,
+                size: Math.random() * 2.0 + 0.9,
                 vx: (Math.random() - 0.5) * 0.15,
                 vy: (Math.random() - 0.5) * 0.15,
                 twinkle: Math.random() * Math.PI * 2,
                 twinkleSpeed: Math.random() * 0.03 + 0.005,
                 hue: 200 + Math.random() * 60,
-                opacity: Math.random() * 0.6 + 0.3
+                opacity: Math.random() * 0.4 + 0.55
             });
             stars[i].baseX = stars[i].x;
             stars[i].baseY = stars[i].y;
@@ -118,10 +118,10 @@
             ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha})`;
             ctx.fill();
 
-            if (s.size > 1.1) {
+            if (s.size > 1.4) {
                 ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size * 2.5, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha * 0.12})`;
+                ctx.arc(s.x, s.y, s.size * 3.2, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha * 0.18})`;
                 ctx.fill();
             }
         }
