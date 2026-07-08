@@ -204,17 +204,19 @@
         ctx.restore();
     }
 
-    function drawArc(cx, cy, R, color, riseStr, setStr) {
+    function drawArc(cx, cy, R, color, glow, riseStr, setStr) {
         ctx.save();
         ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 6]);
+        ctx.lineWidth = 2;
+        ctx.setLineDash([7, 9]);
+        ctx.shadowColor = glow;
+        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(cx, cy, R, Math.PI, 0, false);
         ctx.stroke();
         ctx.restore();
-        ctx.fillStyle = 'rgba(240,246,252,0.5)';
-        ctx.font = '11px sans-serif';
+        ctx.fillStyle = 'rgba(240,246,252,0.7)';
+        ctx.font = '600 11px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(riseStr, cx - R, cy + 18);
         ctx.fillText(setStr, cx + R, cy + 18);
@@ -222,47 +224,84 @@
 
     function drawSun(x, y, r) {
         ctx.save();
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 5);
-        glow.addColorStop(0, 'rgba(255,220,120,0.5)');
-        glow.addColorStop(1, 'rgba(255,220,120,0)');
-        ctx.fillStyle = glow;
+        const corona = ctx.createRadialGradient(x, y, r, x, y, r * 7);
+        corona.addColorStop(0, 'rgba(255,200,80,0.3)');
+        corona.addColorStop(0.5, 'rgba(255,160,60,0.12)');
+        corona.addColorStop(1, 'rgba(255,160,60,0)');
+        ctx.fillStyle = corona;
         ctx.beginPath();
-        ctx.arc(x, y, r * 5, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 7, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,200,80,0.3)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 12; i++) {
-            const a = (i / 12) * Math.PI * 2;
+        ctx.strokeStyle = 'rgba(255,210,100,0.55)';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = 'rgba(255,200,80,0.7)';
+        ctx.shadowBlur = 6;
+        for (let i = 0; i < 16; i++) {
+            const a = (i / 16) * Math.PI * 2;
+            const inner = r * 1.4;
+            const outer = i % 2 === 0 ? r * 3.2 : r * 2.2;
             ctx.beginPath();
-            ctx.moveTo(x + Math.cos(a) * r * 1.5, y + Math.sin(a) * r * 1.5);
-            ctx.lineTo(x + Math.cos(a) * r * 2.4, y + Math.sin(a) * r * 2.4);
+            ctx.moveTo(x + Math.cos(a) * inner, y + Math.sin(a) * inner);
+            ctx.lineTo(x + Math.cos(a) * outer, y + Math.sin(a) * outer);
             ctx.stroke();
         }
+        ctx.shadowBlur = 0;
+        const halo = ctx.createRadialGradient(x, y, 0, x, y, r * 1.8);
+        halo.addColorStop(0, 'rgba(255,240,180,0.6)');
+        halo.addColorStop(1, 'rgba(255,240,180,0)');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 1.8, 0, Math.PI * 2);
+        ctx.fill();
         const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
-        grad.addColorStop(0, '#fff5d6');
-        grad.addColorStop(0.6, '#ffd24d');
-        grad.addColorStop(1, '#ff9d2e');
+        grad.addColorStop(0, '#fff8e0');
+        grad.addColorStop(0.4, '#ffd24d');
+        grad.addColorStop(0.8, '#ff9d2e');
+        grad.addColorStop(1, '#e85d2e');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,210,0.7)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.restore();
     }
 
     function drawMoon(x, y, r, phase) {
         ctx.save();
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
-        glow.addColorStop(0, 'rgba(220,230,255,0.35)');
-        glow.addColorStop(1, 'rgba(220,230,255,0)');
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
+        glow.addColorStop(0, 'rgba(210,225,255,0.38)');
+        glow.addColorStop(0.5, 'rgba(210,225,255,0.13)');
+        glow.addColorStop(1, 'rgba(210,225,255,0)');
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 4, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#e8e4d0';
+        const moonGrad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, 0, x, y, r * 1.2);
+        moonGrad.addColorStop(0, '#fdfcf0');
+        moonGrad.addColorStop(0.6, '#e8e4d0');
+        moonGrad.addColorStop(1, '#a8a48c');
+        ctx.fillStyle = moonGrad;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#1a1f2e';
+        ctx.fillStyle = 'rgba(150,145,128,0.25)';
+        const craters = [[-0.3, -0.1, 0.18], [0.25, 0.2, 0.14], [0.1, -0.35, 0.1], [-0.15, 0.35, 0.12]];
+        craters.forEach(c => {
+            ctx.beginPath();
+            ctx.arc(x + c[0] * r, y + c[1] * r, c[2] * r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.fillStyle = 'rgba(18,22,40,0.94)';
+        ctx.shadowColor = 'rgba(18,22,40,0.6)';
+        ctx.shadowBlur = r * 0.25;
         const ang = 2 * Math.PI * phase;
         const cosT = Math.cos(ang);
         ctx.beginPath();
@@ -274,6 +313,12 @@
             ctx.ellipse(x, y, r * Math.abs(cosT), r, 0, 0.5 * Math.PI, 1.5 * Math.PI, cosT > 0);
         }
         ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = 'rgba(240,238,220,0.4)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.restore();
     }
 
@@ -347,10 +392,10 @@
         ctx.clearRect(0, 0, W, H);
         drawSky(sunElev);
         drawStars(sunElev, time);
-        drawArc(cx, cy, R, 'rgba(255,210,77,0.25)', fmt(data.sunrise), fmt(data.sunset));
-        drawArc(cx, cy, R * 0.95, 'rgba(220,230,255,0.18)', fmt(data.moonrise), fmt(data.moonset));
-        if (sun) drawSun(sun.x, sun.y, Math.max(10, R * 0.05));
-        if (moon) drawMoon(moon.x, moon.y, Math.max(9, R * 0.045), data.phase);
+        drawArc(cx, cy, R, 'rgba(255,210,77,0.55)', 'rgba(255,210,77,0.6)', fmt(data.sunrise), fmt(data.sunset));
+        drawArc(cx, cy, R * 0.95, 'rgba(220,230,255,0.45)', 'rgba(220,230,255,0.5)', fmt(data.moonrise), fmt(data.moonset));
+        if (sun) drawSun(sun.x, sun.y, Math.max(16, R * 0.1));
+        if (moon) drawMoon(moon.x, moon.y, Math.max(14, R * 0.085), data.phase);
         drawMountains(cy);
         drawLabels(cx, cy, R, sun, moon);
 
