@@ -36,91 +36,91 @@ body {
 }
 
 body.theme-dawn {
-    --theme-bg-overlay: rgba(240, 235, 225, 0.7);
-    --theme-primary-color: #d4a07a;
-    --theme-primary-glow: rgba(212, 160, 122, 0.3);
-    --theme-primary-glow-strong: rgba(212, 160, 122, 0.5);
-    --theme-border-color: rgba(212, 160, 122, 0.3);
-    --theme-text-color: #4a3b2a;
-    --theme-text-light: #2d2318;
-    --theme-text-muted: #7a6a5a;
-    --theme-card-bg: rgba(255, 250, 240, 0.4);
-    --theme-card-border: rgba(212, 160, 122, 0.3);
-    --theme-btn-text: #2d2318;
-    --theme-btn-hover-bg: rgba(212, 160, 122, 0.85);
-    --theme-btn-hover-text: #f0e8dc;
-    --theme-code-color: #8b5a9b;
-    --theme-code-bg: rgba(212, 160, 122, 0.1);
-    --theme-link-color: #7e3a8d;
-    --theme-link-hover-color: #8b5a9b;
-    --theme-icon-color: #2d2318;
-    --theme-accent-color: #d4a07a;
+    --theme-bg-overlay: rgba(255, 248, 240, 0.8);
+    --theme-primary-color: #5b9bd5;
+    --theme-primary-glow: rgba(91, 155, 213, 0.3);
+    --theme-primary-glow-strong: rgba(91, 155, 213, 0.5);
+    --theme-border-color: rgba(91, 155, 213, 0.4);
+    --theme-text-color: #1e3a5f;
+    --theme-text-light: #0f1f2f;
+    --theme-text-muted: #5a7a9a;
+    --theme-card-bg: rgba(255, 255, 255, 0.7);
+    --theme-card-border: rgba(91, 155, 213, 0.4);
+    --theme-btn-text: #0f1f2f;
+    --theme-btn-hover-bg: rgba(91, 155, 213, 0.9);
+    --theme-btn-hover-text: #ffffff;
+    --theme-code-color: #6b4c9a;
+    --theme-code-bg: rgba(91, 155, 213, 0.15);
+    --theme-link-color: #5b6cc9;
+    --theme-link-hover-color: #7b8ce9;
+    --theme-icon-color: #1e3a5f;
+    --theme-accent-color: #5b9bd5;
 }
 
 body.theme-morning {
-    --theme-bg-overlay: rgba(230, 235, 240, 0.7);
-    --theme-primary-color: #6a8a9e;
-    --theme-primary-glow: rgba(106, 138, 158, 0.3);
-    --theme-primary-glow-strong: rgba(106, 138, 158, 0.5);
-    --theme-border-color: rgba(106, 138, 158, 0.3);
-    --theme-text-color: #3a4a5a;
-    --theme-text-light: #1a2a3a;
-    --theme-text-muted: #6a7a8a;
-    --theme-card-bg: rgba(245, 250, 255, 0.4);
-    --theme-card-border: rgba(106, 138, 158, 0.3);
-    --theme-btn-text: #1a2a3a;
-    --theme-btn-hover-bg: rgba(106, 138, 158, 0.85);
-    --theme-btn-hover-text: #e0e8f0;
-    --theme-code-color: #8b5a9b;
-    --theme-code-bg: rgba(106, 138, 158, 0.1);
-    --theme-link-color: #7e3a8d;
-    --theme-link-hover-color: #8b5a9b;
-    --theme-icon-color: #1a2a3a;
-    --theme-accent-color: #6a8a9e;
+    --theme-bg-overlay: rgba(240, 248, 255, 0.85);
+    --theme-primary-color: #4a90c2;
+    --theme-primary-glow: rgba(74, 144, 194, 0.3);
+    --theme-primary-glow-strong: rgba(74, 144, 194, 0.5);
+    --theme-border-color: rgba(74, 144, 194, 0.4);
+    --theme-text-color: #1a365d;
+    --theme-text-light: #0d1b2a;
+    --theme-text-muted: #4a6585;
+    --theme-card-bg: rgba(255, 255, 255, 0.8);
+    --theme-card-border: rgba(74, 144, 194, 0.4);
+    --theme-btn-text: #0d1b2a;
+    --theme-btn-hover-bg: rgba(74, 144, 194, 0.9);
+    --theme-btn-hover-text: #ffffff;
+    --theme-code-color: #6b4c9a;
+    --theme-code-bg: rgba(74, 144, 194, 0.15);
+    --theme-link-color: #4a5cc9;
+    --theme-link-hover-color: #6a7ce9;
+    --theme-icon-color: #1a365d;
+    --theme-accent-color: #4a90c2;
 }
 
 body.theme-noon {
-    --theme-bg-overlay: rgba(245, 248, 252, 0.75);
-    --theme-primary-color: #4a8ad4;
-    --theme-primary-glow: rgba(74, 138, 212, 0.3);
-    --theme-primary-glow-strong: rgba(74, 138, 212, 0.5);
-    --theme-border-color: rgba(74, 138, 212, 0.3);
-    --theme-text-color: #1e293b;
-    --theme-text-light: #0f172a;
-    --theme-text-muted: #54647b;
-    --theme-card-bg: rgba(255, 255, 255, 0.45);
-    --theme-card-border: rgba(74, 138, 212, 0.3);
-    --theme-btn-text: #0f172a;
-    --theme-btn-hover-bg: rgba(74, 138, 212, 0.85);
-    --theme-btn-hover-text: #e8f0f8;
-    --theme-code-color: #7b2ea8;
-    --theme-code-bg: rgba(74, 138, 212, 0.1);
-    --theme-link-color: #7b4cd6;
-    --theme-link-hover-color: #9b6cf6;
-    --theme-icon-color: #0f172a;
-    --theme-accent-color: #4a8ad4;
+    --theme-bg-overlay: rgba(248, 252, 255, 0.85);
+    --theme-primary-color: #3a8ac4;
+    --theme-primary-glow: rgba(58, 138, 196, 0.3);
+    --theme-primary-glow-strong: rgba(58, 138, 196, 0.5);
+    --theme-border-color: rgba(58, 138, 196, 0.4);
+    --theme-text-color: #162d4a;
+    --theme-text-light: #0a1624;
+    --theme-text-muted: #4a6580;
+    --theme-card-bg: rgba(255, 255, 255, 0.85);
+    --theme-card-border: rgba(58, 138, 196, 0.4);
+    --theme-btn-text: #0a1624;
+    --theme-btn-hover-bg: rgba(58, 138, 196, 0.9);
+    --theme-btn-hover-text: #ffffff;
+    --theme-code-color: #6b4c9a;
+    --theme-code-bg: rgba(58, 138, 196, 0.15);
+    --theme-link-color: #4a5cc9;
+    --theme-link-hover-color: #6a7ce9;
+    --theme-icon-color: #162d4a;
+    --theme-accent-color: #3a8ac4;
 }
 
 body.theme-afternoon {
-    --theme-bg-overlay: rgba(245, 235, 220, 0.7);
-    --theme-primary-color: #c99030;
-    --theme-primary-glow: rgba(201, 144, 48, 0.3);
-    --theme-primary-glow-strong: rgba(201, 144, 48, 0.5);
-    --theme-border-color: rgba(201, 144, 48, 0.3);
-    --theme-text-color: #4a3a1a;
-    --theme-text-light: #2a1a0a;
-    --theme-text-muted: #7a6a4a;
-    --theme-card-bg: rgba(250, 240, 225, 0.4);
-    --theme-card-border: rgba(201, 144, 48, 0.3);
-    --theme-btn-text: #2a1a0a;
-    --theme-btn-hover-bg: rgba(201, 144, 48, 0.85);
-    --theme-btn-hover-text: #f0e8d8;
-    --theme-code-color: #8b5a9b;
-    --theme-code-bg: rgba(201, 144, 48, 0.1);
-    --theme-link-color: #7e3a8d;
-    --theme-link-hover-color: #8b5a9b;
-    --theme-icon-color: #2a1a0a;
-    --theme-accent-color: #c99030;
+    --theme-bg-overlay: rgba(250, 245, 240, 0.85);
+    --theme-primary-color: #6a9bc4;
+    --theme-primary-glow: rgba(106, 155, 196, 0.3);
+    --theme-primary-glow-strong: rgba(106, 155, 196, 0.5);
+    --theme-border-color: rgba(106, 155, 196, 0.4);
+    --theme-text-color: #1a2d4a;
+    --theme-text-light: #0d1a2a;
+    --theme-text-muted: #4a5a70;
+    --theme-card-bg: rgba(255, 255, 255, 0.8);
+    --theme-card-border: rgba(106, 155, 196, 0.4);
+    --theme-btn-text: #0d1a2a;
+    --theme-btn-hover-bg: rgba(106, 155, 196, 0.9);
+    --theme-btn-hover-text: #ffffff;
+    --theme-code-color: #6b4c9a;
+    --theme-code-bg: rgba(106, 155, 196, 0.15);
+    --theme-link-color: #4a5cc9;
+    --theme-link-hover-color: #6a7ce9;
+    --theme-icon-color: #1a2d4a;
+    --theme-accent-color: #6a9bc4;
 }
 
 body.theme-dusk {
@@ -830,7 +830,7 @@ article a[href^="#"]:hover {
 }
 
 .scrollable-list-container::-webkit-scrollbar-track {
-    background: rgba(22, 27, 34, 0.5);
+    background: rgba(22, 27, 34, 0.2);
     border-radius: 3px;
 }
 
@@ -841,6 +841,54 @@ article a[href^="#"]:hover {
 
 .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     background: rgba(88, 166, 255, 0.6);
+}
+
+body.theme-dawn .scrollable-list-container::-webkit-scrollbar-track {
+    background: rgba(91, 155, 213, 0.15);
+}
+
+body.theme-dawn .scrollable-list-container::-webkit-scrollbar-thumb {
+    background: rgba(91, 155, 213, 0.4);
+}
+
+body.theme-dawn .scrollable-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(91, 155, 213, 0.6);
+}
+
+body.theme-morning .scrollable-list-container::-webkit-scrollbar-track {
+    background: rgba(74, 144, 194, 0.15);
+}
+
+body.theme-morning .scrollable-list-container::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 194, 0.4);
+}
+
+body.theme-morning .scrollable-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 144, 194, 0.6);
+}
+
+body.theme-noon .scrollable-list-container::-webkit-scrollbar-track {
+    background: rgba(58, 138, 196, 0.15);
+}
+
+body.theme-noon .scrollable-list-container::-webkit-scrollbar-thumb {
+    background: rgba(58, 138, 196, 0.4);
+}
+
+body.theme-noon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(58, 138, 196, 0.6);
+}
+
+body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-track {
+    background: rgba(106, 155, 196, 0.15);
+}
+
+body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb {
+    background: rgba(106, 155, 196, 0.4);
+}
+
+body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 155, 196, 0.6);
 }
 .article-toc .toc-level-4 { padding-left: 54px; }
 .article-toc .toc-level-5 { padding-left: 72px; }
