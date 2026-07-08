@@ -376,12 +376,30 @@ function initBirds() {
         }
     }, 500);
 
+    function seededRandom(seed) {
+        let s = seed;
+        return function() {
+            s = Math.imul(s ^ 3, 69069);
+            s = s ^ (s >>> 16);
+            s = Math.imul(s ^ 3, 69069);
+            s = s ^ (s >>> 16);
+            return (s >>> 0) / 0x100000000;
+        };
+    }
+
     function generateRandomSleepSchedule() {
         const today = new Date();
         const year = today.getFullYear();
         const month = today.getMonth() + 1;
         const day = today.getDate();
         const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        
+        let seed = 0;
+        for (let i = 0; i < dateStr.length; i++) {
+            seed = seed * 31 + dateStr.charCodeAt(i);
+        }
+        
+        const rand = seededRandom(seed);
         
         const periods = [];
         
@@ -399,25 +417,25 @@ function initBirds() {
             fixed: true
         });
         
-        const numRandomPeriods = Math.floor(Math.random() * 3) + 1;
+        const numRandomPeriods = Math.floor(rand() * 3) + 1;
         
         for (let i = 0; i < numRandomPeriods; i++) {
             let startHour, startMinute, duration;
             
             if (i === 0) {
-                startHour = 11 + Math.floor(Math.random() * 3);
-                startMinute = Math.floor(Math.random() * 60);
-                duration = 15 + Math.floor(Math.random() * 45);
+                startHour = 11 + Math.floor(rand() * 3);
+                startMinute = Math.floor(rand() * 60);
+                duration = 15 + Math.floor(rand() * 45);
             } else {
-                const rand = Math.random();
-                if (rand < 0.5) {
-                    startHour = 9 + Math.floor(Math.random() * 2);
-                    startMinute = Math.floor(Math.random() * 60);
-                    duration = 5 + Math.floor(Math.random() * 20);
+                const r = rand();
+                if (r < 0.5) {
+                    startHour = 9 + Math.floor(rand() * 2);
+                    startMinute = Math.floor(rand() * 60);
+                    duration = 5 + Math.floor(rand() * 20);
                 } else {
-                    startHour = 14 + Math.floor(Math.random() * 4);
-                    startMinute = Math.floor(Math.random() * 60);
-                    duration = 5 + Math.floor(Math.random() * 20);
+                    startHour = 14 + Math.floor(rand() * 4);
+                    startMinute = Math.floor(rand() * 60);
+                    duration = 5 + Math.floor(rand() * 20);
                 }
             }
             
@@ -442,110 +460,11 @@ function initBirds() {
         };
     }
     
-    async function getTodaySleepSchedule() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1;
-        const day = today.getDate();
-        const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        const localStorageKey = `bird_sleep_${dateStr}`;
-        
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule?date=eq.${dateStr}`, {
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.length > 0) {
-                    const schedule = typeof data[0].schedule === 'string' 
-                        ? JSON.parse(data[0].schedule) 
-                        : data[0].schedule;
-                    
-                    try {
-                        localStorage.setItem(localStorageKey, JSON.stringify(schedule));
-                    } catch (e) {}
-                    
-                    return schedule;
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching sleep schedule from DB:', error);
-        }
-        
-        try {
-            const cached = localStorage.getItem(localStorageKey);
-            if (cached) {
-                return JSON.parse(cached);
-            }
-        } catch (e) {}
-        
-        return null;
-    }
-    
-    async function saveSleepSchedule(schedule) {
-        try {
-            localStorage.setItem(`bird_sleep_${schedule.date}`, JSON.stringify(schedule));
-        } catch (e) {}
-        
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule?date=eq.${schedule.date}`, {
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.length > 0) {
-                    const existingSchedule = typeof data[0].schedule === 'string' 
-                        ? JSON.parse(data[0].schedule) 
-                        : data[0].schedule;
-                    
-                    try {
-                        localStorage.setItem(`bird_sleep_${schedule.date}`, JSON.stringify(existingSchedule));
-                    } catch (e) {}
-                    
-                    return existingSchedule;
-                }
-            }
-        } catch (error) {
-            console.error('Error checking existing schedule:', error);
-        }
-        
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/bird_sleep_schedule`, {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'resolution=merge-duplicates'
-                },
-                body: JSON.stringify({
-                    date: schedule.date,
-                    schedule: schedule
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Error saving sleep schedule:', errorData);
-            }
-        } catch (error) {
-            console.error('Error saving sleep schedule:', error);
-        }
-        
-        return schedule;
-    }
-    
-    async function updateSleepScheduleForNewDay() {
+    function updateSleepScheduleForNewDay() {
         const schedule = generateRandomSleepSchedule();
-        await saveSleepSchedule(schedule);
+        try {
+            localStorage.removeItem(`bird_sleep_${schedule.date}`);
+        } catch (e) {}
         return schedule;
     }
     
@@ -554,25 +473,15 @@ function initBirds() {
     
     async function initSleepSchedule() {
         try {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth() + 1;
-            const day = today.getDate();
-            const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-            
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key && key.startsWith('bird_sleep_') && key !== `bird_sleep_${dateStr}`) {
+                if (key && key.startsWith('bird_sleep_')) {
                     localStorage.removeItem(key);
                 }
             }
         } catch (e) {}
         
-        currentSleepSchedule = await getTodaySleepSchedule();
-        
-        if (!currentSleepSchedule) {
-            currentSleepSchedule = await saveSleepSchedule(generateRandomSleepSchedule());
-        }
+        currentSleepSchedule = generateRandomSleepSchedule();
         
         checkSleepSchedule();
     }
@@ -677,16 +586,12 @@ function initBirds() {
         const delayUntilMidnight = midnight.getTime() - now.getTime();
         
         setTimeout(() => {
-            updateSleepScheduleForNewDay().then((newSchedule) => {
-                currentSleepSchedule = newSchedule;
-                checkSleepSchedule();
-            });
+            currentSleepSchedule = updateSleepScheduleForNewDay();
+            checkSleepSchedule();
             
             setInterval(() => {
-                updateSleepScheduleForNewDay().then((newSchedule) => {
-                    currentSleepSchedule = newSchedule;
-                    checkSleepSchedule();
-                });
+                currentSleepSchedule = updateSleepScheduleForNewDay();
+                checkSleepSchedule();
             }, 24 * 60 * 60 * 1000);
         }, delayUntilMidnight);
     }
