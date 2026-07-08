@@ -53,6 +53,17 @@
             </div>
         </nav>
         <div class="container mt-5">
+            <div class="mobile-toc-wrapper d-lg-none">
+                <button class="mobile-toc-toggle" id="mobile-toc-toggle" type="button" aria-expanded="false">
+                    <span>📑 文章目录</span>
+                    <span class="mobile-toc-arrow">▼</span>
+                </button>
+                <div class="mobile-toc-content" id="mobile-toc-content">
+                    <div class="scrollable-list-container" id="mobile-toc-container">
+                        <span class="text-muted">加载中...</span>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-lg-8">
                     <article id="article-content">
@@ -101,7 +112,7 @@
                             <span class="text-muted">加载中...</span>
                         </div>
                     </div>
-                    <div class="card mb-4 bg-dark border-gray sticky-toc">
+                    <div class="card mb-4 bg-dark border-gray sticky-toc d-none d-lg-block">
                         <div class="card-header text-light">📑 文章目录</div>
                         <div class="card-body">
                             <div class="scrollable-list-container" id="article-toc-container">
@@ -455,8 +466,10 @@
                         
                         if (toc) {
                             document.getElementById('article-toc-container').innerHTML = toc;
+                            document.getElementById('mobile-toc-container').innerHTML = toc;
                         } else {
                             document.getElementById('article-toc-container').innerHTML = '<span class="text-muted">暂无目录</span>';
+                            document.getElementById('mobile-toc-container').innerHTML = '<span class="text-muted">暂无目录</span>';
                         }
 
                         document.querySelectorAll('pre code').forEach(block => {
@@ -506,6 +519,31 @@
                 submitComment();
             });
             loadComments();
+
+            const mobileTocToggle = document.getElementById('mobile-toc-toggle');
+            const mobileTocContent = document.getElementById('mobile-toc-content');
+            const mobileTocArrow = mobileTocToggle.querySelector('.mobile-toc-arrow');
+            mobileTocContent.style.display = 'none';
+            mobileTocToggle.addEventListener('click', function() {
+                const isVisible = mobileTocContent.style.display !== 'none';
+                if (isVisible) {
+                    mobileTocContent.style.display = 'none';
+                    mobileTocArrow.textContent = '▼';
+                    mobileTocToggle.setAttribute('aria-expanded', 'false');
+                } else {
+                    mobileTocContent.style.display = 'block';
+                    mobileTocArrow.textContent = '▲';
+                    mobileTocToggle.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            document.getElementById('mobile-toc-container').addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    mobileTocContent.style.display = 'none';
+                    mobileTocArrow.textContent = '▼';
+                    mobileTocToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
         });
 
         function generateAvatar(username) {
