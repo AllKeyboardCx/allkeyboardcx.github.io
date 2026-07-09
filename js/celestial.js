@@ -159,41 +159,93 @@
     function rgb(c) { return `rgb(${c[0]},${c[1]},${c[2]})`; }
 
     function skyColors(sunElev) {
-        const nightTop = [8, 12, 28], nightBot = [22, 28, 48];
-        const dawnTop = [90, 50, 90], dawnBot = [240, 130, 90];
-        const dayTop = [60, 120, 200], dayBot = [150, 200, 235];
-        const t = smoothstep(-0.12, 0.18, sunElev);
-        const dawnMix = Math.max(0, 1 - Math.abs(sunElev) * 6);
+        const nightTop = [5, 8, 20], nightBot = [15, 20, 38];
+        const deepDawnTop = [60, 30, 70], deepDawnBot = [180, 80, 60];
+        const dawnTop = [140, 80, 110], dawnBot = [255, 140, 80];
+        const sunriseTop = [255, 180, 120], sunriseBot = [255, 200, 150];
+        const morningTop = [80, 150, 220], morningBot = [180, 220, 245];
+        const noonTop = [70, 160, 230], noonBot = [190, 230, 255];
+        const afternoonTop = [90, 140, 210], afternoonBot = [170, 210, 240];
+        const sunsetTop = [255, 140, 80], sunsetBot = [255, 100, 60];
+        const duskTop = [120, 50, 80], duskBot = [200, 70, 50];
+        const deepDuskTop = [40, 20, 50], deepDuskBot = [80, 30, 40];
+
+        let t = sunElev;
         let top, bot;
-        top = lerpColor(nightTop, dayTop, t);
-        bot = lerpColor(nightBot, dayBot, t);
-        top = lerpColor(top, dawnTop, dawnMix * 0.7);
-        bot = lerpColor(bot, dawnBot, dawnMix * 0.8);
+
+        if (t < -0.15) {
+            top = lerpColor(nightTop, deepDuskTop, smoothstep(-0.3, -0.15, t));
+            bot = lerpColor(nightBot, deepDuskBot, smoothstep(-0.3, -0.15, t));
+        } else if (t < -0.08) {
+            top = lerpColor(deepDuskTop, duskTop, smoothstep(-0.15, -0.08, t));
+            bot = lerpColor(deepDuskBot, duskBot, smoothstep(-0.15, -0.08, t));
+        } else if (t < -0.02) {
+            top = lerpColor(duskTop, sunsetTop, smoothstep(-0.08, -0.02, t));
+            bot = lerpColor(duskBot, sunsetBot, smoothstep(-0.08, -0.02, t));
+        } else if (t < 0.02) {
+            top = lerpColor(sunsetTop, sunriseTop, smoothstep(-0.02, 0.02, t));
+            bot = lerpColor(sunsetBot, sunriseBot, smoothstep(-0.02, 0.02, t));
+        } else if (t < 0.08) {
+            top = lerpColor(sunriseTop, dawnTop, smoothstep(0.02, 0.08, t));
+            bot = lerpColor(sunriseBot, dawnBot, smoothstep(0.02, 0.08, t));
+        } else if (t < 0.15) {
+            top = lerpColor(dawnTop, deepDawnTop, smoothstep(0.08, 0.15, t));
+            bot = lerpColor(dawnBot, deepDawnBot, smoothstep(0.08, 0.15, t));
+        } else if (t < 0.3) {
+            top = lerpColor(deepDawnTop, morningTop, smoothstep(0.15, 0.3, t));
+            bot = lerpColor(deepDawnBot, morningBot, smoothstep(0.15, 0.3, t));
+        } else if (t < 0.5) {
+            top = lerpColor(morningTop, noonTop, smoothstep(0.3, 0.5, t));
+            bot = lerpColor(morningBot, noonBot, smoothstep(0.3, 0.5, t));
+        } else if (t < 0.7) {
+            top = lerpColor(noonTop, afternoonTop, smoothstep(0.5, 0.7, t));
+            bot = lerpColor(noonBot, afternoonBot, smoothstep(0.5, 0.7, t));
+        } else if (t < 0.85) {
+            top = lerpColor(afternoonTop, sunsetTop, smoothstep(0.7, 0.85, t));
+            bot = lerpColor(afternoonBot, sunsetBot, smoothstep(0.7, 0.85, t));
+        } else {
+            top = lerpColor(sunsetTop, nightTop, smoothstep(0.85, 1.0, t));
+            bot = lerpColor(sunsetBot, nightBot, smoothstep(0.85, 1.0, t));
+        }
         return { top, bot };
     }
 
     function drawSky(sunElev) {
         const { top, bot } = skyColors(sunElev);
+        const brightness = smoothstep(-0.2, 0.4, sunElev);
+        const finalTop = top.map(c => Math.round(c * (0.35 + brightness * 0.65)));
+        const finalBot = bot.map(c => Math.round(c * (0.35 + brightness * 0.65)));
         const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, rgb(top));
-        g.addColorStop(1, rgb(bot));
+        g.addColorStop(0, rgb(finalTop));
+        g.addColorStop(1, rgb(finalBot));
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
     }
 
     function drawStars(sunElev, time) {
-        if (sunElev > 0.05) return;
-        const alpha = Math.max(0, 1 - sunElev * 8);
+        const starAlpha = Math.max(0, smoothstep(-0.1, 0.05, -sunElev));
+        if (starAlpha < 0.01) return;
         ctx.save();
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 100; i++) {
             const sx = (i * 137.5) % W;
             const sy = (i * 73.3) % (H * 0.7);
-            const tw = (Math.sin(time / 1000 + i) + 1) / 2;
-            ctx.globalAlpha = alpha * (0.3 + tw * 0.7);
+            const tw = (Math.sin(time / 1200 + i) + 1) / 2;
+            const size = 0.5 + Math.random() * 1.2;
+            ctx.globalAlpha = starAlpha * (0.3 + tw * 0.6);
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(sx, sy, 0.8, 0, Math.PI * 2);
+            ctx.arc(sx, sy, size, 0, Math.PI * 2);
             ctx.fill();
+            if (size > 1.1 && starAlpha > 0.3) {
+                const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 3);
+                glow.addColorStop(0, `rgba(255,255,255,${starAlpha * 0.15})`);
+                glow.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.globalAlpha = starAlpha;
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(sx, sy, size * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
         ctx.restore();
     }
