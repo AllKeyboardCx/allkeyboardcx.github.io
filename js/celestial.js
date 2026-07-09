@@ -95,32 +95,26 @@
     async function getCelestialData() {
         const now = new Date();
         const todayKey = now.toISOString().slice(0, 10);
-        const cacheKey = 'celestial_data_' + todayKey;
+        const cacheKey = 'celestial_v3_' + todayKey;
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
             try { return JSON.parse(cached); } catch (e) {}
         }
         const pos = await getPosition();
+        const fb = fallbackData(now, pos.lat);
         try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${pos.lat.toFixed(3)}&longitude=${pos.lng.toFixed(3)}&daily=sunrise,sunset,moonrise,moonset,moon_phase&timezone=auto`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${pos.lat.toFixed(3)}&longitude=${pos.lng.toFixed(3)}&daily=sunrise,sunset&timezone=auto`;
             const r = await fetch(url);
             if (!r.ok) throw new Error('api error');
             const data = await r.json();
             const d = data.daily;
             let sunrise = parseHour(d.sunrise[0]);
             let sunset = parseHour(d.sunset[0]);
-            let moonrise = parseHour(d.moonrise[0]);
-            let moonset = parseHour(d.moonset[0]);
-            let phase = d.moon_phase[0];
-            const fb = fallbackData(now, pos.lat);
             if (sunrise === null) sunrise = fb.sunrise;
             if (sunset === null) sunset = fb.sunset;
-            if (phase === null || phase === undefined) phase = fb.phase;
-            if (moonrise === null) {
-                moonrise = fb.moonrise;
-                moonset = fb.moonset;
-            }
-            const result = { sunrise, sunset, moonrise, moonset, phase, source: '实时天气API' };
+            const phase = fb.phase;
+            const { moonrise, moonset } = calcMoon(sunrise, sunset, phase);
+            const result = { sunrise, sunset, moonrise, moonset, phase, source: '日出日落·实时API' };
             localStorage.setItem(cacheKey, JSON.stringify(result));
             return result;
         } catch (e) {
@@ -135,7 +129,7 @@
         return { rise: moonrise, set: moonset };
     }
 
-    function bodyPos(rise, set, now, cx, cy, R) {
+    function bodyPos(rise, set, now, cx, cy, Rx, Ry) {
         let progress;
         if (set > rise) {
             if (now >= rise && now <= set) progress = (now - rise) / (set - rise);
@@ -146,7 +140,7 @@
             else return null;
         }
         const angle = Math.PI * (1 - progress);
-        return { x: cx + R * Math.cos(angle), y: cy - R * Math.sin(angle), elev: Math.sin(angle), progress };
+        return { x: cx + Rx * Math.cos(angle), y: cy - Ry * Math.sin(angle), elev: Math.sin(angle), progress };
     }
 
     function smoothstep(a, b, x) {
@@ -204,7 +198,7 @@
         ctx.restore();
     }
 
-    function drawArc(cx, cy, R, color, glow, riseStr, setStr) {
+    function drawArc(cx, cy, Rx, Ry, color, glow, riseStr, setStr) {
         ctx.save();
         ctx.strokeStyle = color;
         ctx.lineWidth = 2;
@@ -212,14 +206,14 @@
         ctx.shadowColor = glow;
         ctx.shadowBlur = 10;
         ctx.beginPath();
-        ctx.arc(cx, cy, R, Math.PI, 0, false);
+        ctx.ellipse(cx, cy, Rx, Ry, 0, Math.PI, 0, true);
         ctx.stroke();
         ctx.restore();
         ctx.fillStyle = 'rgba(240,246,252,0.7)';
         ctx.font = '600 11px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(riseStr, cx - R, cy + 18);
-        ctx.fillText(setStr, cx + R, cy + 18);
+        ctx.fillText(riseStr, cx - Rx, cy + 18);
+        ctx.fillText(setStr, cx + Rx, cy + 18);
     }
 
     function drawSun(x, y, r) {
@@ -349,14 +343,14 @@
         ctx.stroke();
     }
 
-    function drawLabels(cx, cy, R, sunData, moonData) {
+    function drawLabels(cx, cy, Rx, Ry, sunData, moonData) {
         ctx.save();
         ctx.fillStyle = 'rgba(240,246,252,0.5)';
         ctx.font = '11px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('东', cx - R, cy + 34);
-        ctx.fillText('南', cx, cy - R - 14);
-        ctx.fillText('西', cx + R, cy + 34);
+        ctx.fillText('东', cx - Rx, cy + 34);
+        ctx.fillText('南', cx, cy - Ry - 14);
+        ctx.fillText('西', cx + Rx, cy + 34);
         if (sunData) {
             ctx.fillStyle = 'rgba(255,210,77,0.85)';
             ctx.fillText('日', sunData.x, sunData.y - 22);
@@ -382,22 +376,25 @@
 
         const cx = W / 2;
         const cy = H * 0.82;
-        const R = Math.min(W * 0.42, H * 0.72);
+        const Rx = W * 0.47;
+        const Ry = H * 0.62;
+        const mRx = Rx * 0.97;
+        const mRy = Ry * 0.93;
 
-        const sun = bodyPos(data.sunrise, data.sunset, nowH, cx, cy, R);
+        const sun = bodyPos(data.sunrise, data.sunset, nowH, cx, cy, Rx, Ry);
         const moonNorm = normalizeMoonTimes(data.moonrise, data.moonset, nowH);
-        const moon = bodyPos(moonNorm.rise, moonNorm.set, nowH, cx, cy, R * 0.95);
+        const moon = bodyPos(moonNorm.rise, moonNorm.set, nowH, cx, cy, mRx, mRy);
         const sunElev = sun ? sun.elev : -0.3;
 
         ctx.clearRect(0, 0, W, H);
         drawSky(sunElev);
         drawStars(sunElev, time);
-        drawArc(cx, cy, R, 'rgba(255,210,77,0.55)', 'rgba(255,210,77,0.6)', fmt(data.sunrise), fmt(data.sunset));
-        drawArc(cx, cy, R * 0.95, 'rgba(220,230,255,0.45)', 'rgba(220,230,255,0.5)', fmt(data.moonrise), fmt(data.moonset));
-        if (sun) drawSun(sun.x, sun.y, Math.max(16, R * 0.1));
-        if (moon) drawMoon(moon.x, moon.y, Math.max(14, R * 0.085), data.phase);
+        drawArc(cx, cy, Rx, Ry, 'rgba(255,210,77,0.55)', 'rgba(255,210,77,0.6)', fmt(data.sunrise), fmt(data.sunset));
+        drawArc(cx, cy, mRx, mRy, 'rgba(220,230,255,0.45)', 'rgba(220,230,255,0.5)', fmt(data.moonrise), fmt(data.moonset));
+        if (sun) drawSun(sun.x, sun.y, Math.max(16, Rx * 0.05));
+        if (moon) drawMoon(moon.x, moon.y, Math.max(14, mRx * 0.045), data.phase);
         drawMountains(cy);
-        drawLabels(cx, cy, R, sun, moon);
+        drawLabels(cx, cy, Rx, Ry, sun, moon);
 
         const clockEl = document.getElementById('celestial-clock');
         const phaseEl = document.getElementById('celestial-phase');

@@ -174,8 +174,15 @@ class Bird {
 
         this.bird.style.left = this.currentX + 'px';
         this.bird.style.top = this.currentY + 'px';
+        this.updateSpeechBubble();
 
         this.animationId = requestAnimationFrame(() => this.animateFlight());
+    }
+
+    updateSpeechBubble() {
+        if (!this.speechBubble.classList.contains('show')) return;
+        this.speechBubble.style.left = (this.currentX - 20) + 'px';
+        this.speechBubble.style.top = (this.currentY - 80) + 'px';
     }
 
     showPerched() {
@@ -307,6 +314,7 @@ class Bird {
         
         this.bird.style.left = this.currentX + 'px';
         this.bird.style.top = this.currentY + 'px';
+        this.updateSpeechBubble();
         
         this.animationId = requestAnimationFrame(() => this.animateFlightToHouse());
     }
