@@ -1052,8 +1052,8 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 @media (max-width: 575px) {
     .celestial-wrapper { height: 230px; }
     .celestial-clock { font-size: 1.35rem; }
-    .celestial-phase { font-size: 0.68rem; }
-    .celestial-info { top: 12px; left: 14px; padding: 8px 12px; }
+    .celestial-phase { font-size: 0.68rem; line-height: 1.5; }
+    .celestial-info { top: 10px; left: 10px; right: 10px; padding: 8px 12px; max-width: calc(100% - 20px); }
 }
 
 .mobile-toc-island {

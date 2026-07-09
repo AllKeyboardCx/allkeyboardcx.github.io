@@ -211,9 +211,17 @@
         ctx.restore();
         ctx.fillStyle = 'rgba(240,246,252,0.7)';
         ctx.font = '600 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(riseStr, cx - Rx, cy + 18);
-        ctx.fillText(setStr, cx + Rx, cy + 18);
+        const narrow = W < 520;
+        if (narrow) {
+            ctx.textAlign = 'left';
+            ctx.fillText(riseStr, cx - Rx + 4, cy + 18);
+            ctx.textAlign = 'right';
+            ctx.fillText(setStr, cx + Rx - 4, cy + 18);
+        } else {
+            ctx.textAlign = 'center';
+            ctx.fillText(riseStr, cx - Rx, cy + 18);
+            ctx.fillText(setStr, cx + Rx, cy + 18);
+        }
     }
 
     function drawSun(x, y, r) {
@@ -347,10 +355,19 @@
         ctx.save();
         ctx.fillStyle = 'rgba(240,246,252,0.5)';
         ctx.font = '11px sans-serif';
+        const narrow = W < 520;
+        if (narrow) {
+            ctx.textAlign = 'left';
+            ctx.fillText('东', cx - Rx + 4, cy + 34);
+            ctx.textAlign = 'right';
+            ctx.fillText('西', cx + Rx - 4, cy + 34);
+        } else {
+            ctx.textAlign = 'center';
+            ctx.fillText('东', cx - Rx, cy + 34);
+            ctx.fillText('西', cx + Rx, cy + 34);
+        }
         ctx.textAlign = 'center';
-        ctx.fillText('东', cx - Rx, cy + 34);
         ctx.fillText('南', cx, cy - Ry - 14);
-        ctx.fillText('西', cx + Rx, cy + 34);
         if (sunData) {
             ctx.fillStyle = 'rgba(255,210,77,0.85)';
             ctx.fillText('日', sunData.x, sunData.y - 22);
@@ -400,7 +417,11 @@
         const phaseEl = document.getElementById('celestial-phase');
         if (clockEl) clockEl.textContent = now.toTimeString().slice(0, 5);
         if (phaseEl) {
-            phaseEl.textContent = `${moonPhaseName(data.phase)} · 日出 ${fmt(data.sunrise)} 日落 ${fmt(data.sunset)} · 月出 ${fmt(data.moonrise)} 月落 ${fmt(data.moonset)} · ${data.source}`;
+            if (W < 520) {
+                phaseEl.innerHTML = `${moonPhaseName(data.phase)} · ${data.source}<br>日出 ${fmt(data.sunrise)} · 日落 ${fmt(data.sunset)}<br>月出 ${fmt(data.moonrise)} · 月落 ${fmt(data.moonset)}`;
+            } else {
+                phaseEl.textContent = `${moonPhaseName(data.phase)} · 日出 ${fmt(data.sunrise)} 日落 ${fmt(data.sunset)} · 月出 ${fmt(data.moonrise)} 月落 ${fmt(data.moonset)} · ${data.source}`;
+            }
         }
     }
 
