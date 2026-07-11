@@ -105,11 +105,11 @@ edit(0, payload)
 
 但是在后续edit3的时候，由于chunk4的size被修改为0x21，所以被识别为chunk2的fd_chunk，导致显示的是被放入fastbins中的：
 
-![[Pasted image 20260711191625.png]]
+![Pasted image 20260711191625.png](<../pictures/Pasted image 20260711191625.png>)
 
 接着又申请了两个0x21的chunk，于是chunk4就名正言顺的成为0x21大小的chunk了
 
-![[Pasted image 20260711191808.png]]
+![Pasted image 20260711191808.png](<../pictures/Pasted image 20260711191808.png>)
 
 然后又修改chunk4的size为0x91，紧接着申请了一个0x91的chunk，然后又释放了chunk4，这里加一个chunk5的原因是为了防止chunk4被释放后直接与Top chunk合并而不是进入unsorted bin中（因为这里我们要利用的是unsorted bin泄露 malloc_hook），
 
@@ -171,7 +171,7 @@ libc_base = leak - 0x3c4b78
 
 这里算libc基址的手法就是先gdb调试，用vmmap查看libc基址，再用leak-libc基址，就可以得到对应的偏移，把这个偏移放在程序里用就行了
 
-![[Pasted image 20260711192940.png]]
+![Pasted image 20260711192940.png](<../pictures/Pasted image 20260711192940.png>)
 
 ---
 
@@ -334,14 +334,14 @@ io.interactive()
 - 这一步使用 `readelf -s /lib/x86_64-linux-gnu/libc-2.23.so | grep malloc_hook`
 
 得到的是：
-![[Pasted image 20260708151832.png]]
+![Pasted image 20260708151832.png](<../pictures/Pasted image 20260708151832.png>)
 
 ## 第二步就是查看并寻找一处合适的地址空间来存储one_gadget
 
 - 这一步使用 `objdump -s -j .data /lib/x86_64-linux-gnu/libc-2.23.so | grep -A 5 -B 5 "3c4b10"`
 
 得到的是：
-![[Pasted image 20260708151926.png]]
+![Pasted image 20260708151926.png](<../pictures/Pasted image 20260708151926.png>)
 <font size=6 color=yellow>可以发现0x3c4af0这里有完整的空地址，再 0x3c4af0 - 0x3 就可以得到 0x3c4aed</font>
 
 ### 这里说一下为什么不能用0x3c4b10上面的地址和下面的地址
@@ -350,7 +350,7 @@ io.interactive()
 - 下面主要是因为这里是main_arena的起始地址：
 - 根据调试如下，main_arena在当前libc中的偏移是0x3c4b20
 
-![[Pasted image 20260708152752.png]]
+![Pasted image 20260708152752.png](<../pictures/Pasted image 20260708152752.png>)
 
 - 如果选下面的地址，就会覆盖main_arena，导致程序报错
 
@@ -359,7 +359,7 @@ io.interactive()
 
 这里主要是要找一个可以用的one_gadget，
 用命令：`one_gadget /lib/x86_64-linux-gnu/libc-2.23.so` 即可获取想要的one_gadget
-![[Pasted image 20260708153111.png]]
+![Pasted image 20260708153111.png](<../pictures/Pasted image 20260708153111.png>)
 
 >[!IMPORTANT]
 >注意这里的one_gadget调用时要注意是否能满足对应的约束条件
