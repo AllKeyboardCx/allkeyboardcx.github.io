@@ -1,5 +1,20 @@
 [
   {
+    "title": "babyheap_0ctf_2017 堆利用",
+    "filename": "babyheap_0ctf_2017",
+    "date": "2026-07-11",
+    "tags": [
+      "heap",
+      "堆重叠",
+      "堆溢出",
+      "fastbin劫持",
+      "unsorted bin泄露",
+      "伪造chunk",
+      "hook劫持"
+    ],
+    "summary": "通过篡改堆块 size制造堆重叠，结合fastbin劫持伪造链表指向 __malloc_hook 附近，利用unsorted bin泄露libc基址，最终覆盖 __malloc_hook 为 one_gadget 触发 getshell。核心是堆元数据操控和钩子函数劫持"
+  },
+  {
     "title": "CTF那些事儿-Pwn-进入Pwn的世界-动态链接动态系统调用-ret2libc3",
     "filename": "CTF那些事儿-Pwn-进入Pwn的世界-动态链接动态系统调用-ret2libc3",
     "date": "2026-07-05",
