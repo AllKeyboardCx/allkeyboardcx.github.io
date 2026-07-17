@@ -92,10 +92,27 @@
         return { sunrise, sunset, moonrise, moonset, phase, source: '天文公式估算' };
     }
 
+    async function getCityName(lat, lng) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat.toFixed(4)}&lon=${lng.toFixed(4)}&zoom=10&addressdetails=1`;
+            const r = await fetch(url);
+            if (!r.ok) return null;
+            const data = await r.json();
+            const addr = data.address;
+            if (addr.city) return addr.city;
+            if (addr.town) return addr.town;
+            if (addr.village) return addr.village;
+            if (addr.state) return addr.state;
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     async function getCelestialData() {
         const now = new Date();
         const todayKey = now.toISOString().slice(0, 10);
-        const cacheKey = 'celestial_v3_' + todayKey;
+        const cacheKey = 'celestial_v4_' + todayKey;
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
             try { return JSON.parse(cached); } catch (e) {}
@@ -114,7 +131,9 @@
             if (sunset === null) sunset = fb.sunset;
             const phase = fb.phase;
             const { moonrise, moonset } = calcMoon(sunrise, sunset, phase);
-            const result = { sunrise, sunset, moonrise, moonset, phase, source: '日出日落·实时API' };
+            const city = await getCityName(pos.lat, pos.lng);
+            const source = city ? `日出日落·实时API(${city})` : '日出日落·实时API';
+            const result = { sunrise, sunset, moonrise, moonset, phase, source };
             localStorage.setItem(cacheKey, JSON.stringify(result));
             return result;
         } catch (e) {
