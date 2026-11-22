@@ -3,10 +3,17 @@
 
     const canvas = document.getElementById('celestial-canvas');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    let ctx = canvas.getContext('2d');
     const DEFAULT_LAT = 39.9042, DEFAULT_LNG = 116.4074;
     let W, H, dpr;
     let celestialData = null;
+
+    // 静态场景缓存：天空/日月/山/刻度这些几十秒才移动一点点，没必要每帧重画。
+    // 每帧只做一次 drawImage + 100 颗小星星的闪烁。
+    const bgCanvas = document.createElement('canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let staticDirty = true;
+    let staticAt = -1e9;
 
     function resize() {
         dpr = window.devicePixelRatio || 1;
@@ -15,6 +22,10 @@
         canvas.width = W * dpr;
         canvas.height = H * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        bgCanvas.width = W * dpr;
+        bgCanvas.height = H * dpr;
+        bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        staticDirty = true;
     }
 
     function dayOfYear(d) {
@@ -241,32 +252,49 @@
         ctx.fillRect(0, 0, W, H);
     }
 
-    function drawStars(sunElev, time) {
+    // 星星尺寸用固定公式算，不再每帧 Math.random（否则每帧闪烁抖动，也没法缓存）
+    function starSize(i) {
+        return 0.5 + (((i * 37) % 13) / 13) * 1.2;
+    }
+
+    function starPos(i) {
+        return [(i * 137.5) % W, (i * 73.3) % (H * 0.7)];
+    }
+
+    // 大星星的光晕进静态层（每帧重画 radialGradient 是最贵的部分）
+    function drawStarsStatic(sunElev) {
         const starAlpha = Math.max(0, smoothstep(-0.1, 0.05, -sunElev));
         if (starAlpha < 0.01) return;
         ctx.save();
         for (let i = 0; i < 100; i++) {
-            const sx = (i * 137.5) % W;
-            const sy = (i * 73.3) % (H * 0.7);
-            const tw = (Math.sin(time / 1200 + i) + 1) / 2;
-            const size = 0.5 + Math.random() * 1.2;
-            ctx.globalAlpha = starAlpha * (0.3 + tw * 0.6);
-            ctx.fillStyle = '#ffffff';
+            const size = starSize(i);
+            if (size <= 1.1 || starAlpha <= 0.3) continue;
+            const p = starPos(i);
+            const glow = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], size * 3);
+            glow.addColorStop(0, 'rgba(255,255,255,' + (starAlpha * 0.15) + ')');
+            glow.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.globalAlpha = starAlpha;
+            ctx.fillStyle = glow;
             ctx.beginPath();
-            ctx.arc(sx, sy, size, 0, Math.PI * 2);
+            ctx.arc(p[0], p[1], size * 3, 0, Math.PI * 2);
             ctx.fill();
-            if (size > 1.1 && starAlpha > 0.3) {
-                const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 3);
-                glow.addColorStop(0, `rgba(255,255,255,${starAlpha * 0.15})`);
-                glow.addColorStop(1, 'rgba(255,255,255,0)');
-                ctx.globalAlpha = starAlpha;
-                ctx.fillStyle = glow;
-                ctx.beginPath();
-                ctx.arc(sx, sy, size * 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
         }
         ctx.restore();
+    }
+
+    function drawStarsTwinkle(sunElev, time) {
+        const starAlpha = Math.max(0, smoothstep(-0.1, 0.05, -sunElev));
+        if (starAlpha < 0.01) return;
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 100; i++) {
+            const p = starPos(i);
+            const tw = (Math.sin(time / 1200 + i) + 1) / 2;
+            ctx.globalAlpha = starAlpha * (0.3 + tw * 0.6);
+            ctx.beginPath();
+            ctx.arc(p[0], p[1], starSize(i), 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
     }
 
     function drawArc(cx, cy, Rx, Ry, color, glow, riseStr, setStr) {
@@ -457,6 +485,22 @@
         return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
     }
 
+    function renderStatic(time, sunElev, cx, cy, Rx, Ry, mRx, mRy, sun, moon, data) {
+        const realCtx = ctx;
+        ctx = bgCtx;
+        ctx.clearRect(0, 0, W, H);
+        drawSky(sunElev);
+        drawStarsStatic(sunElev);
+        drawArc(cx, cy, Rx, Ry, 'rgba(255,210,77,0.55)', 'rgba(255,210,77,0.6)', fmt(data.sunrise), fmt(data.sunset));
+        drawArc(cx, cy, mRx, mRy, 'rgba(220,230,255,0.45)', 'rgba(220,230,255,0.5)', fmt(data.moonrise), fmt(data.moonset));
+        if (sun) drawSun(sun.x, sun.y, Math.max(16, Rx * 0.05));
+        if (moon) drawMoon(moon.x, moon.y, Math.max(14, mRx * 0.045), data.phase);
+        drawMountains(cy);
+        drawLabels(cx, cy, Rx, Ry, sun, moon);
+        ctx = realCtx;
+        staticDirty = false;
+    }
+
     function render(time) {
         const now = new Date();
         const nowH = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
@@ -474,15 +518,14 @@
         const moon = bodyPos(moonNorm.rise, moonNorm.set, nowH, cx, cy, mRx, mRy);
         const sunElev = sun ? sun.elev : -0.3;
 
+        if (staticDirty || time - staticAt > 30000) {
+            renderStatic(time, sunElev, cx, cy, Rx, Ry, mRx, mRy, sun, moon, data);
+            staticAt = time;
+        }
+
         ctx.clearRect(0, 0, W, H);
-        drawSky(sunElev);
-        drawStars(sunElev, time);
-        drawArc(cx, cy, Rx, Ry, 'rgba(255,210,77,0.55)', 'rgba(255,210,77,0.6)', fmt(data.sunrise), fmt(data.sunset));
-        drawArc(cx, cy, mRx, mRy, 'rgba(220,230,255,0.45)', 'rgba(220,230,255,0.5)', fmt(data.moonrise), fmt(data.moonset));
-        if (sun) drawSun(sun.x, sun.y, Math.max(16, Rx * 0.05));
-        if (moon) drawMoon(moon.x, moon.y, Math.max(14, mRx * 0.045), data.phase);
-        drawMountains(cy);
-        drawLabels(cx, cy, Rx, Ry, sun, moon);
+        ctx.drawImage(bgCanvas, 0, 0, W, H);
+        drawStarsTwinkle(sunElev, time);
 
         const clockEl = document.getElementById('celestial-clock');
         const phaseEl = document.getElementById('celestial-phase');
@@ -497,20 +540,21 @@
     }
 
     let rafId = null;
-    let lastFrameTime = 0;
+    let frameToggle = false;
 
-    function loop(t) {
+    // 每两帧画一次：60Hz 屏上正好 30fps，间隔均等（用时间差判断会抖成 33/50ms 交替）
+    function loop() {
         rafId = requestAnimationFrame(loop);
-        if (t - lastFrameTime < 33) return;   // 限帧 30fps
-        lastFrameTime = t;
-        render(t);
+        frameToggle = !frameToggle;
+        if (frameToggle) return;
+        render(performance.now());
     }
 
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         } else if (!rafId) {
-            lastFrameTime = 0;
+            frameToggle = false;
             rafId = requestAnimationFrame(loop);
         }
     });
@@ -518,5 +562,5 @@
     window.addEventListener('resize', () => { resize(); });
     resize();
     rafId = requestAnimationFrame(loop);
-    getCelestialData().then(data => { celestialData = data; });
+    getCelestialData().then(data => { celestialData = data; staticDirty = true; });
 })();

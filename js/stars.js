@@ -19,11 +19,41 @@
     let mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999, active: false };
     let lightTheme = false;
 
+    // 预渲染星星贴图：每帧只做 drawImage，不再逐颗 arc()/fill()，也不再拼 hsla 字符串
+    const HUE_STEPS = 12;
+    const spritesDark = [];
+    const spritesLight = [];
+
+    function makeSprite(hue, sat, light) {
+        const size = 64;
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        const g = c.getContext('2d');
+        const grd = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        grd.addColorStop(0, 'hsla(' + hue + ',' + sat + '%,' + light + '%,1)');
+        grd.addColorStop(0.28, 'hsla(' + hue + ',' + sat + '%,' + light + '%,0.62)');
+        grd.addColorStop(0.55, 'hsla(' + hue + ',' + sat + '%,' + light + '%,0.18)');
+        grd.addColorStop(1, 'hsla(' + hue + ',' + sat + '%,' + light + '%,0)');
+        g.fillStyle = grd;
+        g.fillRect(0, 0, size, size);
+        return c;
+    }
+
+    function buildSprites() {
+        spritesDark.length = 0;
+        spritesLight.length = 0;
+        for (let i = 0; i < HUE_STEPS; i++) {
+            const hue = Math.round(200 + (i * 60) / (HUE_STEPS - 1));
+            spritesDark.push(makeSprite(hue, 80, 78));
+            spritesLight.push(makeSprite(hue, 45, 52));
+        }
+    }
+
     function checkTheme() {
         const newLight = /theme-(dawn|morning|noon|afternoon)/.test(document.body.className);
         if (newLight !== lightTheme) {
             lightTheme = newLight;
-            canvas.style.mixBlendMode = lightTheme ? 'normal' : 'screen';
+            ctx.globalCompositeOperation = lightTheme ? 'source-over' : 'lighter';
         }
     }
 
@@ -37,7 +67,7 @@
         stars = [];
         const count = Math.floor((width * height) / 6500);
         for (let i = 0; i < count; i++) {
-            stars.push({
+            const s = {
                 x: Math.random() * width,
                 y: Math.random() * height,
                 baseX: 0,
@@ -47,11 +77,12 @@
                 vy: (Math.random() - 0.5) * 0.15,
                 twinkle: Math.random() * Math.PI * 2,
                 twinkleSpeed: Math.random() * 0.03 + 0.005,
-                hue: 200 + Math.random() * 60,
+                hue: Math.floor(Math.random() * HUE_STEPS),
                 opacity: Math.random() * 0.4 + 0.55
-            });
-            stars[i].baseX = stars[i].x;
-            stars[i].baseY = stars[i].y;
+            };
+            s.baseX = s.x;
+            s.baseY = s.y;
+            stars.push(s);
         }
     }
 
@@ -64,7 +95,7 @@
             vy: (Math.random() - 0.5) * 0.8,
             life: 1,
             size: Math.random() * 2 + 0.8,
-            hue: 190 + Math.random() * 70
+            hue: Math.floor(Math.random() * HUE_STEPS)
         });
     }
 
@@ -122,11 +153,11 @@
     function draw() {
         checkTheme();
         ctx.clearRect(0, 0, width, height);
+
         const dim = lightTheme;
         const starAlphaScale = dim ? 0.15 : 1;
-        const starLightness = dim ? 55 : 75;
-        const starSat = dim ? 45 : 80;
         const step = dim ? 2 : 1;
+        const sprites = dim ? spritesLight : spritesDark;
 
         for (let i = 0; i < stars.length; i += step) {
             const s = stars[i];
@@ -134,67 +165,55 @@
             const tw = (Math.sin(s.twinkle) + 1) / 2;
             const alpha = s.opacity * (0.5 + tw * 0.5) * starAlphaScale;
             if (alpha < 0.03) continue;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.size * (dim ? 0.7 : 1), 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${s.hue}, ${starSat}%, ${starLightness}%, ${alpha})`;
-            ctx.fill();
-
-            if (s.size > 1.4 && !dim) {
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size * 3.2, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha * 0.18})`;
-                ctx.fill();
-            }
+            const r = s.size * (dim ? 1.8 : 2.6);
+            ctx.globalAlpha = alpha;
+            ctx.drawImage(sprites[s.hue], s.x - r, s.y - r, r * 2, r * 2);
         }
 
-        const pLightness = dim ? 50 : 70;
-        const pSat = dim ? 55 : 85;
         const pAlphaScale = dim ? 0.6 : 1;
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${p.hue}, ${pSat}%, ${pLightness}%, ${p.life * 0.8 * pAlphaScale})`;
-            ctx.fill();
-
-            if (!dim) {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${p.hue}, 85%, 70%, ${p.life * 0.12})`;
-                ctx.fill();
-            }
+            const r = p.size * 2.4;
+            ctx.globalAlpha = p.life * 0.8 * pAlphaScale;
+            ctx.drawImage(sprites[p.hue], p.x - r, p.y - r, r * 2, r * 2);
         }
 
         if (mouse.active) {
-            const lineLightness = dim ? 50 : 70;
             const lineAlphaScale = dim ? 0.4 : 1;
+            ctx.globalAlpha = 1;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            let drew = false;
             for (let i = 0; i < stars.length; i += step) {
                 const s = stars[i];
                 const dx = s.x - mouse.x;
                 const dy = s.y - mouse.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < 120) {
-                    const alpha = (1 - dist / 120) * 0.25 * lineAlphaScale;
-                    if (alpha < 0.02) continue;
-                    ctx.beginPath();
+                    const a = (1 - dist / 120) * 0.25 * lineAlphaScale;
+                    if (a < 0.02) continue;
                     ctx.moveTo(mouse.x, mouse.y);
                     ctx.lineTo(s.x, s.y);
-                    ctx.strokeStyle = `hsla(${s.hue}, 45%, ${lineLightness}%, ${alpha})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
+                    drew = true;
                 }
             }
+            if (drew) {
+                ctx.strokeStyle = dim ? 'hsla(215,45%,52%,0.18)' : 'hsla(215,70%,78%,0.22)';
+                ctx.stroke();
+            }
         }
+
+        ctx.globalAlpha = 1;
     }
 
     let rafId = null;
-    let lastFrameTime = 0;
+    let frameToggle = false;
 
-    function animate(now) {
+    // 每两帧画一次：60Hz 屏上正好 30fps，间隔均等（用时间差判断会抖成 33/50ms 交替）
+    function animate() {
         rafId = requestAnimationFrame(animate);
-        now = now || (window.performance ? performance.now() : Date.now());
-        if (now - lastFrameTime < 33) return;   // 限帧 30fps
-        lastFrameTime = now;
+        frameToggle = !frameToggle;
+        if (frameToggle) return;
         update();
         draw();
     }
@@ -215,18 +234,16 @@
         mouse.active = false;
     });
 
-    let visibilityChanged = false;
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
-            visibilityChanged = true;
             if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         } else if (!rafId) {
-            visibilityChanged = true;
-            lastFrameTime = 0;
             rafId = requestAnimationFrame(animate);
         }
     });
 
+    buildSprites();
+    checkTheme();
     resize();
     rafId = requestAnimationFrame(animate);
 })();

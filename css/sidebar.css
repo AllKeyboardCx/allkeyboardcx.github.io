@@ -354,7 +354,7 @@ pre,
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-card-border) !important;
     box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
-    animation: glowBorder 3s ease-in-out infinite;
+    /* 光晕呼吸动画已停用：box-shadow 是逐帧重绘属性，大面积常驻动画是掉帧主因 */
     transition: background-color 1.5s ease, border-color 1.5s ease, box-shadow 1.5s ease;
 }
 
@@ -620,7 +620,7 @@ article {
     padding: 24px;
     margin-bottom: 24px;
     box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
-    animation: glowBorder 3s ease-in-out infinite;
+    /* 光晕呼吸动画已停用：box-shadow 是逐帧重绘属性，大面积常驻动画是掉帧主因 */
     transition: background-color 1.5s ease, border-color 1.5s ease, box-shadow 1.5s ease;
 }
 
@@ -1201,7 +1201,7 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-card-border) !important;
     box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
-    animation: glowBorder 3s ease-in-out infinite;
+    /* 光晕呼吸动画已停用：box-shadow 是逐帧重绘属性，大面积常驻动画是掉帧主因 */
     transition: background-color 1.5s ease, border-color 1.5s ease;
 }
 
