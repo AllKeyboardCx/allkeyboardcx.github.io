@@ -202,7 +202,6 @@ body::before {
     flex-direction: column;
     z-index: 1050;
     overflow-y: auto;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     transition: left 0.35s ease-in-out, background-color 1.5s ease, border-color 1.5s ease;
 }
 
@@ -308,14 +307,10 @@ body::before {
 
 .bg-gray {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .bg-gray-dark {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .bg-dark,
@@ -324,8 +319,6 @@ body::before {
 .bg-gray,
 .bg-gray-dark {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     transition: background-color 1.5s ease;
 }
 
@@ -350,10 +343,7 @@ pre,
 .accordion-button,
 .accordion-button:not(.collapsed) {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-card-border) !important;
-    box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
     /* 光晕呼吸动画已停用：box-shadow 是逐帧重绘属性，大面积常驻动画是掉帧主因 */
     transition: background-color 1.5s ease, border-color 1.5s ease, box-shadow 1.5s ease;
 }
@@ -389,10 +379,7 @@ code {
 
 #sidebar {
     background-color: rgba(13, 17, 23, 0.5) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     border-right: 1px solid var(--theme-border-color) !important;
-    box-shadow: 2px 0 15px var(--theme-primary-glow);
 }
 
 .sidebar-nav-item a:hover {
@@ -409,22 +396,9 @@ code {
     border-bottom: 1px solid var(--theme-border-color) !important;
 }
 
-@keyframes glowBorder {
-    0%, 100% {
-        box-shadow: 0 0 8px var(--theme-primary-glow), 0 0 16px var(--theme-primary-glow-strong);
-        border-color: var(--theme-border-color);
-    }
-    50% {
-        box-shadow: 0 0 16px var(--theme-primary-glow-strong), 0 0 32px var(--theme-primary-glow-strong);
-        border-color: var(--theme-primary-color);
-    }
-}
-
 .navbar,
 .navbar-dark {
     background-color: rgba(13, 17, 23, 0.35) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--theme-border-color);
     position: sticky !important;
     top: 0;
@@ -437,8 +411,6 @@ code {
     background-color: rgba(13, 17, 23, 0.3) !important;
     border: 1px solid var(--theme-border-color) !important;
     color: var(--theme-text-color) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     transition: border-color 1.5s ease;
 }
 
@@ -449,13 +421,10 @@ code {
 .btn-primary {
     background-color: rgba(88, 166, 255, 0.5) !important;
     border: 1px solid rgba(88, 166, 255, 0.6) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .btn-primary:hover {
     background-color: rgba(88, 166, 255, 0.9) !important;
-    box-shadow: 0 0 12px rgba(88, 166, 255, 0.6);
 }
 
 .btn-outline-primary {
@@ -466,13 +435,10 @@ code {
 
 .btn-outline-primary:hover {
     background-color: rgba(88, 166, 255, 0.2) !important;
-    box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
 }
 
 footer {
     background-color: rgba(13, 17, 23, 0.35) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid var(--theme-border-color) !important;
     transition: border-color 1.5s ease;
 }
@@ -603,8 +569,6 @@ textarea {
     background-color: rgba(13, 17, 23, 0.3) !important;
     border: 1px solid var(--theme-border-color) !important;
     color: var(--theme-text-color) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 textarea::placeholder {
@@ -613,13 +577,10 @@ textarea::placeholder {
 
 article {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-card-border) !important;
     border-radius: 8px;
     padding: 24px;
     margin-bottom: 24px;
-    box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
     /* 光晕呼吸动画已停用：box-shadow 是逐帧重绘属性，大面积常驻动画是掉帧主因 */
     transition: background-color 1.5s ease, border-color 1.5s ease, box-shadow 1.5s ease;
 }
@@ -671,14 +632,12 @@ article li > p {
 
 article figure img {
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 article img {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     margin: 8px 0;
 }
 
@@ -713,14 +672,11 @@ article a[href^="#"]:hover {
 
 .callout {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-border-color);
     border-left: 4px solid var(--theme-primary-color);
     border-radius: 8px;
     padding: 12px 16px;
     margin: 16px 0;
-    box-shadow: 0 0 8px var(--theme-primary-glow);
     transition: background-color 1.5s ease, border-color 1.5s ease;
 }
 
@@ -769,13 +725,10 @@ article a[href^="#"]:hover {
 
 .article-toc {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-card-border) !important;
     border-radius: 8px;
     padding: 16px 20px;
     margin-bottom: 24px;
-    box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
     transition: background-color 1.5s ease, border-color 1.5s ease;
 }
 
@@ -965,7 +918,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 .friend-avatar {
     flex-shrink: 0;
     object-fit: cover;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
 .friend-link-item:nth-child(1) {
@@ -991,7 +943,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 
 .friend-link-item:hover {
     transform: translateX(5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 .friend-link-item:nth-child(1):hover { background: linear-gradient(135deg, rgba(139, 92, 246, 0.40), rgba(167, 139, 250, 0.22)); }
 .friend-link-item:nth-child(2):hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.40), rgba(96, 165, 250, 0.22)); }
@@ -1006,7 +957,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     overflow: hidden;
     background: linear-gradient(to bottom, #0a0e1a 0%, #1a1f2e 100%);
     border-bottom: 1px solid var(--theme-border-color);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
 }
 
 .celestial-wrapper canvas {
@@ -1026,11 +976,8 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     pointer-events: none;
     padding: 10px 18px;
     background: rgba(13, 17, 23, 0.42);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
 }
 
 .celestial-clock {
@@ -1078,8 +1025,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     gap: 8px;
     padding: 10px 20px;
     background: rgba(20, 25, 35, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(88, 166, 255, 0.3);
     border-radius: 28px;
     color: #f0f6fc;
@@ -1087,13 +1032,11 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(88, 166, 255, 0.2);
 }
 
 .mobile-toc-pill:hover, .mobile-toc-pill:focus {
     background: rgba(30, 40, 55, 0.9);
     border-color: rgba(88, 166, 255, 0.5);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(88, 166, 255, 0.35);
     outline: none;
 }
 
@@ -1113,11 +1056,8 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     left: 0;
     right: 0;
     background: rgba(20, 25, 35, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(88, 166, 255, 0.3);
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(88, 166, 255, 0.2);
     overflow: hidden;
     animation: tocPanelSlide 0.25s ease;
 }
@@ -1197,10 +1137,7 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 
 .comment-card {
     background-color: var(--theme-card-bg) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--theme-card-border) !important;
-    box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong);
     /* 光晕呼吸动画已停用：box-shadow 是逐帧重绘属性，大面积常驻动画是掉帧主因 */
     transition: background-color 1.5s ease, border-color 1.5s ease;
 }
@@ -1284,7 +1221,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     z-index: 9999;
     transform: translate(-50%, -50%);
     animation: particleBurst 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    box-shadow: 0 0 8px currentColor;
 }
 
 @keyframes particleBurst {
@@ -1376,15 +1312,12 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     height: 36px;
     border-radius: 50%;
     background: rgba(22, 27, 34, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--theme-border-color);
     color: var(--theme-icon-color);
     font-size: 16px;
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 12px var(--theme-primary-glow);
     transition: transform 0.2s, background 0.2s, box-shadow 0.2s, border-color 1.5s ease, color 1.5s ease;
     padding: 0;
     line-height: 1;
@@ -1393,7 +1326,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 #live2d-shrink-btn:hover {
     background: rgba(88, 166, 255, 0.3);
     transform: scale(1.1);
-    box-shadow: 0 0 18px rgba(88, 166, 255, 0.8);
 }
 
 /* 展开按钮（缩小后显示） */
@@ -1406,15 +1338,12 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     height: 44px;
     border-radius: 50%;
     background: rgba(22, 27, 34, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--theme-border-color);
     color: var(--theme-icon-color);
     font-size: 22px;
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 14px var(--theme-primary-glow);
     transition: transform 0.2s, background 0.2s, box-shadow 0.2s, border-color 1.5s ease, color 1.5s ease;
     padding: 0;
     line-height: 1;
@@ -1423,7 +1352,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 #live2d-expand-btn:hover {
     background: rgba(88, 166, 255, 0.3);
     transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(88, 166, 255, 0.8);
 }
 
 @media (max-width: 768px) {
@@ -1450,8 +1378,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     .bg-gray, .bg-gray-dark, .modal-content, pre,
     .accordion-item, .accordion-button, .accordion-button:not(.collapsed) {
         background-color: var(--theme-card-bg) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
     }
 
     .bg-dark, .bg-black, .bg-secondary, .bg-gray, .bg-gray-dark {
@@ -1464,7 +1390,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     .accordion-item, .accordion-button, .accordion-button:not(.collapsed),
     article, .comment-card, .article-toc {
         animation: none !important;
-        box-shadow: 0 0 12px var(--theme-primary-glow), 0 0 24px var(--theme-primary-glow-strong) !important;
         border-color: var(--theme-border-color) !important;
     }
     
@@ -1547,10 +1472,7 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s, background-color 0.3s, transform 0.3s, border-color 1.5s ease, color 1.5s ease;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     z-index: 1000;
-    box-shadow: 0 0 12px var(--theme-primary-glow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1564,7 +1486,6 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
 
 #back-to-top:hover {
     background-color: rgba(88, 166, 255, 0.8);
-    box-shadow: 0 0 16px rgba(88, 166, 255, 0.7);
     transform: translateY(-3px);
 }
 

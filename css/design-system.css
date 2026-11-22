@@ -24,7 +24,7 @@ html body {
     --ds-shadow-2: 0 6px 24px rgba(0, 0, 0, .38);
 
     /* 覆盖旧 token：中性色打底，强调色只留给链接/焦点/主按钮 */
-    --theme-bg-overlay: rgba(8, 8, 8, .86);
+    --theme-bg-overlay: rgba(8, 8, 8, .5);
     --theme-border-color: rgba(255, 255, 255, .10);
     --theme-text-color: #d4d4d4;
     --theme-text-light: #f5f5f5;
@@ -37,52 +37,10 @@ html body {
     --theme-primary-glow-strong: rgba(88, 166, 255, .18);
 }
 
-html body.theme-dawn,
-html body.theme-morning,
-html body.theme-noon,
-html body.theme-afternoon {
-    --ds-surface: #ffffff;
-    --ds-surface-2: #f7f7f8;
-    --ds-surface-3: #efeff1;
-    --ds-line: rgba(0, 0, 0, .09);
-    --ds-line-strong: rgba(0, 0, 0, .16);
-    --ds-hover: rgba(0, 0, 0, .035);
-    --ds-nav-bg: rgba(255, 255, 255, .86);
-    --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .06);
-    --ds-shadow-2: 0 8px 24px rgba(0, 0, 0, .08);
-
-    --theme-bg-overlay: rgba(255, 255, 255, .88);
-    --theme-border-color: rgba(0, 0, 0, .10);
-    --theme-text-color: #3d4450;
-    --theme-text-light: #0b0d10;
-    --theme-text-muted: #868c96;
-    --theme-card-bg: #ffffff;
-    --theme-card-border: rgba(0, 0, 0, .09);
-    --theme-code-bg: #f6f6f7;
-    --theme-icon-color: #3d4450;
-    --theme-primary-glow: rgba(0, 0, 0, .04);
-    --theme-primary-glow-strong: rgba(0, 0, 0, .06);
-}
-
-html body.theme-dusk {
-    --ds-surface: #171310;
-    --ds-surface-2: #1f1a16;
-    --ds-surface-3: #27211c;
-    --ds-line: rgba(255, 236, 214, .10);
-    --ds-line-strong: rgba(255, 236, 214, .18);
-    --ds-hover: rgba(255, 236, 214, .05);
-    --ds-nav-bg: rgba(18, 14, 11, .82);
-    --theme-bg-overlay: rgba(20, 14, 10, .84);
-    --theme-border-color: rgba(255, 236, 214, .10);
-    --theme-text-color: #ded3c6;
-    --theme-text-light: #fbf5ee;
-    --theme-text-muted: #a89886;
-    --theme-card-bg: #171310;
-    --theme-card-border: rgba(255, 236, 214, .09);
-    --theme-code-bg: #1e1915;
-}
-
-html body.theme-night {
+/* 六套时辰皮肤共用同一套中性底色，只有强调色随时辰变。
+   :is() 的特异度取参数里最高的一个：html body:is(.theme-x) = (0,1,2)，
+   高于 sidebar.css 的 body.theme-x (0,1,1)，加载顺序和特异性都不用再赌。 */
+html body:is(.theme-dawn, .theme-morning, .theme-noon, .theme-afternoon, .theme-dusk, .theme-night) {
     --ds-surface: #101010;
     --ds-surface-2: #161616;
     --ds-surface-3: #1d1d1d;
@@ -93,7 +51,7 @@ html body.theme-night {
     --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
     --ds-shadow-2: 0 6px 24px rgba(0, 0, 0, .38);
 
-    --theme-bg-overlay: rgba(8, 8, 8, .86);
+    --theme-bg-overlay: rgba(8, 8, 8, .5);
     --theme-border-color: rgba(255, 255, 255, .10);
     --theme-text-color: #d4d4d4;
     --theme-text-light: #f5f5f5;
@@ -102,6 +60,49 @@ html body.theme-night {
     --theme-card-border: rgba(255, 255, 255, .09);
     --theme-code-bg: #151515;
     --theme-icon-color: #d4d4d4;
+}
+
+/* 强调色：整套主题里唯一按时辰变化的东西 */
+html body.theme-dawn {
+    --theme-primary-color: #e8a33d;
+    --theme-accent-color: #e8a33d;
+    --theme-primary-glow: rgba(232, 163, 61, .18);
+    --theme-primary-glow-strong: rgba(232, 163, 61, .30);
+}
+
+html body.theme-morning {
+    --theme-primary-color: #5b9bd5;
+    --theme-accent-color: #5b9bd5;
+    --theme-primary-glow: rgba(91, 155, 213, .18);
+    --theme-primary-glow-strong: rgba(91, 155, 213, .30);
+}
+
+html body.theme-noon {
+    --theme-primary-color: #3a8ac4;
+    --theme-accent-color: #3a8ac4;
+    --theme-primary-glow: rgba(58, 138, 196, .18);
+    --theme-primary-glow-strong: rgba(58, 138, 196, .30);
+}
+
+html body.theme-afternoon {
+    --theme-primary-color: #6a9bc4;
+    --theme-accent-color: #6a9bc4;
+    --theme-primary-glow: rgba(106, 155, 196, .18);
+    --theme-primary-glow-strong: rgba(106, 155, 196, .30);
+}
+
+html body.theme-dusk {
+    --theme-primary-color: #d4a05a;
+    --theme-accent-color: #d4a05a;
+    --theme-primary-glow: rgba(212, 160, 90, .18);
+    --theme-primary-glow-strong: rgba(212, 160, 90, .30);
+}
+
+html body.theme-night {
+    --theme-primary-color: #58a6ff;
+    --theme-accent-color: #58a6ff;
+    --theme-primary-glow: rgba(88, 166, 255, .18);
+    --theme-primary-glow-strong: rgba(88, 166, 255, .30);
 }
 
 /* ---------- 2. 归零块：去毛玻璃、去光晕 ---------- */
