@@ -1,0 +1,709 @@
+/* ============================================================
+   design-system.css — 冷静极简视觉层
+   加载顺序：styles.css → sidebar.css → design-system.css（本文件最后）
+   只覆盖视觉，不改结构；结构类名与 --theme-* 变量名完全沿用。
+   ============================================================ */
+
+/* ---------- 1. tokens ---------- */
+/* 落在 html body 上：与 sidebar.css 的 body / body.theme-* 同层，靠后加载取胜 */
+html body {
+    --ds-font: ui-sans-serif, -apple-system, "Segoe UI Variable Text", "Segoe UI", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    --ds-radius-sm: 6px;
+    --ds-radius: 10px;
+    --ds-radius-lg: 14px;
+    --ds-ease: cubic-bezier(.2, .6, .2, 1);
+
+    --ds-surface: #101010;
+    --ds-surface-2: #161616;
+    --ds-surface-3: #1d1d1d;
+    --ds-line: rgba(255, 255, 255, .09);
+    --ds-line-strong: rgba(255, 255, 255, .16);
+    --ds-hover: rgba(255, 255, 255, .045);
+    --ds-nav-bg: rgba(10, 10, 10, .84);
+    --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
+    --ds-shadow-2: 0 6px 24px rgba(0, 0, 0, .38);
+
+    /* 覆盖旧 token：中性色打底，强调色只留给链接/焦点/主按钮 */
+    --theme-bg-overlay: rgba(8, 8, 8, .86);
+    --theme-border-color: rgba(255, 255, 255, .10);
+    --theme-text-color: #d4d4d4;
+    --theme-text-light: #f5f5f5;
+    --theme-text-muted: #8b8b8b;
+    --theme-card-bg: #101010;
+    --theme-card-border: rgba(255, 255, 255, .09);
+    --theme-code-bg: #151515;
+    --theme-icon-color: #d4d4d4;
+    --theme-primary-glow: rgba(88, 166, 255, .12);
+    --theme-primary-glow-strong: rgba(88, 166, 255, .18);
+}
+
+html body.theme-dawn,
+html body.theme-morning,
+html body.theme-noon,
+html body.theme-afternoon {
+    --ds-surface: #ffffff;
+    --ds-surface-2: #f7f7f8;
+    --ds-surface-3: #efeff1;
+    --ds-line: rgba(0, 0, 0, .09);
+    --ds-line-strong: rgba(0, 0, 0, .16);
+    --ds-hover: rgba(0, 0, 0, .035);
+    --ds-nav-bg: rgba(255, 255, 255, .86);
+    --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .06);
+    --ds-shadow-2: 0 8px 24px rgba(0, 0, 0, .08);
+
+    --theme-bg-overlay: rgba(255, 255, 255, .88);
+    --theme-border-color: rgba(0, 0, 0, .10);
+    --theme-text-color: #3d4450;
+    --theme-text-light: #0b0d10;
+    --theme-text-muted: #868c96;
+    --theme-card-bg: #ffffff;
+    --theme-card-border: rgba(0, 0, 0, .09);
+    --theme-code-bg: #f6f6f7;
+    --theme-icon-color: #3d4450;
+    --theme-primary-glow: rgba(0, 0, 0, .04);
+    --theme-primary-glow-strong: rgba(0, 0, 0, .06);
+}
+
+html body.theme-dusk {
+    --ds-surface: #171310;
+    --ds-surface-2: #1f1a16;
+    --ds-surface-3: #27211c;
+    --ds-line: rgba(255, 236, 214, .10);
+    --ds-line-strong: rgba(255, 236, 214, .18);
+    --ds-hover: rgba(255, 236, 214, .05);
+    --ds-nav-bg: rgba(18, 14, 11, .82);
+    --theme-bg-overlay: rgba(20, 14, 10, .84);
+    --theme-border-color: rgba(255, 236, 214, .10);
+    --theme-text-color: #ded3c6;
+    --theme-text-light: #fbf5ee;
+    --theme-text-muted: #a89886;
+    --theme-card-bg: #171310;
+    --theme-card-border: rgba(255, 236, 214, .09);
+    --theme-code-bg: #1e1915;
+}
+
+html body.theme-night {
+    --ds-surface: #101010;
+    --ds-surface-2: #161616;
+    --ds-surface-3: #1d1d1d;
+    --ds-line: rgba(255, 255, 255, .09);
+    --ds-line-strong: rgba(255, 255, 255, .16);
+    --ds-hover: rgba(255, 255, 255, .045);
+    --ds-nav-bg: rgba(10, 10, 10, .84);
+    --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
+    --ds-shadow-2: 0 6px 24px rgba(0, 0, 0, .38);
+
+    --theme-bg-overlay: rgba(8, 8, 8, .86);
+    --theme-border-color: rgba(255, 255, 255, .10);
+    --theme-text-color: #d4d4d4;
+    --theme-text-light: #f5f5f5;
+    --theme-text-muted: #8b8b8b;
+    --theme-card-bg: #101010;
+    --theme-card-border: rgba(255, 255, 255, .09);
+    --theme-code-bg: #151515;
+    --theme-icon-color: #d4d4d4;
+}
+
+/* ---------- 2. 归零块：去毛玻璃、去光晕 ---------- */
+/* 本层不用投影表达层次：层次只靠 1px 线与底色差。
+   需要投影时在白名单里重新声明 --ds-shadow-*，不要放开成通配。 */
+/* :not(#ds-no-shadow) 只是把特异度抬到 (1,0,0) 的哨兵，匹配的是「除这个不存在的 id 之外的所有元素」，
+   这样 !important 才压得住 sidebar.css 里 .card / .list-group-item.bg-dark / 媒体查询里的同类 !important。
+   不用纯 * 的原因：* 的特异度是 (0,0,0)，任何带类的 !important 都能反过来赢它。 */
+*:not(#ds-no-shadow),
+*:not(#ds-no-shadow)::before,
+*:not(#ds-no-shadow)::after {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* ---------- 3. 基底 ---------- */
+body {
+    font-family: var(--ds-font) !important;
+    font-size: 16px;
+    line-height: 1.7;
+    letter-spacing: 0;
+    color: var(--theme-text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* 背景插画压暗：遮罩必须叠进 background 图层。
+   sidebar.css 里 body::before 是 z-index:-1，会画在 body 自身背景之下，实际遮不住插画。 */
+body {
+    background-image:
+        linear-gradient(var(--theme-bg-overlay), var(--theme-bg-overlay)),
+        url('../assets/background.webp') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    background-color: var(--ds-surface) !important;
+}
+
+body::before {
+    background-color: transparent !important;
+}
+
+/* 字号标尺：display 40 / h1 32 / h2 24 / h3 19 / 正文 16·1.7 / meta 13 */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--ds-font) !important;
+    color: var(--theme-text-light);
+    letter-spacing: -.02em;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+h1.fw-bolder {
+    font-size: 2.5rem;
+    line-height: 1.15;
+    letter-spacing: -.03em;
+}
+
+p, li, td, th {
+    color: var(--theme-text-color);
+}
+
+a {
+    color: var(--theme-primary-color);
+    text-decoration: none;
+    transition: opacity .15s var(--ds-ease);
+}
+
+a:hover {
+    opacity: .8;
+}
+
+::selection {
+    background: var(--theme-primary-color);
+    color: #0a0a0a;
+}
+
+:focus-visible {
+    outline: 2px solid var(--theme-primary-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--ds-line-strong);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-text-muted);
+    background-clip: padding-box;
+}
+
+.text-muted {
+    color: var(--theme-text-muted) !important;
+}
+
+/* ---------- 4. 导航 ---------- */
+.navbar,
+.navbar-dark {
+    background-color: var(--ds-nav-bg) !important;
+    border-bottom: 1px solid var(--ds-line) !important;
+    border-top: 0 !important;
+    min-height: 56px;
+    padding: .5rem 1rem;
+}
+
+.navbar-brand {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--theme-text-light) !important;
+}
+
+.nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--theme-text-muted) !important;
+    padding: .35rem .7rem !important;
+    border-radius: var(--ds-radius-sm);
+    transition: color .15s var(--ds-ease), background-color .15s var(--ds-ease);
+}
+
+.nav-link:hover {
+    color: var(--theme-text-light) !important;
+    background-color: var(--ds-hover);
+    opacity: 1;
+}
+
+.nav-link.active {
+    color: var(--theme-text-light) !important;
+}
+
+.navbar-toggler {
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius-sm);
+    padding: .3rem .5rem;
+}
+
+#open-sidebar-btn {
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius-sm) !important;
+    color: var(--theme-text-color) !important;
+    background: transparent !important;
+    font-size: 13px;
+    padding: .3rem .6rem !important;
+}
+
+#open-sidebar-btn:hover {
+    background: var(--ds-hover) !important;
+    color: var(--theme-text-light) !important;
+}
+
+/* ---------- 5. 侧栏 ---------- */
+#sidebar {
+    background-color: var(--ds-surface) !important;
+    border-right: 1px solid var(--ds-line) !important;
+    box-shadow: none !important;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid var(--ds-line) !important;
+    padding: 16px 18px;
+}
+
+.sidebar-header h5,
+.sidebar-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+}
+
+.sidebar a,
+.sidebar .list-group-item {
+    border: 0 !important;
+    border-radius: var(--ds-radius-sm) !important;
+    background: transparent !important;
+    color: var(--theme-text-color) !important;
+    font-size: 14px;
+    padding: .5rem .7rem;
+    margin-bottom: 2px;
+    transition: background-color .15s var(--ds-ease), color .15s var(--ds-ease);
+}
+
+.sidebar a:hover,
+.sidebar .list-group-item:hover {
+    background: var(--ds-hover) !important;
+    color: var(--theme-text-light) !important;
+}
+
+/* ---------- 6. 面 / 卡片 ---------- */
+.card,
+.card-header,
+.card-body,
+.card-footer,
+.list-group-item,
+.modal-content,
+.accordion-item,
+.comment-card,
+.article-toc,
+.celestial-info {
+    background-color: var(--ds-surface) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius-lg) !important;
+    transition: border-color .18s var(--ds-ease), background-color .18s var(--ds-ease);
+}
+
+.card,
+.accordion-item {
+    overflow: hidden;
+}
+
+.card:hover {
+    border-color: var(--ds-line-strong) !important;
+}
+
+.card-header {
+    border: 0 !important;
+    border-bottom: 1px solid var(--ds-line) !important;
+    border-radius: 0 !important;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    color: var(--theme-text-muted) !important;
+    background-color: transparent !important;
+}
+
+.card-body {
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 20px;
+}
+
+article {
+    background-color: var(--ds-surface) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius-lg) !important;
+    padding: 32px !important;
+    box-shadow: none !important;
+}
+
+footer {
+    background-color: var(--ds-surface) !important;
+    border-top: 1px solid var(--ds-line) !important;
+    color: var(--theme-text-muted);
+}
+
+pre,
+code,
+kbd {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+pre {
+    background-color: var(--theme-code-bg) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius) !important;
+    padding: 16px 18px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    overflow-x: auto;
+}
+
+code {
+    color: var(--theme-title-code, var(--theme-text-light));
+    background: transparent;
+    font-size: .92em;
+}
+
+p code,
+li code,
+td code {
+    background: var(--theme-code-bg);
+    border: 1px solid var(--ds-line);
+    border-radius: 5px;
+    padding: .1em .35em;
+}
+
+/* ---------- 6b. 组合类清场 ---------- */
+/* sidebar.css 用 .list-group-item.bg-dark（0,2,0 + !important）把文章列表做成玻璃卡，
+   这里用同等特异度 + 更晚加载压回去，并且连 hover 一起收。 */
+.card.bg-dark,
+.card.bg-black,
+.card.bg-secondary,
+.card.bg-gray,
+.card.bg-gray-dark,
+.list-group-item.bg-dark,
+.list-group-item.bg-black,
+.list-group-item.bg-secondary,
+.list-group-item.bg-gray,
+.list-group-item.bg-gray-dark,
+.modal-content.bg-dark,
+pre.bg-dark,
+article.bg-dark {
+    background-color: var(--ds-surface) !important;
+    border: 1px solid var(--ds-line) !important;
+}
+
+.card.bg-dark:hover,
+.card.bg-black:hover,
+.card.bg-gray:hover,
+.card.bg-gray-dark:hover,
+.list-group-item.bg-dark:hover,
+.list-group-item.bg-black:hover,
+.list-group-item.bg-secondary:hover,
+.list-group-item.bg-gray:hover,
+.list-group-item.bg-gray-dark:hover,
+.modal-content.bg-dark:hover,
+article.bg-dark:hover {
+    background-color: var(--ds-surface-2) !important;
+    border-color: var(--ds-line-strong) !important;
+}
+
+/* ---------- 7. 按钮 / 表单 / 徽章 ---------- */
+.btn {
+    border-radius: var(--ds-radius-sm) !important;
+    font-size: 14px;
+    font-weight: 500;
+    padding: .45rem .9rem;
+    border: 1px solid var(--ds-line) !important;
+    background: transparent;
+    color: var(--theme-text-color);
+    transition: background-color .15s var(--ds-ease), border-color .15s var(--ds-ease), color .15s var(--ds-ease);
+}
+
+.btn:hover {
+    background: var(--ds-hover);
+    color: var(--theme-text-light);
+    border-color: var(--ds-line-strong) !important;
+}
+
+.btn-primary {
+    background: var(--theme-primary-color) !important;
+    border-color: var(--theme-primary-color) !important;
+    color: #0a0a0a !important;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.08);
+    color: #0a0a0a !important;
+}
+
+.btn-outline-light {
+    border-color: var(--ds-line) !important;
+    color: var(--theme-text-color) !important;
+}
+
+.btn-outline-light:hover {
+    background: var(--ds-hover) !important;
+    color: var(--theme-text-light) !important;
+}
+
+.form-control,
+textarea {
+    background-color: var(--ds-surface-2) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius) !important;
+    color: var(--theme-text-light) !important;
+    font-size: 14px;
+    padding: .55rem .8rem;
+    transition: border-color .15s var(--ds-ease);
+}
+
+.form-control::placeholder,
+textarea::placeholder {
+    color: var(--theme-text-muted) !important;
+}
+
+.form-control:focus,
+textarea:focus {
+    border-color: var(--theme-primary-color) !important;
+    outline: 2px solid var(--theme-primary-color);
+    outline-offset: 1px;
+}
+
+.badge {
+    border-radius: 999px !important;
+    border: 1px solid var(--ds-line) !important;
+    background: transparent !important;
+    color: var(--theme-text-muted) !important;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: .3em .7em;
+}
+
+.badge:hover {
+    color: var(--theme-text-light) !important;
+    border-color: var(--ds-line-strong) !important;
+}
+
+.accordion-button {
+    background: transparent !important;
+    color: var(--theme-text-light) !important;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.accordion-button::after {
+    filter: none;
+}
+
+/* ---------- 8. 首屏 ------ */
+.celestial-wrapper {
+    border-bottom: 1px solid var(--ds-line);
+}
+
+.celestial-info {
+    background-color: var(--ds-surface) !important;
+    border-radius: var(--ds-radius) !important;
+    padding: 12px 16px;
+    color: var(--theme-text-color);
+}
+
+.celestial-clock {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--theme-text-light);
+}
+
+.celestial-phase {
+    font-size: 12.5px;
+    color: var(--theme-text-muted);
+    line-height: 1.6;
+}
+
+/* ---------- 9. 文章排版 ---------- */
+#article-content,
+article > section {
+    max-width: 70ch;
+}
+
+#article-content h1,
+#article-content h2,
+#article-content h3,
+#article-content h4 {
+    color: var(--theme-text-light) !important;
+    margin-top: 2.5em;
+    margin-bottom: .7em;
+    scroll-margin-top: 80px;
+}
+
+#article-content h1 { font-size: 2rem; margin-top: 0; }
+#article-content h2 { font-size: 1.5rem; padding-bottom: .35em; border-bottom: 1px solid var(--ds-line); }
+#article-content h3 { font-size: 1.18rem; }
+#article-content h4 { font-size: 1rem; }
+
+#article-content p,
+#article-content li {
+    color: var(--theme-text-color) !important;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+#article-content p {
+    margin-bottom: 1.1em;
+}
+
+#article-content ul,
+#article-content ol {
+    padding-left: 1.4em;
+    margin-bottom: 1.1em;
+}
+
+#article-content li {
+    margin-bottom: .35em;
+}
+
+#article-content img {
+    border-radius: var(--ds-radius);
+    border: 1px solid var(--ds-line);
+    max-width: 100%;
+    height: auto;
+}
+
+#article-content a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: var(--theme-primary-glow-strong);
+}
+
+#article-content blockquote {
+    margin: 1.4em 0;
+    padding: .2em 1.1em;
+    border-left: 2px solid var(--theme-primary-color);
+    background: var(--ds-surface-2);
+    border-radius: 0 var(--ds-radius) var(--ds-radius) 0;
+    color: var(--theme-text-muted);
+}
+
+#article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.4em 0;
+    font-size: 14px;
+}
+
+#article-content th,
+#article-content td {
+    border: 0 !important;
+    border-bottom: 1px solid var(--ds-line) !important;
+    padding: .6em .8em;
+    text-align: left;
+}
+
+#article-content th {
+    color: var(--theme-text-light);
+    font-weight: 600;
+    border-bottom-color: var(--ds-line-strong) !important;
+}
+
+#article-content hr {
+    border: 0;
+    border-top: 1px solid var(--ds-line);
+    margin: 2.4em 0;
+}
+
+/* ---------- 10. 提示块 / 评论 / 目录 ---------- */
+.callout {
+    background-color: var(--ds-surface-2) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-left: 2px solid var(--theme-primary-color) !important;
+    border-radius: var(--ds-radius) !important;
+    padding: 14px 18px;
+}
+
+.article-toc {
+    padding: 16px 18px;
+}
+
+.article-toc a {
+    display: block;
+    padding: .3rem 0;
+    font-size: 13.5px;
+    color: var(--theme-text-muted);
+}
+
+.article-toc a:hover {
+    color: var(--theme-text-light);
+}
+
+.comment-card {
+    padding: 16px 18px;
+}
+
+#back-to-top {
+    background-color: var(--ds-surface) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-radius: 999px !important;
+    color: var(--theme-text-color) !important;
+}
+
+#back-to-top:hover {
+    border-color: var(--ds-line-strong) !important;
+    color: var(--theme-text-light) !important;
+}
+
+#live2d-shrink-btn,
+#live2d-expand-btn {
+    background-color: var(--ds-surface) !important;
+    border: 1px solid var(--ds-line) !important;
+    border-radius: var(--ds-radius-sm) !important;
+    color: var(--theme-text-muted) !important;
+}
+
+/* ---------- 11. 响应式 ---------- */
+@media (max-width: 991px) {
+    article {
+        padding: 20px !important;
+        border-radius: var(--ds-radius) !important;
+    }
+
+    #article-content h1 { font-size: 1.6rem; }
+    #article-content h2 { font-size: 1.3rem; }
+
+    .navbar {
+        min-height: 52px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
