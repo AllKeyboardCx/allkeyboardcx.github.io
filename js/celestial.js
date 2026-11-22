@@ -496,13 +496,27 @@
         }
     }
 
+    let rafId = null;
+    let lastFrameTime = 0;
+
     function loop(t) {
+        rafId = requestAnimationFrame(loop);
+        if (t - lastFrameTime < 33) return;   // 限帧 30fps
+        lastFrameTime = t;
         render(t);
-        requestAnimationFrame(loop);
     }
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        } else if (!rafId) {
+            lastFrameTime = 0;
+            rafId = requestAnimationFrame(loop);
+        }
+    });
 
     window.addEventListener('resize', () => { resize(); });
     resize();
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
     getCelestialData().then(data => { celestialData = data; });
 })();

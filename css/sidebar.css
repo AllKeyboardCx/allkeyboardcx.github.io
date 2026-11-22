@@ -21,7 +21,7 @@
 }
 
 body {
-    background-image: url('../assets/background.jpg') !important;
+    background-image: url('../assets/background.webp') !important;
     background-color: #0d1117 !important;
     background-size: cover !important;
     background-position: center !important;
@@ -1469,7 +1469,7 @@ body.theme-afternoon .scrollable-list-container::-webkit-scrollbar-thumb:hover {
     }
     
     html, body {
-        background-image: url('../assets/background.jpg') !important;
+        background-image: url('../assets/background.webp') !important;
         background-color: #0d1117 !important;
         background-size: cover !important;
         background-position: center !important;

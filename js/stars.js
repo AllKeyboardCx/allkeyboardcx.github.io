@@ -5,6 +5,10 @@
         return;
     }
 
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+
     const canvas = document.createElement('canvas');
     canvas.id = 'starfield-canvas';
     canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;';
@@ -183,10 +187,16 @@
         }
     }
 
-    function animate() {
+    let rafId = null;
+    let lastFrameTime = 0;
+
+    function animate(now) {
+        rafId = requestAnimationFrame(animate);
+        now = now || (window.performance ? performance.now() : Date.now());
+        if (now - lastFrameTime < 33) return;   // 限帧 30fps
+        lastFrameTime = now;
         update();
         draw();
-        requestAnimationFrame(animate);
     }
 
     window.addEventListener('resize', resize);
@@ -209,9 +219,14 @@
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             visibilityChanged = true;
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        } else if (!rafId) {
+            visibilityChanged = true;
+            lastFrameTime = 0;
+            rafId = requestAnimationFrame(animate);
         }
     });
 
     resize();
-    animate();
+    rafId = requestAnimationFrame(animate);
 })();

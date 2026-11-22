@@ -585,7 +585,7 @@ function initBirds() {
         }
     }
     
-    setInterval(checkSleepSchedule, 1000);
+    setInterval(checkSleepSchedule, 30000);
     
     function setupMidnightUpdate() {
         const now = new Date();

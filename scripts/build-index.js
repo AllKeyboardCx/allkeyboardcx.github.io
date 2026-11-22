@@ -10,7 +10,7 @@ function convertObsidianImages(content) {
         const width = parts[1] ? parts[1].trim() : '';
 
         if (width) {
-            return `<img src="../pictures/${filename}" width="${width}" alt="${filename}">`;
+            return `<img src="../pictures/${filename}" width="${width}" alt="${filename}" loading="lazy" decoding="async">`;
         }
         return `![${filename}](<../pictures/${filename}>)`;
     });
