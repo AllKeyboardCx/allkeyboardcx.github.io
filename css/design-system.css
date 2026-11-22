@@ -10,7 +10,7 @@ html body {
     --ds-font: ui-sans-serif, -apple-system, "Segoe UI Variable Text", "Segoe UI", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
     --ds-radius-sm: 6px;
     --ds-radius: 10px;
-    --ds-radius-lg: 14px;
+    --ds-radius-lg: 12px;
     --ds-ease: cubic-bezier(.2, .6, .2, 1);
 
     --ds-surface: #101010;
@@ -131,21 +131,36 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* 背景插画压暗：遮罩必须叠进 background 图层。
-   sidebar.css 里 body::before 是 z-index:-1，会画在 body 自身背景之下，实际遮不住插画。 */
+/* 背景插画：全站只剩这一层，固定铺满视口，滚到哪儿都连续。
+   以前插画挂在 body 上（background-attachment: fixed），上面还压着一条不透明的天空带，
+   两个图层交界就是那条「断层」硬边。现在拆成「页面底色 + 一个固定底层伪元素」：
+   -2 层放插画，-1 层留给星星画布，正文永远在最上面。 */
+html {
+    background-image: none !important;
+}
+
 body {
-    background-image:
-        linear-gradient(var(--theme-bg-overlay), var(--theme-bg-overlay)),
-        url('../assets/background.webp') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
+    background-image: none !important;
     background-color: var(--ds-surface) !important;
 }
 
 body::before {
     background-color: transparent !important;
+    background-image: none !important;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-image:
+        linear-gradient(var(--theme-bg-overlay), var(--theme-bg-overlay)),
+        url('../assets/background.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 /* 字号标尺：display 40 / h1 32 / h2 24 / h3 19 / 正文 16·1.7 / meta 13 */
@@ -349,7 +364,7 @@ a:hover {
 .card-body {
     border: 0 !important;
     border-radius: 0 !important;
-    padding: 20px;
+    padding: 18px;
 }
 
 article {
@@ -494,19 +509,24 @@ textarea:focus {
     outline-offset: 1px;
 }
 
-.badge {
+/* 标签云：默认只留一层很浅的底色，边框浮到 hover 才出现 */
+.badge,
+.badge.bg-secondary {
     border-radius: 999px !important;
-    border: 1px solid var(--ds-line) !important;
-    background: transparent !important;
+    border: 1px solid transparent !important;
+    background: rgba(255, 255, 255, .05) !important;
     color: var(--theme-text-muted) !important;
     font-size: 12.5px;
     font-weight: 500;
     padding: .3em .7em;
+    transition: background-color .15s var(--ds-ease), border-color .15s var(--ds-ease), color .15s var(--ds-ease);
 }
 
-.badge:hover {
+.badge:hover,
+.badge.bg-secondary:hover {
     color: var(--theme-text-light) !important;
     border-color: var(--ds-line-strong) !important;
+    background: rgba(255, 255, 255, .08) !important;
 }
 
 .accordion-button {
@@ -521,8 +541,15 @@ textarea:focus {
 }
 
 /* ---------- 8. 首屏 ------ */
+/* 天空带：去掉那条硬底边，canvas 上下各渐隐一截，和页面背景自然接上 */
 .celestial-wrapper {
-    border-bottom: 1px solid var(--ds-line);
+    border-bottom: 0 !important;
+    background: transparent !important;
+}
+
+.celestial-wrapper canvas {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 48px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 48px), transparent 100%);
 }
 
 .celestial-info {
