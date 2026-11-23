@@ -116,14 +116,20 @@
                             <span class="text-muted">加载中...</span>
                         </div>
                     </div>
-                    <div class="card mb-4 bg-dark border-gray sticky-toc d-none d-lg-block">
-                        <div class="card-header text-light">📑 文章目录</div>
+                    <div id="toc-float" class="card mb-4 bg-dark border-gray sticky-toc d-none d-lg-block">
+                        <div class="card-header text-light toc-float-head">
+                            <span>📑 文章目录</span>
+                            <button type="button" id="toc-close" class="toc-close" aria-label="收起目录" title="收起目录">✕</button>
+                        </div>
                         <div class="card-body">
                             <div class="scrollable-list-container" id="article-toc-container">
                                 <span class="text-muted">加载中...</span>
                             </div>
                         </div>
                     </div>
+                    <button type="button" id="toc-tab" class="toc-tab" aria-label="展开文章目录" title="展开目录">
+                        <span>📑</span><span>目录</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -487,7 +493,12 @@
                             document.getElementById('article-toc-container').innerHTML = toc;
                             document.getElementById('mobile-toc-container').innerHTML = toc;
                         } else {
-                            document.getElementById('article-toc-container').innerHTML = '<span class="text-muted">暂无目录</span>';
+                            // 没有标题就不留空浮窗
+                            const emptyFloat = document.getElementById('toc-float');
+                            const emptyTab = document.getElementById('toc-tab');
+                            if (emptyFloat) emptyFloat.remove();
+                            if (emptyTab) emptyTab.remove();
+                            // 手机端小岛保留提示文字
                             document.getElementById('mobile-toc-container').innerHTML = '<span class="text-muted">暂无目录</span>';
                         }
 
@@ -572,6 +583,26 @@
                     mobileTocIsland.classList.remove('expanded');
                 }
             });
+
+            /* 桌面目录浮窗：默认展开，✕ 收起，右边缘标签再展开，Esc 也能收起 */
+            const tocFloat = document.getElementById('toc-float');
+            const tocTab = document.getElementById('toc-tab');
+            const tocClose = document.getElementById('toc-close');
+            const tocWide = window.matchMedia('(min-width: 1200px)');
+
+            function setTocOpen(open) {
+                if (!tocFloat) return;
+                tocFloat.classList.toggle('is-hidden', !open);
+                if (tocTab) tocTab.classList.toggle('is-on', !open && tocWide.matches);
+            }
+
+            if (tocClose) tocClose.addEventListener('click', function() { setTocOpen(false); });
+            if (tocTab) tocTab.addEventListener('click', function() { setTocOpen(true); });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') setTocOpen(false);
+            });
+            tocWide.addEventListener('change', function() { setTocOpen(true); });
+            setTocOpen(true);
         });
 
         function generateAvatar(username) {
