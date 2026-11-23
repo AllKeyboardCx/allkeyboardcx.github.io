@@ -132,8 +132,8 @@ html body.theme-night {
 /* ---------- 3. 基底 ---------- */
 body {
     font-family: var(--ds-font) !important;
-    font-size: 17px;
-    line-height: 1.75;
+    font-size: 16px;
+    line-height: 1.7;
     letter-spacing: 0;
     color: var(--theme-text-color);
     -webkit-font-smoothing: antialiased;
@@ -193,7 +193,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1.fw-bolder {
-    font-size: 2.5rem;
+    font-size: 2.125rem;
     line-height: 1.15;
     letter-spacing: -.03em;
     font-weight: 650;
@@ -337,7 +337,7 @@ a:hover {
     border-radius: var(--ds-radius-sm) !important;
     color: var(--theme-text-color) !important;
     background: transparent !important;
-    font-size: 13px;
+    font-size: 14px;
     padding: .3rem .6rem !important;
 }
 
@@ -361,7 +361,7 @@ a:hover {
 .sidebar-header h5,
 .sidebar-title {
     font-family: var(--ds-mono) !important;
-    font-size: 12.5px;
+    font-size: 13.5px;
     font-weight: 500;
     letter-spacing: .08em;
     text-transform: uppercase;
@@ -381,7 +381,7 @@ a:hover {
     border-radius: var(--ds-radius-sm) !important;
     background: transparent !important;
     color: var(--theme-text-color) !important;
-    font-size: 15px;
+    font-size: 15.5px;
     padding: .5rem .7rem;
     margin-bottom: 2px;
     transition: background-color .15s var(--ds-ease), color .15s var(--ds-ease);
@@ -423,7 +423,7 @@ a:hover {
     border-radius: 0 !important;
     padding: 12px 20px;
     font-family: var(--ds-mono) !important;
-    font-size: 12.5px;
+    font-size: 13.5px;
     font-weight: 500;
     letter-spacing: .08em;
     text-transform: uppercase;
@@ -444,7 +444,7 @@ a:hover {
     border-radius: 0 !important;
     background-color: transparent !important;
     padding: 12px 20px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .card-body {
@@ -457,7 +457,7 @@ article {
     background-color: var(--ds-surface) !important;
     border: 1px solid var(--ds-line) !important;
     border-radius: var(--ds-radius-lg) !important;
-    padding: 40px !important;
+    padding: 32px !important;
     box-shadow: none !important;
 }
 
@@ -465,7 +465,7 @@ footer {
     background-color: transparent !important;
     border-top: 1px solid var(--ds-line) !important;
     color: var(--theme-text-muted);
-    font-size: 13px;
+    font-size: 13.5px;
 }
 
 pre,
@@ -603,7 +603,7 @@ textarea:focus {
     border: 1px solid transparent !important;
     background: rgba(255, 255, 255, .05) !important;
     color: var(--theme-text-muted) !important;
-    font-size: 13.5px;
+    font-size: 14.5px;
     font-weight: 500;
     padding: .32em .72em;
     transition: background-color .15s var(--ds-ease), border-color .15s var(--ds-ease), color .15s var(--ds-ease);
@@ -671,9 +671,10 @@ textarea:focus {
 }
 
 /* ---------- 9. 文章排版 ---------- */
+/* 正文不再限宽：宽度交给栅格，长文在宽屏上铺满左栏 */
 #article-content,
 article > section {
-    max-width: 70ch;
+    max-width: none;
 }
 
 #article-content h1,
@@ -686,16 +687,16 @@ article > section {
     scroll-margin-top: 80px;
 }
 
-#article-content h1 { font-size: 2.25rem; margin-top: 0; }
-#article-content h2 { font-size: 1.65rem; padding-bottom: .35em; border-bottom: 1px solid var(--ds-line); }
-#article-content h3 { font-size: 1.3rem; }
-#article-content h4 { font-size: 1.1rem; }
+#article-content h1 { font-size: 2rem; margin-top: 0; }
+#article-content h2 { font-size: 1.5rem; padding-bottom: .35em; border-bottom: 1px solid var(--ds-line); }
+#article-content h3 { font-size: 1.18rem; }
+#article-content h4 { font-size: 1rem; }
 
 #article-content p,
 #article-content li {
     color: var(--theme-text-color) !important;
-    font-size: 17px;
-    line-height: 1.75;
+    font-size: 16px;
+    line-height: 1.7;
 }
 
 #article-content p {
@@ -777,7 +778,7 @@ article > section {
 .article-toc a {
     display: block;
     padding: .3rem 0;
-    font-size: 13.5px;
+    font-size: 14.5px;
     color: var(--theme-text-muted);
 }
 
@@ -824,11 +825,11 @@ html body .text-light {
 }
 
 .text-sm {
-    font-size: 13.5px;
+    font-size: 14px;
 }
 
 .text-xs {
-    font-size: 12.5px;
+    font-size: 13px;
     letter-spacing: .04em;
 }
 
@@ -845,7 +846,7 @@ html body .text-light {
 /* 表头等宽：读起来像数据而不是散文 */
 th {
     font-family: var(--ds-mono);
-    font-size: 12.5px;
+    font-size: 13.5px;
     letter-spacing: .02em;
     font-weight: 500;
 }
@@ -853,7 +854,7 @@ th {
 /* ---------- 11. 响应式 ---------- */
 @media (max-width: 991px) {
     article {
-        padding: 24px !important;
+        padding: 20px !important;
         border-radius: var(--ds-radius) !important;
     }
 
@@ -873,4 +874,44 @@ th {
         animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
     }
+}
+
+/* 首页统计数字：跟随组件放大，不跟正文 */
+#home-stat-articles,
+#home-stat-views,
+#home-stat-days {
+    font-size: 1.25rem;
+    line-height: 1.3;
+}
+
+/* ---------- 9b. 文章信息头（标题 / 日期 / 阅读量 / 标签 / 摘要） ---------- */
+#article-content .article-title {
+    margin: 0 0 .6rem;
+    font-size: 1.9rem;
+    line-height: 1.3;
+}
+
+#article-content .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem .75rem;
+    margin-bottom: 1.1rem;
+    font-family: var(--ds-mono);
+    font-size: 12.5px;
+    letter-spacing: .02em;
+    color: var(--theme-text-muted);
+}
+
+#article-content .article-meta .badge {
+    font-size: 12.5px;
+}
+
+#article-content .article-summary {
+    margin: 0 0 1.8rem;
+    padding-left: 14px;
+    border-left: 2px solid var(--ds-line);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--theme-text-muted);
 }
