@@ -8,58 +8,68 @@
 /* 落在 html body 上：与 sidebar.css 的 body / body.theme-* 同层，靠后加载取胜 */
 html body {
     --ds-font: ui-sans-serif, -apple-system, "Segoe UI Variable Text", "Segoe UI", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    /* 系统等宽栈：Windows 有 Cascadia / Consolas，不额外拉字体，零请求 */
+    --ds-mono: ui-monospace, "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     --ds-radius-sm: 6px;
     --ds-radius: 10px;
-    --ds-radius-lg: 12px;
+    --ds-radius-lg: 14px;
     --ds-ease: cubic-bezier(.2, .6, .2, 1);
 
-    --ds-surface: #101010;
-    --ds-surface-2: #161616;
-    --ds-surface-3: #1d1d1d;
-    --ds-line: rgba(255, 255, 255, .09);
+    /* 关键反转：页面底色比卡片更暗。卡片是「亮于底色」的半透明面，
+       不再是和页面同值的黑板子 —— 这才是大块黑色的根因。 */
+    --ds-bg: #08090a;
+    --ds-grid: rgba(255, 255, 255, .03);
+    --ds-surface: rgba(10, 12, 14, .55);
+    --ds-surface-2: rgba(255, 255, 255, .055);
+    --ds-surface-3: rgba(255, 255, 255, .08);
+    --ds-surface-solid: #0d0e10;
+    --ds-line: rgba(255, 255, 255, .075);
     --ds-line-strong: rgba(255, 255, 255, .16);
-    --ds-hover: rgba(255, 255, 255, .045);
-    --ds-nav-bg: rgba(10, 10, 10, .84);
+    --ds-hover: rgba(255, 255, 255, .05);
+    --ds-nav-bg: rgba(8, 9, 10, .82);
     --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
     --ds-shadow-2: 0 6px 24px rgba(0, 0, 0, .38);
 
-    /* 覆盖旧 token：中性色打底，强调色只留给链接/焦点/主按钮 */
-    --theme-bg-overlay: rgba(8, 8, 8, .5);
-    --theme-border-color: rgba(255, 255, 255, .10);
-    --theme-text-color: #d4d4d4;
-    --theme-text-light: #f5f5f5;
-    --theme-text-muted: #8b8b8b;
-    --theme-card-bg: #101010;
-    --theme-card-border: rgba(255, 255, 255, .09);
-    --theme-code-bg: #151515;
-    --theme-icon-color: #d4d4d4;
-    --theme-primary-glow: rgba(88, 166, 255, .12);
-    --theme-primary-glow-strong: rgba(88, 166, 255, .18);
+    /* 覆盖旧 token：中性色打底，强调色只留给链接/焦点/主按钮/面板前缀 */
+    --theme-bg-overlay: rgba(4, 5, 6, .72);
+    --theme-border-color: rgba(255, 255, 255, .075);
+    --theme-text-color: #c8ccd0;
+    --theme-text-light: #f2f4f6;
+    --theme-text-muted: #7f858b;
+    --theme-card-bg: rgba(10, 12, 14, .55);
+    --theme-card-border: rgba(255, 255, 255, .075);
+    --theme-code-bg: rgba(255, 255, 255, .05);
+    --theme-icon-color: #c8ccd0;
+    --theme-primary-glow: rgba(88, 166, 255, .10);
+    --theme-primary-glow-strong: rgba(88, 166, 255, .16);
 }
 
 /* 六套时辰皮肤共用同一套中性底色，只有强调色随时辰变。
    :is() 的特异度取参数里最高的一个：html body:is(.theme-x) = (0,1,2)，
    高于 sidebar.css 的 body.theme-x (0,1,1)，加载顺序和特异性都不用再赌。 */
 html body:is(.theme-dawn, .theme-morning, .theme-noon, .theme-afternoon, .theme-dusk, .theme-night) {
-    --ds-surface: #101010;
-    --ds-surface-2: #161616;
-    --ds-surface-3: #1d1d1d;
-    --ds-line: rgba(255, 255, 255, .09);
+    --ds-bg: #08090a;
+    --ds-grid: rgba(255, 255, 255, .03);
+    --ds-surface: rgba(10, 12, 14, .55);
+    --ds-surface-2: rgba(255, 255, 255, .055);
+    --ds-surface-3: rgba(255, 255, 255, .08);
+    --ds-surface-solid: #0d0e10;
+    --ds-line: rgba(255, 255, 255, .075);
     --ds-line-strong: rgba(255, 255, 255, .16);
-    --ds-hover: rgba(255, 255, 255, .045);
-    --ds-nav-bg: rgba(10, 10, 10, .84);
+    --ds-hover: rgba(255, 255, 255, .05);
+    --ds-nav-bg: rgba(8, 9, 10, .82);
     --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
     --ds-shadow-2: 0 6px 24px rgba(0, 0, 0, .38);
 
-    --theme-bg-overlay: rgba(8, 8, 8, .5);
-    --theme-border-color: rgba(255, 255, 255, .10);
-    --theme-text-color: #d4d4d4;
-    --theme-text-light: #f5f5f5;
-    --theme-text-muted: #8b8b8b;
-    --theme-card-bg: #101010;
-    --theme-card-border: rgba(255, 255, 255, .09);
-    --theme-code-bg: #151515;
-    --theme-icon-color: #d4d4d4;
+    --theme-bg-overlay: rgba(4, 5, 6, .72);
+    --theme-border-color: rgba(255, 255, 255, .075);
+    --theme-text-color: #c8ccd0;
+    --theme-text-light: #f2f4f6;
+    --theme-text-muted: #7f858b;
+    --theme-card-bg: rgba(10, 12, 14, .55);
+    --theme-card-border: rgba(255, 255, 255, .075);
+    --theme-code-bg: rgba(255, 255, 255, .05);
+    --theme-icon-color: #c8ccd0;
 }
 
 /* 强调色：整套主题里唯一按时辰变化的东西 */
@@ -135,13 +145,18 @@ body {
    以前插画挂在 body 上（background-attachment: fixed），上面还压着一条不透明的天空带，
    两个图层交界就是那条「断层」硬边。现在拆成「页面底色 + 一个固定底层伪元素」：
    -2 层放插画，-1 层留给星星画布，正文永远在最上面。 */
+/* 关键：html 上不能有 background-color。
+   一旦 html 自带背景，body 的背景就不再上溯到 canvas，而 body::after 是 z-index:-2，
+   会画在 body 自己的背景「之下」—— 插画会被 body 的纯色底彻底盖死，整页只剩一块黑板。
+   底色只放在 body 上，让浏览器把它当画布色。 */
 html {
+    background-color: transparent !important;
     background-image: none !important;
 }
 
 body {
     background-image: none !important;
-    background-color: var(--ds-surface) !important;
+    background-color: var(--ds-bg) !important;
 }
 
 body::before {
@@ -149,6 +164,8 @@ body::before {
     background-image: none !important;
 }
 
+/* 背景五层（同一个固定伪元素，零额外 DOM）：网格 → 顶部信号色晕 → 压暗 → 插画。
+   网格给「终端画布」的质感，色晕给页面一个光源，插画只当纹理。 */
 body::after {
     content: '';
     position: fixed;
@@ -156,11 +173,14 @@ body::after {
     z-index: -2;
     pointer-events: none;
     background-image:
+        repeating-linear-gradient(to right, var(--ds-grid) 0 1px, transparent 1px 40px),
+        repeating-linear-gradient(to bottom, var(--ds-grid) 0 1px, transparent 1px 40px),
+        radial-gradient(1100px 520px at 50% -12%, var(--theme-primary-glow-strong), transparent 70%),
         linear-gradient(var(--theme-bg-overlay), var(--theme-bg-overlay)),
         url('../assets/background.webp');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-size: auto, auto, auto, cover, cover;
+    background-position: center top, center top, center top, center, center;
+    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
 }
 
 /* 字号标尺：display 40 / h1 32 / h2 24 / h3 19 / 正文 16·1.7 / meta 13 */
@@ -173,9 +193,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1.fw-bolder {
-    font-size: 2.5rem;
+    font-size: 2.125rem;
     line-height: 1.15;
     letter-spacing: -.03em;
+    font-weight: 650;
+}
+
+/* 等宽语汇：凡是「系统信息」都换等宽 —— 品牌、导航、日期、标签、面板标题、
+   按钮、页脚、时钟、目录、数字。正文仍然用无衬线，保证中文可读性。 */
+.navbar-brand,
+.nav-link,
+.card-header,
+.badge,
+.btn,
+footer,
+.celestial-clock,
+.celestial-phase,
+.article-toc a,
+.friend-link-item,
+.post-meta,
+.text-muted.fst-italic,
+[id^="home-stat-"] {
+    font-family: var(--ds-mono) !important;
 }
 
 p, li, td, th {
@@ -194,7 +233,7 @@ a:hover {
 
 ::selection {
     background: var(--theme-primary-color);
-    color: #0a0a0a;
+    color: var(--ds-bg);
 }
 
 :focus-visible {
@@ -234,20 +273,31 @@ a:hover {
     background-color: var(--ds-nav-bg) !important;
     border-bottom: 1px solid var(--ds-line) !important;
     border-top: 0 !important;
-    min-height: 56px;
-    padding: .5rem 1rem;
+    min-height: 52px;
+    padding: .4rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 30;
 }
 
 .navbar-brand {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 13.5px;
+    font-weight: 500;
     letter-spacing: -.01em;
     color: var(--theme-text-light) !important;
 }
 
+/* 提示符只做装饰，不动 HTML 文案 */
+.navbar-brand::before {
+    content: '~$ ';
+    color: var(--theme-primary-color);
+    opacity: .9;
+}
+
 .nav-link {
-    font-size: 14px;
-    font-weight: 500;
+    position: relative;
+    font-size: 13px;
+    font-weight: 450;
     color: var(--theme-text-muted) !important;
     padding: .35rem .7rem !important;
     border-radius: var(--ds-radius-sm);
@@ -262,6 +312,18 @@ a:hover {
 
 .nav-link.active {
     color: var(--theme-text-light) !important;
+    background-color: transparent;
+}
+
+/* 当前项：一条 2px 信号色下划线，是全站唯一的「位置」提示 */
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: .7rem;
+    right: .7rem;
+    bottom: -.1rem;
+    height: 2px;
+    background: var(--theme-primary-color);
 }
 
 .navbar-toggler {
@@ -286,7 +348,7 @@ a:hover {
 
 /* ---------- 5. 侧栏 ---------- */
 #sidebar {
-    background-color: var(--ds-surface) !important;
+    background-color: rgba(8, 9, 10, .72) !important;
     border-right: 1px solid var(--ds-line) !important;
     box-shadow: none !important;
 }
@@ -298,11 +360,19 @@ a:hover {
 
 .sidebar-header h5,
 .sidebar-title {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .08em;
+    font-family: var(--ds-mono) !important;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .1em;
     text-transform: uppercase;
     color: var(--theme-text-muted);
+}
+
+.sidebar-header h5::before,
+.sidebar-title::before {
+    content: '# ';
+    color: var(--theme-primary-color);
+    opacity: .85;
 }
 
 .sidebar a,
@@ -324,16 +394,14 @@ a:hover {
 }
 
 /* ---------- 6. 面 / 卡片 ---------- */
+/* 面 = 半透明的「亮面板」压在网格和插画上，边缘只有 1px 发丝线。
+   celestial-info 在大屏上是另一套样式（§8），这里不再和它共用。 */
 .card,
-.card-header,
-.card-body,
-.card-footer,
 .list-group-item,
 .modal-content,
 .accordion-item,
 .comment-card,
-.article-toc,
-.celestial-info {
+.article-toc {
     background-color: var(--ds-surface) !important;
     border: 1px solid var(--ds-line) !important;
     border-radius: var(--ds-radius-lg) !important;
@@ -353,18 +421,36 @@ a:hover {
     border: 0 !important;
     border-bottom: 1px solid var(--ds-line) !important;
     border-radius: 0 !important;
-    padding: 14px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .02em;
+    padding: 12px 20px;
+    font-family: var(--ds-mono) !important;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
     color: var(--theme-text-muted) !important;
     background-color: transparent !important;
+}
+
+/* 面板标题前的 # —— 这套界面里最省力的「黑客」语汇，只改样式不动文案 */
+.card-header::before {
+    content: '# ';
+    color: var(--theme-primary-color);
+    opacity: .85;
+}
+
+.card-footer {
+    border: 0 !important;
+    border-top: 1px solid var(--ds-line) !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    padding: 12px 20px;
+    font-size: 12px;
 }
 
 .card-body {
     border: 0 !important;
     border-radius: 0 !important;
-    padding: 18px;
+    padding: 20px;
 }
 
 article {
@@ -376,15 +462,16 @@ article {
 }
 
 footer {
-    background-color: var(--ds-surface) !important;
+    background-color: transparent !important;
     border-top: 1px solid var(--ds-line) !important;
     color: var(--theme-text-muted);
+    font-size: 12px;
 }
 
 pre,
 code,
 kbd {
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-family: var(--ds-mono) !important;
 }
 
 pre {
@@ -522,11 +609,19 @@ textarea:focus {
     transition: background-color .15s var(--ds-ease), border-color .15s var(--ds-ease), color .15s var(--ds-ease);
 }
 
+.badge::before,
+.badge.bg-secondary::before {
+    content: '#';
+    color: var(--theme-primary-color);
+    opacity: .7;
+    margin-right: .12em;
+}
+
 .badge:hover,
 .badge.bg-secondary:hover {
     color: var(--theme-text-light) !important;
-    border-color: var(--ds-line-strong) !important;
-    background: rgba(255, 255, 255, .08) !important;
+    border-color: var(--theme-primary-color) !important;
+    background: rgba(255, 255, 255, .07) !important;
 }
 
 .accordion-button {
@@ -541,33 +636,36 @@ textarea:focus {
 }
 
 /* ---------- 8. 首屏 ------ */
-/* 天空带：去掉那条硬底边，canvas 上下各渐隐一截，和页面背景自然接上 */
+/* 天空带：压到 200px，上下各渐隐一截 —— 它是一段天色，不是一个黑方块 */
 .celestial-wrapper {
+    height: 200px !important;
     border-bottom: 0 !important;
     background: transparent !important;
 }
 
 .celestial-wrapper canvas {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 48px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 48px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 48px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 48px), transparent 100%);
 }
 
 .celestial-info {
-    background-color: var(--ds-surface) !important;
+    background-color: rgba(8, 9, 10, .55) !important;
+    border: 1px solid var(--ds-line) !important;
     border-radius: var(--ds-radius) !important;
-    padding: 12px 16px;
+    padding: 10px 14px;
     color: var(--theme-text-color);
 }
 
 .celestial-clock {
-    font-size: 26px;
-    font-weight: 600;
-    letter-spacing: -.02em;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -.01em;
     color: var(--theme-text-light);
 }
 
 .celestial-phase {
-    font-size: 12.5px;
+    font-size: 12px;
+    letter-spacing: .04em;
     color: var(--theme-text-muted);
     line-height: 1.6;
 }
@@ -709,6 +807,47 @@ article > section {
     border: 1px solid var(--ds-line) !important;
     border-radius: var(--ds-radius-sm) !important;
     color: var(--theme-text-muted) !important;
+}
+
+/* ---------- 12. Bootstrap 工具类映射 ---------- */
+/* HTML 里 text-primary / text-muted 是 (0,1,0)，必须用 html body 前缀抬到 (0,1,2) 才压得住。 */
+html body .text-primary {
+    color: var(--theme-primary-color) !important;
+}
+
+html body .text-muted {
+    color: var(--theme-text-muted) !important;
+}
+
+html body .text-light {
+    color: var(--theme-text-light) !important;
+}
+
+.text-sm {
+    font-size: 12.5px;
+}
+
+.text-xs {
+    font-size: 11.5px;
+    letter-spacing: .04em;
+}
+
+.btn {
+    font-size: 13px;
+    letter-spacing: .01em;
+}
+
+.list-group-item:hover {
+    background-color: var(--ds-surface-2) !important;
+    border-color: var(--ds-line-strong) !important;
+}
+
+/* 表头等宽：读起来像数据而不是散文 */
+th {
+    font-family: var(--ds-mono);
+    font-size: 12.5px;
+    letter-spacing: .02em;
+    font-weight: 500;
 }
 
 /* ---------- 11. 响应式 ---------- */
