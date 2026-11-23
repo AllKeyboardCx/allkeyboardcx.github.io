@@ -18,16 +18,49 @@
     <!-- 小鸟样式 -->
     <link href="css/bird.css" rel="stylesheet" />
     <style>
-        /* 启动层：纯色幕布 + 顶部 2px 进度线（轻量版） */
+        /* 启动层：命令行开幕动画。
+           幕布挂在 <html> 上，拿不到 body 上的 --ds-* / --theme-* 变量，
+           所以这里的配色和字体一律写字面量。 */
 
         #boot-curtain {
             position: fixed;
             inset: 0;
+            display: grid;
+            place-items: center;
             background: #08090a;
             z-index: 99998;
-            transition: opacity 0.25s ease-out;
+            transition: opacity 0.26s ease-out;
         }
         #boot-curtain.out { opacity: 0; pointer-events: none; }
+
+        #boot-term {
+            width: 100%;
+            max-width: 560px;
+            padding: 0 24px;
+            text-align: left;
+            font-family: ui-monospace, "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 14.5px;
+            line-height: 1.9;
+            color: #e6e8ea;
+            text-shadow: none;
+        }
+        #boot-term .bt-line { white-space: pre-wrap; word-break: break-word; }
+        #boot-term .bt-user { color: #58a6ff; }
+        #boot-term .bt-hi { color: #58a6ff; }
+        #boot-term .bt-dim { color: #7f858b; }
+        #boot-term .bt-cmd { color: #e6e8ea; }
+        #boot-term .bt-cursor {
+            display: inline-block;
+            width: .58em;
+            height: 1.02em;
+            background: #58a6ff;
+            vertical-align: -.16em;
+            animation: btBlink 1s steps(2, start) infinite;
+        }
+        @keyframes btBlink { to { visibility: hidden; } }
+        @media (max-width: 600px) {
+            #boot-term { font-size: 13px; padding: 0 18px; }
+        }
 
         #page-progress {
             position: fixed;
@@ -35,8 +68,7 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, #58a6ff, #a855f7);
-            box-shadow: 0 0 8px rgba(88, 166, 255, 0.45);
+            background: #58a6ff;
             border-radius: 0 1px 1px 0;
             z-index: 99999;
             pointer-events: none;
@@ -95,20 +127,36 @@
     <script>
         (function () {
             var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var TYPE_MS = 14;       // 第 1 行逐字速度
+            var STEP_MS = 150;      // 后续每行间隔
+            var HOLD_MS = 220;      // 打完后的停顿
+            var FADE_MS = reduce ? 0 : 260;
+            var WATCHDOG_MS = 4000; // 无论如何都要揭幕
 
             var curtain = document.createElement('div');
             curtain.id = 'boot-curtain';
+            var term = document.createElement('div');
+            term.id = 'boot-term';
+            curtain.appendChild(term);
             var bar = document.createElement('div');
             bar.id = 'page-progress';
             if (reduce) { curtain.style.transition = 'none'; bar.style.transition = 'none'; }
             document.documentElement.appendChild(curtain);
             document.documentElement.appendChild(bar);
 
-            var value = 0, finished = false, trickle = null, curtainGone = false;
+            var value = 0, finished = false, curtainGone = false, trickle = null;
+            var timers = [], animDone = false, loadDone = false;
 
             function setBar(v) {
                 value = Math.max(0, Math.min(100, v));
                 bar.style.width = value + '%';
+            }
+
+            function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+            function clearTimers() {
+                for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+                timers = [];
             }
 
             function liftCurtain() {
@@ -117,12 +165,13 @@
                 curtain.classList.add('out');
                 setTimeout(function () {
                     if (curtain.parentNode) curtain.parentNode.removeChild(curtain);
-                }, reduce ? 0 : 300);
+                }, FADE_MS + 40);
             }
 
             function finish() {
                 if (finished) return;
                 finished = true;
+                clearTimers();
                 if (trickle) { clearInterval(trickle); trickle = null; }
                 liftCurtain();
                 setBar(100);
@@ -134,20 +183,98 @@
                 }, reduce ? 0 : 140);
             }
 
-            if (document.readyState === 'complete') {
+            function maybeFinish() { if (animDone && loadDone) finish(); }
+
+            /* ---- 终端内容 ---- */
+            var CMD = './hello --user allkeyboard';
+            var REST = [
+                '<span class="bt-dim">[*]</span> probing kernel ......... ok',
+                '<span class="bt-dim">[*]</span> mapping heap @ 0x7ffd ... ok',
+                '<span class="bt-hi">[+]</span> rop chain resolved: 0xdeadbeef',
+                '<span class="bt-hi">[&gt;]</span> 欢迎回来，AllKeyboard'
+            ];
+
+            var line1 = document.createElement('div');
+            line1.className = 'bt-line';
+            line1.innerHTML = '<span class="bt-user">allkeyboard@arch</span>' +
+                              '<span class="bt-dim"> ~ % </span>' +
+                              '<span class="bt-cmd"></span>';
+            term.appendChild(line1);
+            var cmdSpan = line1.querySelector('.bt-cmd');
+
+            var cursorLine = document.createElement('div');
+            cursorLine.className = 'bt-line';
+            cursorLine.innerHTML = '<span class="bt-cursor"></span>';
+            term.appendChild(cursorLine);
+
+            function renderAll() {
+                cmdSpan.textContent = CMD;
+                for (var i = 0; i < REST.length; i++) {
+                    var d = document.createElement('div');
+                    d.className = 'bt-line';
+                    d.innerHTML = REST[i];
+                    term.insertBefore(d, cursorLine);
+                }
+            }
+
+            function play() {
+                if (reduce) {
+                    renderAll();
+                    later(function () { animDone = true; maybeFinish(); }, 120);
+                    return;
+                }
+                var i = 0;
+                (function tick() {
+                    i++;
+                    cmdSpan.textContent = CMD.slice(0, i);
+                    if (i < CMD.length) { later(tick, TYPE_MS); return; }
+                    later(function () {
+                        var step = 0;
+                        (function next() {
+                            if (step >= REST.length) {
+                                later(function () { animDone = true; maybeFinish(); }, HOLD_MS);
+                                return;
+                            }
+                            var d = document.createElement('div');
+                            d.className = 'bt-line';
+                            d.innerHTML = REST[step++];
+                            term.insertBefore(d, cursorLine);
+                            later(next, STEP_MS);
+                        })();
+                    }, HOLD_MS);
+                })();
+            }
+
+            function skip() {
+                if (finished) return;
+                clearTimers();
+                renderAll();
+                animDone = true;
+                loadDone = true;
                 finish();
-            } else {
+            }
+
+            var skipEvents = ['click', 'keydown', 'touchstart'];
+            for (var s = 0; s < skipEvents.length; s++) {
+                window.addEventListener(skipEvents[s], skip, { passive: true });
+            }
+
+            try {
+                play();
                 setBar(6);
                 if (!reduce) {
                     trickle = setInterval(function () {
                         if (value < 88) setBar(value + Math.random() * 7);
                     }, 160);
                 }
-                document.addEventListener('DOMContentLoaded', liftCurtain);
-                window.addEventListener('load', finish);
-                setTimeout(finish, 4000);
-                window.addEventListener('pageshow', function (e) { if (e.persisted) finish(); });
+            } catch (err) {
+                renderAll();
+                animDone = true;
             }
+
+            window.addEventListener('load', function () { loadDone = true; maybeFinish(); });
+            window.addEventListener('pageshow', function (e) { if (e.persisted) skip(); });
+            setTimeout(skip, WATCHDOG_MS);
         })();
     </script>
 </head>
