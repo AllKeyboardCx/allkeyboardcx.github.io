@@ -172,7 +172,7 @@
                     };
                     
                     resultsContainer.innerHTML = filteredPosts.map(post => `
-                        <a href="article.html?category=${post.category}&file=${post.filename}" class="list-group-item list-group-item-action bg-dark text-light border-gray">
+                        <a href="article.html?category=${encodeURIComponent(post.category)}&file=${encodeURIComponent(post.filename)}" class="list-group-item list-group-item-action bg-dark text-light border-gray">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">${post.title}</h5>
                                 <small class="badge bg-primary text-white">${categoryNames[post.category]}</small>

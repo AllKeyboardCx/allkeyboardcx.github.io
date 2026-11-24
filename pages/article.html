@@ -534,6 +534,16 @@
             ])
             .then(([securityPosts, binaryPosts, webPosts]) => {
                 const allPosts = [...securityPosts, ...binaryPosts, ...webPosts];
+
+                /* 文章属于专栏时，在信息头末尾补一个专栏 chip（只加不改，原有排版不动） */
+                const currentPost = allPosts.find(post => post.filename === file);
+                if (currentPost && currentPost.series) {
+                    const metaEl = document.querySelector('#article-content .article-meta');
+                    if (metaEl) {
+                        metaEl.insertAdjacentHTML('beforeend',
+                            `<a class="badge bg-secondary text-decoration-none" href="series.html?category=${encodeURIComponent(category)}&series=${encodeURIComponent(currentPost.series)}">📚 专栏：${currentPost.seriesTitle || currentPost.series}</a>`);
+                    }
+                }
                 const allTags = allPosts.reduce((tags, post) => [...tags, ...post.tags], []);
                 const tagCounts = {};
                 allTags.forEach(tag => {

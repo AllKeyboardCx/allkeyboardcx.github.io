@@ -1125,3 +1125,75 @@ th {
         width: auto;
     }
 }
+
+/* ---------- 13. 专栏卡片（分类页「📚 专栏」区） ---------- */
+/* 一个专栏 = 一场比赛 / 一个专题的一组文章。卡片只是入口，文章列表仍复用原来的
+   list-group 样式，不另起一套列表。 */
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+@media (max-width: 767.98px) {
+    .series-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.series-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 96px;
+    padding: 14px 16px;
+    border: 1px solid var(--ds-line);
+    border-radius: var(--ds-radius);
+    text-decoration: none;
+    transition: border-color .15s var(--ds-ease), background-color .15s var(--ds-ease);
+}
+
+.series-card:hover {
+    border-color: var(--theme-primary-color);
+    opacity: 1;
+}
+
+.series-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.series-card-title {
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--theme-text-light);
+}
+
+.series-card-count {
+    flex: none;
+    font-family: var(--ds-mono);
+    font-size: 12.5px;
+    color: var(--theme-primary-color);
+}
+
+.series-card-summary {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--theme-text-muted);
+    /* 摘要最多两行，卡片高度才对得齐 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.series-card-meta {
+    margin-top: auto;
+    font-family: var(--ds-mono);
+    font-size: 12.5px;
+    color: var(--theme-text-muted);
+}
