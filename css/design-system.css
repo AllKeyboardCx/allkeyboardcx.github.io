@@ -1016,3 +1016,74 @@ th {
         display: flex;
     }
 }
+
+/* ---------- 9d. 手机端目录岛（<992px） ---------- */
+/* 原来靠 left:50% + translateX(-50%) 居中。只要这个 fixed 元素被某个祖先的
+   transform / filter / backdrop-filter / will-change 改写了包含块，left:50% 就变成
+   「相对那个祖先的中点」，而 translateX(-50%) 只减自身一半宽度 —— pill 会整条甩到
+   右半屏外。手机上看到的就是「目录跑到界面外面，缩小页面才看得见」。
+   改成左右双向 inset + auto 外边距：不依赖 transform，也不假设包含块是哪一层。 */
+@media (max-width: 991px) {
+    .mobile-toc-island {
+        position: fixed;
+        top: calc(60px + env(safe-area-inset-top, 0px));
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: min(420px, calc(100vw - 24px));
+        margin: 0 auto;
+        box-sizing: border-box;
+        transform: none;
+        transition: none;
+    }
+
+    /* 展开时不再撑到 96vw，宽度锁死在安全区里（原来会把 pill 左右甩出屏幕） */
+    .mobile-toc-island.expanded {
+        width: auto;
+        max-width: min(420px, calc(100vw - 24px));
+    }
+
+    .mobile-toc-pill {
+        min-height: 44px;                        /* 触摸目标 ≥44px */
+        padding: 10px 18px;
+        border-radius: 999px;
+        /* 浮层底下是正文，底色要不透明，不能用半透明的 --ds-surface */
+        background: rgba(12, 15, 20, .94);
+        border-color: var(--ds-line-strong);
+        color: var(--theme-text-light);
+    }
+
+    .mobile-toc-panel {
+        background: rgba(12, 15, 20, .97);
+        border-color: var(--ds-line-strong);
+        border-radius: 14px;
+        overscroll-behavior: contain;
+    }
+
+    .mobile-toc-panel-inner {
+        max-height: 62vh;
+        max-height: min(62vh, 60dvh);
+        overscroll-behavior: contain;
+        padding: 8px 10px;
+    }
+
+    /* 手机上小节标题该换行，不要被 nowrap + 省略号吞掉 */
+    .mobile-toc-panel-inner .toc-item a {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        padding: 9px 10px;
+    }
+
+    /* 保险：桌面浮窗、边缘竖标签在手机上一律不出现 */
+    #toc-float,
+    .toc-tab {
+        display: none !important;
+    }
+
+    /* 宽表自己横向滚，别把整页顶宽（整页横向溢出让固定元素跟着跑偏） */
+    #article-content table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+}

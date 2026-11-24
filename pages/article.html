@@ -560,13 +560,17 @@
             const mobileTocArrow = mobileTocToggle.querySelector('.mobile-toc-arrow');
             const mobileTocIsland = document.getElementById('mobile-toc-island');
             mobileTocPanel.style.display = 'none';
+
+            function closeMobileToc() {
+                mobileTocPanel.style.display = 'none';
+                mobileTocArrow.textContent = '▾';
+                mobileTocToggle.setAttribute('aria-expanded', 'false');
+                mobileTocIsland.classList.remove('expanded');
+            }
+
             mobileTocToggle.addEventListener('click', function() {
-                const isVisible = mobileTocPanel.style.display !== 'none';
-                if (isVisible) {
-                    mobileTocPanel.style.display = 'none';
-                    mobileTocArrow.textContent = '▾';
-                    mobileTocToggle.setAttribute('aria-expanded', 'false');
-                    mobileTocIsland.classList.remove('expanded');
+                if (mobileTocPanel.style.display !== 'none') {
+                    closeMobileToc();
                 } else {
                     mobileTocPanel.style.display = 'block';
                     mobileTocArrow.textContent = '▴';
@@ -576,12 +580,14 @@
             });
 
             document.getElementById('mobile-toc-container').addEventListener('click', function(e) {
-                if (e.target.tagName === 'A') {
-                    mobileTocPanel.style.display = 'none';
-                    mobileTocArrow.textContent = '▾';
-                    mobileTocToggle.setAttribute('aria-expanded', 'false');
-                    mobileTocIsland.classList.remove('expanded');
-                }
+                if (e.target.tagName === 'A') closeMobileToc();
+            });
+
+            /* 点面板外也收起（手机上很难准确再点回那颗药丸） */
+            document.addEventListener('click', function(e) {
+                if (mobileTocPanel.style.display === 'none') return;
+                if (mobileTocIsland.contains(e.target)) return;
+                closeMobileToc();
             });
 
             /* 桌面目录浮窗：默认展开，✕ 收起，右边缘标签再展开，Esc 也能收起 */
@@ -599,7 +605,9 @@
             if (tocClose) tocClose.addEventListener('click', function() { setTocOpen(false); });
             if (tocTab) tocTab.addEventListener('click', function() { setTocOpen(true); });
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') setTocOpen(false);
+                if (e.key !== 'Escape') return;
+                setTocOpen(false);
+                closeMobileToc();          /* 手机上 Esc 也把目录面板收起 */
             });
             tocWide.addEventListener('change', function() { setTocOpen(true); });
             setTocOpen(true);
