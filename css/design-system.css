@@ -1024,8 +1024,12 @@ th {
    缩小页面才看得见」的样子。改成流内的一块以后，它永远和文章同宽、同一个起点，
    也不可能被裁到屏幕外。 */
 @media (max-width: 991px) {
+    /* 在正文流里，但用 sticky 钉住：往下滚文章时停在视口顶部。
+       既不像 fixed 那样脱离正文（也就不会被推到屏幕外），又一直够得着。 */
     .mobile-toc-island {
-        position: static;
+        position: sticky;
+        top: 8px;
+        z-index: 30;
         width: 100%;
         max-width: none;
         margin: 0 0 16px;
@@ -1093,5 +1097,31 @@ th {
         display: block;
         max-width: 100%;
         overflow-x: auto;
+    }
+
+    /* sticky 的前提：祖先不能是滚动容器。sidebar.css 的 body{overflow-x:hidden}
+       会按规范把 overflow-y 算成 auto，body 就成了滚动容器，sticky 直接失灵。
+       clip 同样挡住横向溢出，但不建立滚动容器。 */
+    body {
+        overflow-x: clip;
+    }
+
+    /* 手机端整宽兜底：把可能被旧规则挤窄的正文列钉回 100%。
+       这两条本来就是 Bootstrap 在 <992px 的默认结果，只是把被覆盖掉的值还原，
+       不改变桌面表现；写 body 前缀是为了压过老样式里带 .container 的选择器。 */
+    body .container,
+    body .container-fluid {
+        max-width: 100% !important;
+    }
+
+    body .row > [class*="col-"] {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    body #article-content {
+        max-width: 100%;
+        width: auto;
     }
 }
