@@ -1,0 +1,99 @@
+[
+  {
+    "slug": "TheOldestWP",
+    "title": "TheOldestWP",
+    "summary": "通过篡改堆块 size制造堆重叠，结合fastbin劫持伪造链表指向 __malloc_hook 附近，利用unsorted bin泄露libc基址，最终覆盖 __malloc_hook 为 one_gadget 触发 getshell。核心是堆元数据操控和钩子函数劫持",
+    "cover": "",
+    "count": 8,
+    "updated": "2026-07-11",
+    "articles": [
+      {
+        "filename": "TheOldestWP/Buuctf堆利用专项训练",
+        "title": "Buuctf堆利用专项训练（概念理论向）",
+        "date": "2026-07-04",
+        "tags": [
+          "heap理论"
+        ],
+        "summary": "入门&熟悉基础堆漏洞，fastbin、tcache基础利用，unsorted bin&libc泄露，劫持钩子&one gadget"
+      },
+      {
+        "filename": "TheOldestWP/CTF那些事儿-进入Pwn的世界-栈溢出进阶技术",
+        "title": "栈溢出进阶技术",
+        "date": "2026-07-04",
+        "tags": [
+          "栈劫持",
+          "canary",
+          "libc_csu_init",
+          "ret2_dl_runtime_resolve"
+        ],
+        "summary": "包含对栈劫持、Canary保护机制及利用方式、__libc_csu_init的利用方式、ret2_dl_runtime_resolve的相关讲解"
+      },
+      {
+        "filename": "TheOldestWP/Canary保护机制及其利用方式",
+        "title": "Canary保护机制介绍",
+        "date": "2026-07-04",
+        "tags": [
+          "canary"
+        ],
+        "summary": "详细讲解了canary的保护机制及绕过方法，同时介绍了send和sendline的使用场景"
+      },
+      {
+        "filename": "TheOldestWP/hitcon2014_stkof-UAF-unlink-堆利用漏洞-堆溢出 - 副本",
+        "title": "UAF与unlink攻击",
+        "date": "2026-07-04",
+        "tags": [
+          "heap",
+          "unlink",
+          "UAF"
+        ],
+        "summary": "利用UAF和unlink攻击手段达到伪造GOT表进而提权的目的"
+      },
+      {
+        "filename": "TheOldestWP/libc_csu_init的利用方式",
+        "title": "__libc_csu_init攻击方法详细讲解",
+        "date": "2026-07-04",
+        "tags": [
+          "__libc_csu_init"
+        ],
+        "summary": "详细介绍了__libc_csu_init文件及利用方法"
+      },
+      {
+        "filename": "TheOldestWP/CTF那些事儿-Pwn-进入Pwn的世界-动态链接动态系统调用-ret2libc3",
+        "title": "CTF那些事儿-Pwn-进入Pwn的世界-动态链接动态系统调用-ret2libc3",
+        "date": "2026-07-05",
+        "tags": [
+          "栈溢出",
+          "ret2syscall"
+        ],
+        "summary": "有关动态链接动态系统调用的相关真题演练与详细解析"
+      },
+      {
+        "filename": "TheOldestWP/堆利用相关概念阐释",
+        "title": "堆利用相关概念阐释",
+        "date": "2026-07-05",
+        "tags": [
+          "heap理论",
+          "ptmalloc",
+          "堆利用",
+          "知识对比"
+        ],
+        "summary": "堆利用的相关概念、基础漏洞类型、glibc ptmalloc特有的利用手法、针对不同的bins的利用、针对不同版本的libc"
+      },
+      {
+        "filename": "TheOldestWP/babyheap_0ctf_2017",
+        "title": "babyheap_0ctf_2017 堆利用",
+        "date": "2026-07-11",
+        "tags": [
+          "heap",
+          "堆重叠",
+          "堆溢出",
+          "fastbin劫持",
+          "unsorted bin泄露",
+          "伪造chunk",
+          "hook劫持"
+        ],
+        "summary": "通过篡改堆块 size制造堆重叠，结合fastbin劫持伪造链表指向 __malloc_hook 附近，利用unsorted bin泄露libc基址，最终覆盖 __malloc_hook 为 one_gadget 触发 getshell。核心是堆元数据操控和钩子函数劫持"
+      }
+    ]
+  }
+]
