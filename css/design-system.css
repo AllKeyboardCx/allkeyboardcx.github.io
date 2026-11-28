@@ -1219,10 +1219,14 @@ th {
     display: none;
 }
 
-/* 单条弹幕：从右边缘飘到左边缘，悬浮暂停 */
+/* 单条弹幕：贴着右边缘外 24px 起手，一直飘到左边缘外，悬浮暂停
+   —— 起点偏移用 transform 表达（按自身宽度）。旧写法 right: -100% 是「整条轨道宽度」，
+   开场要跑完半程才露头，实测约 8~10 秒才出现第一条。 */
 .honor-dm {
     position: absolute;
-    right: -100%;
+    right: 0;
+    --honor-lead: 24px;   /* 出场前导距离：改小=露头更快，改大=滑入更从容 */
+    transform: translateX(var(--honor-lead));
     white-space: nowrap;
     padding: 6px 12px;
     border-radius: 999px;
@@ -1231,7 +1235,7 @@ th {
     color: rgba(233, 238, 246, .92);
     background: rgba(255, 255, 255, .06);
     border: 1px solid rgba(255, 255, 255, .08);
-    animation: honor-fly var(--honor-dur, 20s) linear infinite;
+    animation: honor-fly var(--honor-dur, 10s) linear infinite;
 }
 
 .honor-danmaku:hover .honor-dm {
@@ -1239,8 +1243,8 @@ th {
 }
 
 @keyframes honor-fly {
-    from { right: -100%; }
-    to   { right: 100%; }
+    from { right: 0;    transform: translateX(var(--honor-lead)); }
+    to   { right: 100%; transform: translateX(-100%); }
 }
 
 /* 画廊：自适应网格 */

@@ -5,6 +5,9 @@
   var IMG_BASE = '../assets/honors/';
   var DANMAKU_MAX = 12;
   var LANES = 3;
+  var DM_STAGGER = 0.5;    // 相邻两条的出场间隔（秒）：嫌挤就调大到 0.8
+  var DM_DUR_MIN = 8;      // 单条飘完一趟的最短用时（秒）
+  var DM_DUR_MAX = 12;     // 最长用时：标题越长飘得越慢，看得清
   var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
   var state = { items: [], shots: [], index: 0, lastFocus: null, lb: null };
@@ -46,8 +49,9 @@
       span.textContent = it.date + ' · ' + it.title;
       if (!reduced) {
         span.style.top = (12 + (i % LANES) * 40) + 'px';
-        span.style.setProperty('--honor-dur', Math.min(34, Math.max(15, 11 + it.title.length * 0.5)).toFixed(1) + 's');
-        span.style.animationDelay = (i * 1.7).toFixed(1) + 's';
+        span.style.setProperty('--honor-dur',
+          Math.min(DM_DUR_MAX, Math.max(DM_DUR_MIN, 8 + it.title.length * 0.08)).toFixed(1) + 's');
+        span.style.animationDelay = (i * DM_STAGGER).toFixed(1) + 's';
       }
       host.appendChild(span);
     });
