@@ -1197,3 +1197,214 @@ th {
     font-size: 12.5px;
     color: var(--theme-text-muted);
 }
+
+/* ============================================================
+   14. 成就与荣誉（弹幕 + 画廊）
+   —— 数据：assets/honors/honors.json；图片：assets/honors/
+   —— 逻辑：js/honors.js
+   ============================================================ */
+
+/* 弹幕区：三泳道，单位是 px */
+.honor-danmaku {
+    position: relative;
+    height: 132px;
+    margin: 0 0 16px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: rgba(8, 10, 13, .55);
+    border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.honor-danmaku[hidden] {
+    display: none;
+}
+
+/* 单条弹幕：从右边缘飘到左边缘，悬浮暂停 */
+.honor-dm {
+    position: absolute;
+    right: -100%;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgba(233, 238, 246, .92);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .08);
+    animation: honor-fly var(--honor-dur, 20s) linear infinite;
+}
+
+.honor-danmaku:hover .honor-dm {
+    animation-play-state: paused;
+}
+
+@keyframes honor-fly {
+    from { right: -100%; }
+    to   { right: 100%; }
+}
+
+/* 画廊：自适应网格 */
+.honor-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.honor-gallery[hidden] {
+    display: none;
+}
+
+.honor-shot {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    padding: 0;
+    overflow: hidden;
+    cursor: zoom-in;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    background: #10131a;
+}
+
+.honor-shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease;
+}
+
+.honor-shot:hover img,
+.honor-shot:focus-visible img {
+    transform: scale(1.06);
+}
+
+.honor-shot-cap {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 22px 10px 9px;
+    text-align: left;
+    background: linear-gradient(to top, rgba(4, 6, 9, .92), rgba(4, 6, 9, 0));
+}
+
+.honor-shot-cap b {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #eef2f8;
+}
+
+.honor-shot-cap i {
+    font-style: normal;
+    font-size: 11px;
+    color: rgba(220, 228, 240, .72);
+}
+
+/* 灯箱 */
+.honor-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(6, 8, 10, .93);
+    backdrop-filter: blur(6px);
+}
+
+.honor-lightbox.is-open {
+    display: flex;
+}
+
+.honor-lightbox figure {
+    margin: 0;
+    max-width: min(1100px, 92vw);
+}
+
+.honor-lightbox img {
+    display: block;
+    max-width: 100%;
+    max-height: 78vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .55);
+}
+
+.honor-lightbox figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 12px;
+    text-align: center;
+}
+
+.honor-lightbox figcaption b {
+    font-size: 15px;
+    color: #f2f5fa;
+}
+
+.honor-lightbox figcaption span {
+    font-size: 12.5px;
+    color: rgba(214, 222, 236, .72);
+}
+
+.honor-lb-close,
+.honor-lb-prev,
+.honor-lb-next {
+    position: fixed;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    background: rgba(16, 20, 26, .85);
+    color: #e8eef7;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.honor-lb-close { top: 20px; right: 20px; }
+.honor-lb-prev { left: 18px; top: 50%; transform: translateY(-50%); }
+.honor-lb-next { right: 18px; top: 50%; transform: translateY(-50%); }
+
+body.honor-lb-lock {
+    overflow: hidden;
+}
+
+/* 手机端 */
+@media (max-width: 575.98px) {
+    .honor-danmaku {
+        height: 104px;
+    }
+
+    .honor-dm {
+        font-size: 12px;
+    }
+
+    .honor-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .honor-lb-prev { left: 8px; }
+    .honor-lb-next { right: 8px; }
+}
+
+/* 系统开启「减少动效」时，弹幕退化成静态标签墙 */
+@media (prefers-reduced-motion: reduce) {
+    .honor-danmaku.is-static {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        height: auto;
+        padding: 12px;
+    }
+
+    .honor-danmaku.is-static .honor-dm {
+        position: static;
+        animation: none;
+    }
+}
+
