@@ -214,6 +214,28 @@ content/binary/xctf/
 | `content/<分类>/series.json` | 脚本生成的**专栏列表**（注意：和专栏文件夹里的同名文件不是一回事，那个才是你手写的） |
 | `css/styles.css`、`css/sidebar.css` | 上游模板样式，改了就再也对不齐 |
 
+## 友情链接怎么改
+
+首页和关于页各有一份，**两处都要改**：
+
+| 文件 | 行号 |
+| --- | --- |
+| `index.html` | 429–440 |
+| `pages/about.html` | 184–195 |
+
+每条由四个部件组成：
+
+```html
+<li class="friend-link-item"><a href="https://github.com/allkeyboardcx" target="_blank" class="text-light text-decoration-none d-flex align-items-center"><span class="friend-icon">🐙</span><span>GitHub</span></a></li>
+```
+
+- 改链接：`<a href="...">`
+- 改显示名：最后一个 `<span>`
+- 改图标：`friend-icon` 里那个 emoji；头像图那条是 `<img src="assets/H4J1M1.jpg">`（关于页写 `../assets/...`）
+- 加一条：复制一整行 `<li>` 粘到 `</ul>` 前面
+
+注意：卡片底色是 `css/sidebar.css` 里按 `nth-child(1)…(5)` 配好的五种渐变色，**顺序即颜色**；加到第 6 条会掉回默认样式，真要加就在 `css/design-system.css` 末尾补一条 `:nth-child(6)`。
+
 ## 阅读量与评论
 
 文章的浏览量和评论走 Supabase，每篇文章的 key 是 `分类/文件名`，专栏文章是 `分类/专栏/文件名`。
