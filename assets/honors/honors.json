@@ -6,8 +6,21 @@
     "image": "qctf2026.jpg"
   },
   {
-    "date": "2025-12-01",
-    "title": "示例 · 完成 BUUCTF 堆利用专项训练",
-    "desc": "只有文字没有配图的条目只飘弹幕，不进画廊"
+    "date": "2026-10-25",
+    "title": "强网杯 团队赛 第584名",
+    "desc": "团队赛",
+    "image": "qwb2026.png"
+  },
+  {
+    "date": "2026-09-25",
+    "title": "PKWCTF 团队赛 23334pts 全站32名",
+    "desc": "CTF团队赛",
+    "image": "pkwctf2026.jpg"
+  },
+  {
+    "date": "2026-08-12",
+    "title": "MoeCTF 个人赛 3509pts 全站279名",
+    "desc": "西电CTF个人赛",
+    "image": "moectf2026.png"
   }
 ]
