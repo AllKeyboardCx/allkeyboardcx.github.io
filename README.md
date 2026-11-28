@@ -3,7 +3,7 @@
 这是 **allkeyboardcx.github.io** 的日常操作说明：怎么发一篇文章、怎么建一个专栏、图片放哪、哪些文件不能手改、出问题怎么查。
 照着做就行，不需要懂前端。
 
-目录：[站点怎么跑的](#站点怎么跑的) · [仓库地图](#仓库地图) · [写一篇文章](#写一篇文章) · [怎么提交](#怎么提交) · [图片](#图片) · [专栏](#专栏) · [分类](#分类) · [不要手改的文件](#不要手改的文件) · [阅读量与评论](#阅读量与评论) · [改样式与改页面](#改样式与改页面) · [本地预览](#本地预览) · [常见坑](#常见坑) · [发布前清单](#发布前清单)
+目录：[站点怎么跑的](#站点怎么跑的) · [仓库地图](#仓库地图) · [写一篇文章](#写一篇文章) · [环境](#环境) · [怎么提交](#怎么提交) · [用 git 命令更新仓库](#用-git-命令更新仓库详细步骤) · [图片](#图片) · [专栏](#专栏) · [分类](#分类) · [不要手改的文件](#不要手改的文件) · [阅读量与评论](#阅读量与评论) · [成就与荣誉怎么更新](#成就与荣誉怎么更新) · [改样式与改页面](#改样式与改页面) · [本地预览](#本地预览) · [常见坑](#常见坑) · [发布前清单](#发布前清单)
 
 ---
 
@@ -107,11 +107,12 @@ checksec ./pwn
 
 图片也一样，拖到 `pictures/` 里。
 
-**B. 命令行**
+**B. 命令行**（最常用；完整版见下一节「用 git 命令更新仓库」）
 
 ```bash
-git add .
-git commit -m "新增：Tcache Poisoning 笔记"
+git pull --rebase                 # 先同步，不然会被远端新提交挡住
+git add <你改过的文件>            # 例如 content/binary/新文章.md
+git commit -m "content: 一句话说明"
 git push
 ```
 
@@ -124,6 +125,179 @@ git push
 
 ```bash
 node scripts/build-index.js     # 或 npm run build
+```
+
+## 用 git 命令更新仓库（详细步骤）
+
+> 下面按 **Windows PowerShell** 写。macOS / Linux 把路径分隔符换成 `/` 即可，命令本身完全一样。
+
+### 0. 先确认你在仓库目录里
+
+```powershell
+cd C:\Users\allkeyboard\Documents\deepseek-harness\default-workspace\allkeyboardcx.github.io
+git status
+```
+
+- 看到 `On branch main` 和 `nothing to commit, working tree clean` → 位置对，且当前没有未提交的改动
+- 看到 `fatal: not a git repository` → 目录不对，`cd` 到仓库根再试
+
+### 1. 一次性配置（配过就跳过）
+
+先查现在是什么状态：
+
+```powershell
+git --version
+git config --global user.name
+git config --global user.email
+```
+
+最后两条没输出，就补上（名字用你的 GitHub 用户名更直观）：
+
+```powershell
+git config --global user.name "AllKeyboardCx"
+git config --global user.email "allkeyboard@163.com"
+```
+
+**认证**：远端用的是 HTTPS，第一次 `git push` 会弹一个浏览器窗口让你登录 GitHub（Git Credential Manager），登录一次以后就不用了。
+如果弹出来的是命令行让你输密码 —— GitHub 早就不收登录密码了，要用 **Personal Access Token**：
+GitHub → `Settings` → `Developer settings` → `Personal access tokens` → `Tokens (classic)` → `Generate new token`，勾上 `repo` 权限，把生成的那串当密码贴进去。
+⚠️ token 只填在那一次弹窗里，**不要写进任何文件**，更不要提交进仓库。
+
+**换行符警告可以忽略**：本机是 `core.autocrlf=true`，`git add` 时会打印 `LF will be replaced by CRLF the next time Git touches it` —— 这是提示，不是错误。
+
+### 2. 第一次拿到仓库（换电脑或重装才需要）
+
+```powershell
+git clone https://github.com/AllKeyboardCx/allkeyboardcx.github.io.git
+cd allkeyboardcx.github.io
+```
+
+### 3. 日常更新：六步
+
+**第 1 步：先同步远端**
+
+```powershell
+git pull --rebase
+```
+
+为什么必须先来这一下：仓库里的 Actions 会自己往 `main` 提交一条 `Auto-update index.json`。你不同步就直接 push，一定被拒。
+输出 `Already up to date.` 或者列出几个更新过的文件，都算正常。真出冲突看第 6 节。
+
+**第 2 步：改文件**
+
+文章 md 放 `content/<分类>/`，配图放 `pictures/`，荣誉照片放 `assets/honors/`。格式见上面「写一篇文章」和「成就与荣誉怎么更新」。
+
+**第 3 步：看清楚要提交什么**
+
+```powershell
+git status
+```
+
+红色的 `modified:`、`deleted:` 和 `??`（未跟踪的新文件）就是这次要提交的东西。
+**先扫一眼这份清单**，确认没有临时文件，也没有把别人的改动一起带上。
+
+**第 4 步：加进暂存区**（写具体文件名，别偷懒用 `git add .`）
+
+```powershell
+git add content/binary/tcache-poisoning.md
+git add pictures/tcache.png
+```
+
+确实要全加就用 `git add -A`，但一定先看完第 3 步的清单。
+
+**第 5 步：提交**
+
+```powershell
+git commit -m "content: 新增 Tcache Poisoning 笔记"
+```
+
+**第 6 步：推送**
+
+```powershell
+git push
+```
+
+成功的样子（箭头是这次推送的范围）：
+
+```
+To https://github.com/AllKeyboardCx/allkeyboardcx.github.io.git
+   be20a74..c66106c  main -> main
+```
+
+### 4. 完整例子：发一篇带图的文章
+
+```powershell
+cd C:\Users\allkeyboard\Documents\deepseek-harness\default-workspace\allkeyboardcx.github.io
+git pull --rebase
+# 用编辑器写 content/binary/tcache-poisoning.md（头部四行：DATE / TAG / SUMMARY / TITLE）
+# 截图存到 pictures/tcache.png
+git status
+git add content/binary/tcache-poisoning.md pictures/tcache.png
+git commit -m "content: 新增 Tcache Poisoning 笔记"
+git push
+```
+
+> 如果 md 里图写的是 `![[tcache.png]]` 这种 Obsidian 写法：本地跑一次 `node scripts/build-index.js` 会把它改写成 `../pictures/tcache.png`，改完记得一起提交；懒得跑就交给 Action，它也会做。
+
+### 5. push 完别急着刷新
+
+1. 打开仓库的 **Actions** 页，等这次「Build Index」变绿（一般 1 分钟左右）
+2. 变绿之后 Pages 才会重新发布，再等它跑完
+3. 回到页面按 `Ctrl+F5` 硬刷新
+
+如果变红了，点进去看日志里第一处红字。最常见的是 md 头部格式写坏，或者 `honors.json` / `series.json` 的 JSON 语法错（少个逗号、多个逗号）。
+
+### 6. 常见报错怎么办
+
+| 报错（原样） | 原因 | 解决 |
+| --- | --- | --- |
+| `! [rejected] main -> main (fetch first)` / `Updates were rejected because the remote contains work that you do not have locally` | 远端有你没有的提交（多半是 Action 自动提交的 index.json） | `git pull --rebase` 再 `git push` |
+| `Authentication failed` | 凭据过期，或者用了登录密码 | 重新登录，或改用 Personal Access Token |
+| `nothing to commit, working tree clean` | 文件没保存，或者改的不是这个仓库 | 检查文件到底改了没、是不是在正确目录 |
+| `LF will be replaced by CRLF` | Windows 换行符转换提示 | 警告，忽略即可 |
+| `fatal: not a git repository` | 不在仓库目录里 | `cd` 到仓库根 |
+| `CONFLICT (content): Merge conflict in ...` | pull 时同一个文件两边都改了 | 按下面「解冲突三步」处理 |
+
+**解冲突三步**：
+
+```powershell
+git status                       # 看哪些文件标了 CONFLICT
+# 用编辑器打开这些文件，删掉 <<<<<<< / ======= / >>>>>>> 三种标记，只留你要的内容
+git add <解好冲突的文件>
+git rebase --continue
+```
+
+不想打这一架，可以直接 `git rebase --abort` 退回到 pull 之前，再想别的办法。
+
+### 7. 后悔药
+
+| 情形 | 命令 |
+| --- | --- |
+| 改了但还没 add，想撤销 | `git restore <文件>` |
+| 已 add 还没 commit，想取消暂存 | `git restore --staged <文件>` |
+| 刚 commit 还没 push，想补文件或改说明 | `git add <漏掉的文件>` 然后 `git commit --amend --no-edit` |
+| 已经 push 了，想撤销这次改动 | `git revert <哈希>` 再 `git push`（生成一条反向提交，历史不乱） |
+
+> ⚠️ 不要用 `git reset --hard` 加 `git push -f`：强推会把 Actions 自动提交的 index.json 顶掉，别人的提交也会一起丢。
+
+### 8. 提交信息怎么写
+
+格式 `类型: 一句话`，类型用下面这几个就够：
+
+| 类型 | 什么时候用 |
+| --- | --- |
+| `content` | 新增或修改文章 |
+| `feat` | 新功能 |
+| `fix` | 修 bug |
+| `docs` | 文档（比如这份 README） |
+| `style` | 样式、排版调整 |
+
+例子：
+
+```
+content: 新增 Tcache Poisoning 笔记
+fix(friends): CSDN 友链指向 blog.csdn.net/qq_54958662
+feat(honors): 成就与荣誉改成 JSON 驱动 —— 弹幕 + 画廊 + 灯箱
 ```
 
 ## 图片
