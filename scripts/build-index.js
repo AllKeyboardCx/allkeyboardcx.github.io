@@ -30,7 +30,7 @@ function processMarkdownFile(filePath) {
 function parseMetadata(content) {
     const lines = content.split('\n');
     const data = {
-        title: 'Untitled',
+        title: '',        // 没写 TITLE 就留空，由 collectPosts 用文件名兜底
         date: '',
         tags: [],
         summary: ''
@@ -60,6 +60,71 @@ function parseMetadata(content) {
     }
 
     return { data, body: lines.slice(bodyStart).join('\n').trim() };
+}
+
+/* ---------- 文件名序号 ---------- */
+
+// 中文数字 / 阿拉伯数字 → 整数，认不出返回 null
+const CN_DIGIT = { 零: 0, 〇: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+const CN_UNIT = { 十: 10, 百: 100 };
+
+function cnToInt(str) {
+    if (!str) return null;
+    if (/^\d+$/.test(str)) return parseInt(str, 10);
+    let total = 0;
+    let num = 0;
+    for (const ch of str) {
+        if (ch in CN_DIGIT) {
+            num = CN_DIGIT[ch];
+        } else if (ch in CN_UNIT) {
+            total += (num || 1) * CN_UNIT[ch];
+            num = 0;
+        } else {
+            return null;
+        }
+    }
+    return total + num;
+}
+
+// 序章类固定词统一当成 0，永远排在最前
+const ORDINAL_ZERO = /^(前言|序言|序|引言|导言|简介|概览|概述)/;
+const ORDINAL_DI = /^第\s*([0-9]+|[零〇一二两三四五六七八九十百]+)\s*(?:部分|关|章|节|课|讲|回|篇|部|期|周|天|幕|话)/;
+
+// 从文件名（不含 .md）里认序号：第X关 / 01-xxx / 一、xxx / 前言
+function ordinalOf(name) {
+    if (ORDINAL_ZERO.test(name)) return 0;
+
+    let m = name.match(ORDINAL_DI);
+    if (m) {
+        const n = cnToInt(m[1]);
+        if (n !== null) return n;
+    }
+
+    m = name.match(/^(\d+)/);
+    if (m) return parseInt(m[1], 10);
+
+    m = name.match(/^([零〇一二两三四五六七八九十百]+)\s*[、.．:：\s]/);
+    if (m) {
+        const n = cnToInt(m[1]);
+        if (n !== null) return n;
+    }
+
+    return null;
+}
+
+// 序号升序；认不出序号的排到有序号的后面，同序号再按日期、文件名
+function ordinalSort(posts) {
+    return posts.slice().sort((a, b) => {
+        const na = a.ordinal;
+        const nb = b.ordinal;
+        const aHas = na !== null && na !== undefined;
+        const bHas = nb !== null && nb !== undefined;
+        if (aHas !== bHas) return aHas ? -1 : 1;
+        if (aHas && bHas && na !== nb) return na - nb;
+        const d = new Date(a.date) - new Date(b.date);
+        if (d) return d;
+        return a.filename < b.filename ? -1 : a.filename > b.filename ? 1 : 0;
+    });
 }
 
 /* ---------- 专栏（series）辅助 ---------- */
@@ -110,12 +175,13 @@ function collectPosts(dirPath, seriesSlug) {
         const baseName = file.replace(/\.md$/i, '');
 
         const post = {
-            title: data.title,
+            title: data.title || baseName,   // 没写 TITLE 就用文件名（不含 .md）
             // 专栏文章的 filename 带上目录前缀：所有「用 filename 拼文章 URL / 阅读量 path」的旧代码不用改
             filename: seriesSlug ? `${seriesSlug}/${baseName}` : baseName,
             date: data.date || defaultDate,
             tags: data.tags,
-            summary: data.summary
+            summary: data.summary,
+            ordinal: ordinalOf(baseName)       // 只用于排序，写 JSON 前会删掉
         };
 
         if (seriesSlug) post.series = seriesSlug;
@@ -127,13 +193,25 @@ function collectPosts(dirPath, seriesSlug) {
 }
 
 function sortByDateDesc(posts) {
-    return posts.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+    return posts.slice().sort((a, b) => {
+        const d = new Date(b.date) - new Date(a.date);
+        if (d) return d;
+        // 同一天的多篇（专栏连载常常是同一天）：按文件名序号升序，不再乱排
+        const na = a.ordinal;
+        const nb = b.ordinal;
+        const aHas = na !== null && na !== undefined;
+        const bHas = nb !== null && nb !== undefined;
+        if (aHas !== bHas) return aHas ? -1 : 1;
+        if (aHas && bHas && na !== nb) return na - nb;
+        return a.filename < b.filename ? -1 : a.filename > b.filename ? 1 : 0;
+    });
 }
 
 // 专栏内顺序：series.json 的 order 优先，其余按 DATE 升序（比赛 WP 按时间读）
 function orderSeriesPosts(posts, order) {
     const asc = posts.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
-    if (!order.length) return asc;
+    // 没手写 order 时：文件名带序号就按序号升序（前言这类算 0），认不出的排最后
+    if (!order.length) return ordinalSort(posts);
 
     const rank = new Map(order.map((name, index) => [name, index]));
     const known = asc.filter(p => rank.has(p.filename.split('/').pop()));
@@ -216,8 +294,14 @@ function buildIndex() {
 
         const posts = sortByDateDesc(flatPosts.concat(seriesPosts));
 
+        const publicPosts = posts.map(post => {
+            const copy = Object.assign({}, post);
+            delete copy.ordinal;
+            return copy;
+        });
+
         const indexPath = path.join(categoryDir, 'index.json');
-        fs.writeFileSync(indexPath, JSON.stringify(posts, null, 2), 'utf-8');
+        fs.writeFileSync(indexPath, JSON.stringify(publicPosts, null, 2), 'utf-8');
 
         const seriesPath = path.join(categoryDir, 'series.json');
         fs.writeFileSync(seriesPath, JSON.stringify(seriesList, null, 2), 'utf-8');
